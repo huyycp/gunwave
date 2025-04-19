@@ -1,0 +1,26 @@
+import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+class AppPermissionHandler {
+  AppPermissionHandler._internal();
+
+  static Future<bool> checkPhotoPermission() async {
+    final Permission permission;
+    if (Platform.isAndroid) {
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      permission = androidInfo.version.sdkInt > 32
+        ? Permission.photos
+        : Permission.storage; 
+    } else {
+      permission = Permission.photos;
+    }
+    final status = await permission.status;
+    if (status != PermissionStatus.granted) {
+      await openAppSettings();
+      return false;
+    } else {
+      return true;
+    }
+  }
+}

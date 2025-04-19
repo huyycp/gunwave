@@ -10,6 +10,19 @@ dependencies:
   flutter:
     sdk: flutter
 
+  cached_network_image: 3.4.1
+  device_info_plus: 11.3.3
+  flutter_dotenv: 5.2.1
+  flutter_riverpod: 2.6.1
+  flutter_svg: 2.1.0
+  go_router: 15.0.0
+  google_fonts: 6.2.1
+  gradient_borders: 1.0.1
+  intl: 0.20.2
+  permission_handler: 12.0.0+1
+  random_avatar: 0.0.8
+  string_validator: 1.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -18,5 +31,3 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   
-  assets:
-    - android/app/src/main/assets/gesture_recognizer.task 

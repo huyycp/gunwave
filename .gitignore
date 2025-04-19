@@ -49,3 +49,7 @@ app.*.map.json
 /docs
 
 /model
+
+*.env
+
+.vscode
