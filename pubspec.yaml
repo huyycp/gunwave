@@ -21,6 +21,8 @@ dependencies:
   permission_handler: 12.0.0+1
   random_avatar: 0.0.8
   string_validator: 1.1.0
+  flame: 1.26.1
+  flame_tiled: 2.0.3
 
 dev_dependencies:
   flutter_test:
@@ -30,3 +32,15 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   
+  assets:
+    - assets/images/main_characters/mask_dude/
+    - assets/images/main_characters/ninja_frog/
+    - assets/images/main_characters/pink_man/
+    - assets/images/main_characters/virtual_guy/
+    - assets/images/hub/joystick/
+    - assets/tiles/
+    - assets/images/Terrain/
+    - assets/images/items/fruits/
+    - assets/images/traps/Saw/
+    - assets/images/background/
+    - assets/images/Other/
