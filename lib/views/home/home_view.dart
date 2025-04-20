@@ -1,6 +1,7 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gunwave/views/game/game_view.dart';
 import 'package:gunwave/views/game/pixel_adventure.dart';
 import 'package:gunwave/views/test_recognizer/test_recognizer.dart';
 import 'package:gunwave/views/home/home_view_model.dart';
@@ -27,7 +28,7 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => GameWidget(game: PixelAdventure()),
+                    builder: (context) => const GameView(),
                   ),
                 );
               },
