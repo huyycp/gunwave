@@ -2,21 +2,30 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/data/constants/game_constants.dart';
 import 'package:gunwave/views/game/components/character.dart';
 import 'package:gunwave/views/game/components/level.dart';
 import 'package:gunwave/views/game/components/shoot_button.dart';
+import 'package:gunwave/views/game/game_view_model.dart';
 
 class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection {
+  PixelAdventure(this.ref);
+  
   late final Character character;
+  WidgetRef ref;
   late final JoystickComponent joystick;
-  final bool isJoystickEnabled = true;
+  final bool isJoystickEnabled = false;
+  String? gesture;
+  Level? level;
+
+  double accoumulatedTime = 0;
 
   @override
   Future<void> onLoad() async {
     character = Character(GameCharacters.virtualGuy);
-    final level = Level(character: character);
-    world = level;
+    level = Level(character: character);
+    if (level != null) world = level!;
     camera = CameraComponent.withFixedResolution(
       width: size.x,
       height: size.y,
@@ -24,7 +33,7 @@ class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents, DragCa
     );
 
     camera.viewfinder.anchor = Anchor.bottomLeft;
-    camera.viewfinder.position = Vector2(0, level.world.height);
+    camera.viewfinder.position = Vector2(0, level?.world.height ?? 0);
 
     await images.loadAllImages();
 
@@ -38,11 +47,12 @@ class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents, DragCa
       addJoystick();
     }
 
+
     camera.viewport.add(ShootButton(
       position: Vector2(size.x - 150, size.y - 120),
       size: Vector2(64, 64),
       onShoot: () {
-        level.shoot();
+        level?.shoot();
       }
     ));
 
@@ -51,8 +61,38 @@ class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents, DragCa
 
   @override
   void update(double dt) {
-    if (isJoystickEnabled) updateJoystick();
-    super.update(dt);
+    accoumulatedTime += dt;
+    while (accoumulatedTime > GameConstants.refreshRate) {
+      gesture = ref.read(gameViewModel).gesture;
+      if (gesture != null) {
+        switch (gesture) {
+          case 'Victory':
+            character.hasJumped = true;
+            break;
+          case 'Closed_Fist':
+            character.horizontalMovement = 0;
+            break;
+          case 'Thumb_Up':
+            character.horizontalMovement = -1;
+            break;
+          case 'Thumb_Down':
+            character.horizontalMovement = 1;
+            break;
+          case "Pointing_Up":
+            level?.shoot();
+            break;
+          default:
+            // character.horizontalMovement = 0;
+            break;
+        }
+        // debugPrint('horizontalMovement: ${character.horizontalMovement}');
+        // debugPrint('velocity: ${character.velocity}');
+      }
+      if (isJoystickEnabled) updateJoystick();
+      
+      accoumulatedTime -= GameConstants.refreshRate;
+      super.update(GameConstants.refreshRate);
+    }
   }
 
   void addJoystick() {

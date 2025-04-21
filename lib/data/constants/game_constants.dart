@@ -1,3 +1,5 @@
+import 'package:flame/game.dart';
+
 enum GameLayers {
   background('background'),
   spawnPoints('spawn_points'),
@@ -42,5 +44,10 @@ enum GameWorlds {
 }
 
 class GameConstants {
+  GameConstants._();
+
   static const double tileSize = 16;
+
+  static const double fps = 45;
+  static double refreshRate = 1 / fps;
 }

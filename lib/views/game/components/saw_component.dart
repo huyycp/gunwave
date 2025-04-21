@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:gunwave/data/constants/game_constants.dart';
 import 'package:gunwave/views/game/pixel_adventure.dart';
 
 class SawComponent extends SpriteAnimationComponent with HasGameRef<PixelAdventure> {
@@ -22,6 +23,8 @@ class SawComponent extends SpriteAnimationComponent with HasGameRef<PixelAdventu
   int movementDirection = 1;
   final tileSize = 16;
   final moveSpeed = 100;
+
+  double accoumulatedTime = 0;
 
   @override
   FutureOr<void> onLoad() {
@@ -45,17 +48,21 @@ class SawComponent extends SpriteAnimationComponent with HasGameRef<PixelAdventu
 
   @override
   void update(double dt) {
-    super.update(dt);
-    if (isVertical) {
-      position.y += movementDirection * moveSpeed * dt;
-      if (position.y < minBound || position.y > maxBound) {
-        movementDirection *= -1;
+    accoumulatedTime += dt;
+    while (accoumulatedTime > GameConstants.refreshRate) {
+      super.update(GameConstants.refreshRate);
+      if (isVertical) {
+        position.y += movementDirection * moveSpeed * GameConstants.refreshRate;
+        if (position.y < minBound || position.y > maxBound) {
+          movementDirection *= -1;
+        }
+      } else {
+        position.x += movementDirection * moveSpeed * GameConstants.refreshRate;
+        if (position.x < minBound || position.x > maxBound) {
+          movementDirection *= -1;
+        }
       }
-    } else {
-      position.x += movementDirection * moveSpeed * dt;
-      if (position.x < minBound || position.x > maxBound) {
-        movementDirection *= -1;
-      }
+      accoumulatedTime -= GameConstants.refreshRate;
     }
   }
 

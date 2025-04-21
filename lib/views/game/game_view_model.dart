@@ -20,7 +20,7 @@ class GameViewModel extends BaseViewModel {
     _gestureSubscription = _gestureRecognizerRepo.gestureStream.listen((gesture) {
       // Handle the recognized gesture
       this.gesture = gesture;
-      notifyListeners();
+      // notifyListeners();
       print("Gesture recognized: $gesture");
     });
   }

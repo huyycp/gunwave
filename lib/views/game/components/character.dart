@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:gunwave/data/constants/game_constants.dart';
 import 'package:gunwave/utils/extensions/string_ex.dart';
 import 'package:gunwave/views/game/components/collision_component.dart';
 import 'package:gunwave/views/game/components/component_hitbox.dart';
@@ -28,6 +30,7 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<PixelAdven
   Vector2 velocity = Vector2.zero();
 
   /// Value : -1, 0, 1
+  /// 
   /// -1 = left, 0 = none, 1 = right
   int horizontalMovement = 0;
 
@@ -44,6 +47,8 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<PixelAdven
   );
 
   Map<String, int> collectedFruits = {};
+
+  double accoumulatedTime = 0;
 
   @override
   FutureOr<void> onLoad() {
@@ -126,15 +131,19 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<PixelAdven
 
   @override
   void update(double dt) {
-    super.update(dt);
-    _updateCharacterMovement(dt);
-    _updateCharacterState(dt);
+    accoumulatedTime += dt;
+    while (accoumulatedTime > GameConstants.refreshRate) {
+      super.update(GameConstants.refreshRate);
+      _updateCharacterMovement(GameConstants.refreshRate);
+      _updateCharacterState(GameConstants.refreshRate);
 
-    //// This order matters
-    _updateCharacterHorizontalCollision();
-    _addGravity(dt);
-    _updateCharacterVerticalCollision();
-    ////
+      //// This order matters
+      _updateCharacterHorizontalCollision();
+      _addGravity(GameConstants.refreshRate);
+      _updateCharacterVerticalCollision();
+      ////
+      accoumulatedTime -= GameConstants.refreshRate;
+    }
   }
 
   SpriteAnimation _createAnimation(GameCharacterStates state, {required int frameAmount}) {
