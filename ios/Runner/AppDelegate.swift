@@ -3,8 +3,8 @@ import Flutter
 import AVFoundation
 import MediaPipeTasksVision
 
-@UIApplicationMain
-class AppDelegate: FlutterAppDelegate {
+@main
+@objc class AppDelegate: FlutterAppDelegate {
   var flutterMethodChannel: FlutterMethodChannel?
   private var cameraFeedService: CameraFeedService?
   private var gestureRecognizerService: GestureRecognizerService?
@@ -14,16 +14,13 @@ class AppDelegate: FlutterAppDelegate {
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    // Initialize FlutterViewController as the root view controller
-    let flutterViewController = FlutterViewController()
-    window = UIWindow(frame: UIScreen.main.bounds)
-    window?.rootViewController = flutterViewController
-    window?.makeKeyAndVisible()
-
+    // Initialize FlutterViewController
+    let controller = window?.rootViewController as! FlutterViewController
+    
     // Create a MethodChannel for communication between Flutter and native iOS
     flutterMethodChannel = FlutterMethodChannel(
       name: "gesture_recognizer",
-      binaryMessenger: flutterViewController.binaryMessenger
+      binaryMessenger: controller.binaryMessenger
     )
 
     // Handle MethodChannel calls
@@ -42,6 +39,8 @@ class AppDelegate: FlutterAppDelegate {
       }
     }
 
+    // Register Flutter plugins
+    GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
