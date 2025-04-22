@@ -39,6 +39,9 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<PixelAdven
   final double terminalVelocity = 1000;
   bool isOnGround = true;
   bool hasJumped = false;
+
+  bool isDying = false;
+
   final ComponentHitbox hitbox = const ComponentHitbox(
     offsetX: 2,
     offsetY: 2,
@@ -102,10 +105,12 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<PixelAdven
       velocity = Vector2.zero();
       horizontalMovement = 0;
       current = GameCharacterStates.hit;
+      isDying = true;
       Future.delayed(const Duration(milliseconds: 150), () {
         position.x = spawnPosition.x;
         position.y = spawnPosition.y;
         current = GameCharacterStates.idle;
+        isDying = false;
       });
     }
     super.onCollision(intersectionPoints, other);
@@ -133,15 +138,17 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<PixelAdven
   void update(double dt) {
     accoumulatedTime += dt;
     while (accoumulatedTime > GameConstants.refreshRate) {
-      super.update(GameConstants.refreshRate);
-      _updateCharacterMovement(GameConstants.refreshRate);
-      _updateCharacterState(GameConstants.refreshRate);
+      if (!isDying) {
+        super.update(GameConstants.refreshRate);
+        _updateCharacterMovement(GameConstants.refreshRate);
+        _updateCharacterState(GameConstants.refreshRate);
 
-      //// This order matters
-      _updateCharacterHorizontalCollision();
-      _addGravity(GameConstants.refreshRate);
-      _updateCharacterVerticalCollision();
-      ////
+        //// This order matters
+        _updateCharacterHorizontalCollision();
+        _addGravity(GameConstants.refreshRate);
+        _updateCharacterVerticalCollision();
+        ////
+      }
       accoumulatedTime -= GameConstants.refreshRate;
     }
   }
