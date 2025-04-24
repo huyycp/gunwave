@@ -10,8 +10,8 @@ import 'package:gunwave/views/game/components/shoot_button.dart';
 import 'package:gunwave/views/game/game_view_model.dart';
 
 class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection {
-  PixelAdventure(this.ref);
-  
+  PixelAdventure(this.ref, {this.joystickEnabled = false});
+  final bool joystickEnabled;
   late final Character character;
   WidgetRef ref;
   late final JoystickComponent joystick;
@@ -43,7 +43,7 @@ class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents, DragCa
     ]);
 
 
-    if (isJoystickEnabled) {
+    if (joystickEnabled) {
       addJoystick();
     }
 
@@ -88,7 +88,7 @@ class PixelAdventure extends FlameGame with HasKeyboardHandlerComponents, DragCa
         // debugPrint('horizontalMovement: ${character.horizontalMovement}');
         // debugPrint('velocity: ${character.velocity}');
       }
-      if (isJoystickEnabled) updateJoystick();
+      if (joystickEnabled) updateJoystick();
       
       accoumulatedTime -= GameConstants.refreshRate;
       super.update(GameConstants.refreshRate);

@@ -14,6 +14,7 @@ void main() async {
     DeviceOrientation.landscapeRight,
   ]);
   await Flame.device.fullScreen();
+  await Flame.device.setLandscape();
   BuildConfig.instance.dev();
   runApp(ProviderScope(overrides: [
     themeProvider.overrideWith((ref) => ThemeProvider()),

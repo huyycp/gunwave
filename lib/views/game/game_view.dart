@@ -8,8 +8,8 @@ import 'package:gunwave/widgets/app_button.dart';
 import 'package:gunwave/widgets/base/base_view.dart';
 
 class GameView extends BaseView {
-  const GameView({super.key});
-
+  const GameView({this.joystickEnabled = false, super.key});
+  final bool joystickEnabled;
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
     return GameViewState();
@@ -22,7 +22,7 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
     return Scaffold(
       body: Stack(
         children: [
-          GameWidget(game: PixelAdventure(ref)),
+          GameWidget(game: PixelAdventure(ref, joystickEnabled: widget.joystickEnabled)),
           Positioned(
             top: 20,
             left: 20,

@@ -16,6 +16,8 @@ class HomeView extends BaseView {
 }
 
 class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
+  bool joystickEnabled = false;
+
   @override
   Widget getView() {
     return Scaffold(
@@ -28,7 +30,7 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const GameView(),
+                    builder: (context) => GameView(joystickEnabled: joystickEnabled),
                   ),
                 );
               },
@@ -45,6 +47,15 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
                 );
               },
               child: const Text('Test Recognizer'),
+            ),
+            const SizedBox(height: 24),
+            AppButton(
+              onPressed: () {
+                setState(() {
+                  joystickEnabled = !joystickEnabled;
+                });
+              },
+              child: Text('Joystick $joystickEnabled'),
             )
           ],
         )

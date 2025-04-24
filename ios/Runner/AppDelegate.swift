@@ -14,6 +14,9 @@ import MediaPipeTasksVision
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    // Force landscape orientation at startup
+    UIDevice.current.setValue(UIInterfaceOrientation.landscapeRight.rawValue, forKey: "orientation")
+    
     // Initialize FlutterViewController
     let controller = window?.rootViewController as! FlutterViewController
     
