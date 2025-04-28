@@ -1,9 +1,9 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:gunwave/views/game/pixel_adventure.dart';
+import 'package:gunwave/views/game/gunwave.dart';
 
-class ShootButton extends SpriteComponent with HasGameRef<PixelAdventure>, TapCallbacks {
+class ShootButton extends SpriteComponent with HasGameRef<Gunwave>, TapCallbacks {
   ShootButton({
     required this.onShoot,
     super.position,

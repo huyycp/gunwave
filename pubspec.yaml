@@ -33,14 +33,9 @@ flutter:
   uses-material-design: true
   
   assets:
-    - assets/images/main_characters/mask_dude/
-    - assets/images/main_characters/ninja_frog/
-    - assets/images/main_characters/pink_man/
-    - assets/images/main_characters/virtual_guy/
     - assets/images/hub/joystick/
     - assets/tiles/
-    - assets/images/Terrain/
-    - assets/images/items/fruits/
-    - assets/images/traps/Saw/
-    - assets/images/background/
-    - assets/images/Other/
+    - assets/images/
+    - assets/images/terrain/
+    - assets/images/terrain/ground/
+    - assets/images/factions/knights/troops/warrior/blue/

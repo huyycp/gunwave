@@ -2,11 +2,10 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gunwave/views/game/components/collision_component.dart';
-import 'package:gunwave/views/game/components/fruit_component.dart';
-import 'package:gunwave/views/game/pixel_adventure.dart';
+import 'package:gunwave/views/game/gunwave.dart';
 
 class BulletComponent extends SpriteAnimationGroupComponent
-    with HasGameRef<PixelAdventure>, CollisionCallbacks {
+    with HasGameRef<Gunwave>, CollisionCallbacks {
   BulletComponent({
     required this.direction,
     super.position,
@@ -43,15 +42,7 @@ class BulletComponent extends SpriteAnimationGroupComponent
 
   @override
   void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) async {
-    if (other is FruitComponent) {
-      velocity = Vector2.zero();
-      current = BulletState.hit;
-      isDead = true;
-
-      await animationTicker?.completed;
-
-      removeFromParent();
-    }
+    
     if (other is CollisionComponent) {
       removeFromParent();
     }
