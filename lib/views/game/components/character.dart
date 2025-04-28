@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flame/game.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:gunwave/data/constants/game/game_character.dart';
@@ -21,9 +22,12 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
   final double stepTime = 0.08;
   late final SpriteAnimation idleAni;
   late final SpriteAnimation runAni;
-  late final SpriteAnimation attachRightAni;
-  late final SpriteAnimation attachTopAni;
-  late final SpriteAnimation attachBotAni;
+  late final SpriteAnimation attach1Ani;
+  late final SpriteAnimation attach2Ani;
+  late final SpriteAnimation attachTop1Ani;
+  late final SpriteAnimation attachTop2Ani;
+  late final SpriteAnimation attachBot1Ani;
+  late final SpriteAnimation attachBot2Ani;
   List<CollisionComponent> collisionComponents = [];
   
   final spawnPosition = Vector2.zero();
@@ -41,13 +45,9 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
   /// -1 = up, 0 = none, 1 = down
   int verticalMovement = 0;
 
-  final double gravity = 9.8;
-  final double jumpSpeed = 300;
-  final double terminalVelocity = 1000;
-  bool isOnGround = true;
-  bool hasJumped = false;
-
-  bool isDying = false;
+  bool triggerAttack = false;
+  bool isAttacking = false;
+  bool isDoubleAttack = false;
 
   final ComponentHitbox hitbox = const ComponentHitbox(
     offsetX: 64,
@@ -76,6 +76,8 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
         position: Vector2(hitbox.offsetX, hitbox.offsetY),
       ),
     );
+
+    
     return super.onLoad();
   }
 
@@ -85,8 +87,11 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
     while (accoumulatedTime > GameConstants.refreshRate) {
       super.update(GameConstants.refreshRate);
       _updateCharacterMovement(GameConstants.refreshRate);
+      debugPrint('isAttacking: $isAttacking');
+      attack();
       _updateCharacterState(GameConstants.refreshRate);
       _updateCharacterCollision();
+      // debugPrint('attack: $isAttacking');
       accoumulatedTime -= GameConstants.refreshRate;
     }
   }
@@ -105,6 +110,11 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
     final isDownKeyPressed =
       keysPressed.contains(LogicalKeyboardKey.arrowDown) ||
       keysPressed.contains(LogicalKeyboardKey.keyS);
+    final isAttackKeyPressed = 
+      keysPressed.contains(LogicalKeyboardKey.keyJ);
+
+    final isDoubleAttackKeyPressed = 
+      keysPressed.contains(LogicalKeyboardKey.keyK);
 
     if ((isLeftKeyPressed && isRightKeyPressed) ||
         (isUpKeyPressed && isDownKeyPressed)) {
@@ -126,6 +136,19 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
         verticalMovement = 0;
       }
     }
+
+    debugPrint('event: $event, keysPressed: $keysPressed');
+    if (event.logicalKey == LogicalKeyboardKey.keyJ) {
+      triggerAttack = event is KeyDownEvent;
+    }
+
+    // if (isDoubleAttackKeyPressed && !isAttacking) {
+    //   isAttacking = true;
+    //   isDoubleAttack = true;
+    // } else {
+    //   isAttacking = false;
+    //   isDoubleAttack = false;
+    // }
 
     return super.onKeyEvent(event, keysPressed);
   }
@@ -152,27 +175,34 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
   }
 
   void onLoadAnimation() {
-    idleAni = _createAnimation(frameAmount: 6, texturePosition: Vector2(0, 0));
-    runAni = _createAnimation(frameAmount: 6, texturePosition: Vector2(0, 192));
-    attachRightAni = _createAnimation(frameAmount: 12, framePerRow: 6, texturePosition: Vector2(0, 192 * 2));
-    attachTopAni = _createAnimation(frameAmount: 12, framePerRow: 6, texturePosition: Vector2(0, 192 * 4));
-    attachBotAni = _createAnimation(frameAmount: 12, framePerRow: 6, texturePosition: Vector2(0, 192 * 6));
+    idleAni       = _createAnimation(frameAmount: 6, loop: true, texturePosition: Vector2(0, 0));
+    runAni        = _createAnimation(frameAmount: 6, loop: true, texturePosition: Vector2(0, 192));
+    attach1Ani    = _createAnimation(frameAmount: 6, loop: false, texturePosition: Vector2(0, 192 * 2));
+    attach2Ani    = _createAnimation(frameAmount: 6, loop: false, texturePosition: Vector2(0, 192 * 3));
+    attachTop1Ani = _createAnimation(frameAmount: 6, loop: false, texturePosition: Vector2(0, 192 * 4));
+    attachTop2Ani = _createAnimation(frameAmount: 6, loop: false, texturePosition: Vector2(0, 192 * 5));
+    attachBot1Ani = _createAnimation(frameAmount: 6, loop: false, texturePosition: Vector2(0, 192 * 6));
+    attachBot2Ani = _createAnimation(frameAmount: 6, loop: false, texturePosition: Vector2(0, 192 * 7));
 
     animations = {
       GameCharacterStates.idle: idleAni,
       GameCharacterStates.run: runAni,
-      GameCharacterStates.attachRight: attachRightAni,
-      GameCharacterStates.attachTop: attachTopAni,
-      GameCharacterStates.attachBottom: attachBotAni,
+      GameCharacterStates.attack1: attach1Ani,
+      GameCharacterStates.attack2: attach2Ani,
+      GameCharacterStates.attackTop1: attachTop1Ani,
+      GameCharacterStates.attackTop2: attachTop2Ani,
+      GameCharacterStates.attackBot1: attachBot1Ani,
+      GameCharacterStates.attackBot2: attachBot2Ani,
     };
 
-    current = GameCharacterStates.attachRight;
+    current = GameCharacterStates.idle;
   }
 
   SpriteAnimation _createAnimation({
     required int frameAmount,
     required Vector2 texturePosition,
     int? framePerRow,
+    bool loop = true,
   }) {
   
     return SpriteAnimation.fromFrameData(
@@ -183,13 +213,14 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
         stepTime: stepTime,
         textureSize: Vector2(192, 192),
         texturePosition: texturePosition,
+        loop: loop,
       ),
     );
   }
 
   void _updateCharacterState(double dt) {
     if (velocity.x == 0 && velocity.y == 0) {
-      current = GameCharacterStates.idle;
+      if (!isAttacking) current = GameCharacterStates.idle;
     } else {
       final isMovingLeft = velocity.x < 0;
       final isMovingRight = velocity.x > 0;
@@ -199,10 +230,9 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
       ) {
         flipHorizontallyAroundCenter();
       }
-      current = GameCharacterStates.run;
+      if (!isAttacking) current = GameCharacterStates.run;
     }
   }
-  
 
   void _updateCharacterMovement(double dt) {
     velocity.x = horizontalMovement * moveSpeed;
@@ -234,28 +264,58 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
 
         if (angCChar > 0 && angCChar < angCB) {
           // right
-          debugPrint("right");
           position.x = scale.x > 0 
             ? component.x + component.width - hitbox.offsetX
             : component.x + component.width + hitbox.width + hitbox.offsetX;
         } else if (angCChar > angCB && angCChar < angCA) {
           // top
-          debugPrint("top");
           position.y = component.y - hitbox.height - hitbox.offsetY;
         } else if (angCChar > angCA && angCChar < angCD) {
           // left
-          debugPrint("left");
           position.x = scale.x > 0
             ? component.x - hitbox.width - hitbox.offsetX
             : component.x + hitbox.offsetX;
         } else if (angCChar > angCD && angCChar < 2 * pi) {
           // bottom
-          debugPrint("bottom");
           position.y = component.y + component.height - hitbox.offsetY;
         }
       }
     }
   }
+
+  void attack({bool isDouble = false}) {
+
+    if (triggerAttack) {
+      if ([
+        GameCharacterStates.attack1,
+        GameCharacterStates.attack2,
+        GameCharacterStates.attackTop1,
+        GameCharacterStates.attackTop2,
+        GameCharacterStates.attackBot1,
+        GameCharacterStates.attackBot2,
+      ].contains(current)) {
+        animationTicker?.completed.then((_) {
+            debugPrint('completed');
+            isAttacking = false;
+            animationTicker?.reset();
+            // current = GameCharacterStates.idle;
+          
+        });
+        return;
+      }
+      isAttacking = true;
+      current = GameCharacterStates.attack1;
+      // current = GameCharacterStates.idle;
+    }
+
+    // if (isDoubleAttack) {
+    //   current = GameCharacterStates.attack2;
+    //   await animationTicker?.completed;
+    // }
+
+    // current = GameCharacterStates.idle;
+  }
+
 
   bool checkCollision(CollisionComponent component) {
     final componentX = component.position.x;
@@ -275,7 +335,10 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
 enum GameCharacterStates {
   idle,
   run,
-  attachRight,
-  attachTop,
-  attachBottom;
+  attack1,
+  attack2,
+  attackTop1,
+  attackTop2,
+  attackBot1,
+  attackBot2,
 }

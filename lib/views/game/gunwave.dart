@@ -9,7 +9,8 @@ import 'package:gunwave/data/constants/game/game_character.dart';
 import 'package:gunwave/data/constants/game/game_constants.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
 import 'package:gunwave/views/game/components/character.dart';
-import 'package:gunwave/views/game/components/level.dart';
+import 'package:gunwave/views/game/components/stage.dart';
+import 'package:gunwave/views/game/components/shoot_button.dart';
 
 class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection {
   Gunwave(this.ref, {this.isJoystickEnabled = false});
@@ -23,7 +24,6 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
   Stage? stage;
 
   double accoumulatedTime = 0;
-
 
   @override
   Future<void> onLoad() async {
@@ -45,7 +45,10 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
       camera,
     ]);
 
-    if (isJoystickEnabled) addJoystick();
+    if (isJoystickEnabled) {
+      addJoystick();
+      addAttachBtn();
+    }
 
     return super.onLoad();
   }
@@ -79,6 +82,18 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
     );
 
     camera.viewport.add(joystick);
+  }
+
+  void addAttachBtn() {
+    final attachBtn = AttachButton(
+      onAttack: (bool attack) {
+        character.triggerAttack = attack;
+      },
+      position: Vector2(size.x - 100, size.y - 100),
+      size: Vector2.all(64),
+    );
+
+    camera.viewport.add(attachBtn);
   }
 
   void updateJoystick() {

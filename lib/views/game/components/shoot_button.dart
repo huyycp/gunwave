@@ -1,22 +1,23 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:gunwave/data/constants/game/game_constants.dart';
 import 'package:gunwave/views/game/gunwave.dart';
 
-class ShootButton extends SpriteComponent with HasGameRef<Gunwave>, TapCallbacks {
-  ShootButton({
-    required this.onShoot,
+class AttachButton extends SpriteComponent with HasGameRef<Gunwave>, TapCallbacks, DoubleTapCallbacks {
+  AttachButton({
+    required this.onAttack,
     super.position,
     super.size,
   });
 
-  final Function onShoot;
+  final void Function(bool attack) onAttack;
 
   @override
   Future<void> onLoad() async {
     add(RectangleHitbox());
 
-    sprite = Sprite(game.images.fromCache('hub/joystick/knob.png'));
+    sprite = Sprite(game.images.fromCache(GameComponents.hub.joystickKnob.path));
     
     priority = 1;
 
@@ -25,7 +26,13 @@ class ShootButton extends SpriteComponent with HasGameRef<Gunwave>, TapCallbacks
 
   @override
   void onTapUp(TapUpEvent event) {
-    onShoot();
+    onAttack(false);
     super.onTapUp(event);
+  }
+
+  @override
+  void onTapDown(TapDownEvent event) {
+    onAttack(true);
+    super.onTapDown(event);
   }
 }

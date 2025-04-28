@@ -8,6 +8,7 @@ import 'package:gunwave/utils/enum_utils.dart';
 import 'package:gunwave/views/game/components/bullet_component.dart';
 import 'package:gunwave/views/game/components/character.dart';
 import 'package:gunwave/views/game/components/collision_component.dart';
+import 'package:gunwave/views/game/components/monster.dart';
 import 'package:gunwave/views/game/gunwave.dart';
 
 class Stage extends World with HasGameRef<Gunwave> {
@@ -50,6 +51,19 @@ class Stage extends World with HasGameRef<Gunwave> {
       if (point.class_ == GameComponents.characters.name) {
         character.position = point.position;
         add(character);
+      } else if (point.class_ == GameComponents.monsters.name) {
+        final negXBound = point.properties.getValue('negXBound') ?? 0;
+        final posXBound = point.properties.getValue('posXBound') ?? 0;
+        final monster = Monster(
+          monster: GameComponents.monsters.torch,
+          position: point.position,
+          size: Vector2(point.width, point.height),
+          negXBound: negXBound,
+          posXBound: posXBound,
+        );
+        add(monster);
+      } else {
+        throw Exception('Unknown spawn point class: ${point.class_}');
       }
     }
   }
