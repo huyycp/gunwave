@@ -11,6 +11,7 @@ import 'package:gunwave/utils/app_math.dart';
 import 'package:gunwave/utils/extensions/string_ex.dart';
 import 'package:gunwave/views/game/components/collision_component.dart';
 import 'package:gunwave/views/game/components/component_hitbox.dart';
+import 'package:gunwave/views/game/components/monster.dart';
 import 'package:gunwave/views/game/gunwave.dart';
 
 class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, KeyboardHandler, CollisionCallbacks {
@@ -47,21 +48,37 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
 
   bool triggerAttack = false;
   bool isAttacking = false;
+  bool isAttackAvailable = false;
   bool isDoubleAttack = false;
 
-  final ComponentHitbox hitbox = const ComponentHitbox(
-    offsetX: 64,
-    offsetY: 64,
-    width: 64,
-    height: 64,
+  int hp = 200;
+  int str = 50;
+
+  final hitbox = RectangleHitbox(
+    position: Vector2(64, 64),
+    size: Vector2(64, 64),
+  );
+
+  late final attackbox = PolygonHitbox(
+    [
+      Vector2(hitbox.x + hitbox.width, 64 / 3),
+      Vector2(hitbox.x + hitbox.width + 64 * 2 / 3, 64),
+      Vector2(hitbox.x + hitbox.width + 64 * 4 / 5, 64 * 3 / 2),
+      Vector2(hitbox.x + hitbox.width + 64 * 4 / 5, 64 * 2),
+      Vector2(hitbox.x + hitbox.width, 64 * 2),
+    ],
   );
 
   Map<String, int> collectedFruits = {};
 
   double accoumulatedTime = 0;
 
-  double get characterX => scale.x > 0 ? position.x + hitbox.offsetX : position.x - hitbox.offsetX - hitbox.width;
-  double get characterY => position.y + hitbox.offsetY;
+  double get characterX => scale.x > 0 ? position.x + hitbox.x : position.x - hitbox.x - hitbox.width;
+  double get characterY => position.y + hitbox.y;
+
+  bool get isDead => hp <= 0;
+
+  int getHitRefreshTime = 500;
 
   @override
   FutureOr<void> onLoad() {
@@ -70,13 +87,8 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
     spawnPosition.x = position.x;
     spawnPosition.y = position.y;
 
-    add(
-      RectangleHitbox(
-        size: Vector2(hitbox.width, hitbox.height),
-        position: Vector2(hitbox.offsetX, hitbox.offsetY),
-      ),
-    );
-
+    add(hitbox);
+    add(attackbox);
     
     return super.onLoad();
   }
@@ -87,7 +99,6 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
     while (accoumulatedTime > GameConstants.refreshRate) {
       super.update(GameConstants.refreshRate);
       _updateCharacterMovement(GameConstants.refreshRate);
-      debugPrint('isAttacking: $isAttacking');
       attack();
       _updateCharacterState(GameConstants.refreshRate);
       _updateCharacterCollision();
@@ -137,7 +148,6 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
       }
     }
 
-    debugPrint('event: $event, keysPressed: $keysPressed');
     if (event.logicalKey == LogicalKeyboardKey.keyJ) {
       triggerAttack = event is KeyDownEvent;
     }
@@ -153,24 +163,32 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
     return super.onKeyEvent(event, keysPressed);
   }
 
+
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    // if (other is FruitComponent) {
-    //   collectedFruits[other.fruit] = (collectedFruits[other.fruit] ?? 0) + 1;
-    // }
-    // if (other is SawComponent) {
-    //   velocity = Vector2.zero();
-    //   horizontalMovement = 0;
-    //   current = GameCharacterStates.hit;
-    //   isDying = true;
-    //   Future.delayed(const Duration(milliseconds: 150), () {
-    //     position.x = spawnPosition.x;
-    //     position.y = spawnPosition.y;
-    //     current = GameCharacterStates.idle;
-    //     isDying = false;
-    //   });
-    // }
+    if (other is Monster) {
+      if (
+        isAttackAvailable && 
+        other.hitbox.collisionType == CollisionType.active &&
+        attackbox.collidingWith(other.hitbox) &&
+       !other.isDead
+      ) {
+        other.hp -= str;
+        debugPrint('Monster HP: ${other.hp}');
+        other.setInvicible();
+      }
 
+      if (
+        other.current == MonsterState.attack1 &&
+        hitbox.collisionType == CollisionType.active && 
+        !isDead
+        // other.attackbox.collidingWith(hitbox)
+      ) {
+        hp -= other.str;
+        setInvicible();
+        debugPrint('Character HP: $hp');
+      }
+    }
     super.onCollision(intersectionPoints, other);
   }
 
@@ -219,6 +237,7 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
   }
 
   void _updateCharacterState(double dt) {
+    if (isDead) removeFromParent();
     if (velocity.x == 0 && velocity.y == 0) {
       if (!isAttacking) current = GameCharacterStates.idle;
     } else {
@@ -265,19 +284,19 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
         if (angCChar > 0 && angCChar < angCB) {
           // right
           position.x = scale.x > 0 
-            ? component.x + component.width - hitbox.offsetX
-            : component.x + component.width + hitbox.width + hitbox.offsetX;
+            ? component.x + component.width - hitbox.x
+            : component.x + component.width + hitbox.width + hitbox.x;
         } else if (angCChar > angCB && angCChar < angCA) {
           // top
-          position.y = component.y - hitbox.height - hitbox.offsetY;
+          position.y = component.y - hitbox.height - hitbox.y;
         } else if (angCChar > angCA && angCChar < angCD) {
           // left
           position.x = scale.x > 0
-            ? component.x - hitbox.width - hitbox.offsetX
-            : component.x + hitbox.offsetX;
+            ? component.x - hitbox.width - hitbox.x
+            : component.x + hitbox.x;
         } else if (angCChar > angCD && angCChar < 2 * pi) {
           // bottom
-          position.y = component.y + component.height - hitbox.offsetY;
+          position.y = component.y + component.height - hitbox.y;
         }
       }
     }
@@ -294,18 +313,24 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
         GameCharacterStates.attackBot1,
         GameCharacterStates.attackBot2,
       ].contains(current)) {
-        animationTicker?.completed.then((_) {
-            debugPrint('completed');
-            isAttacking = false;
-            animationTicker?.reset();
-            // current = GameCharacterStates.idle;
-          
-        });
         return;
       }
       isAttacking = true;
       current = GameCharacterStates.attack1;
-      // current = GameCharacterStates.idle;
+      debugPrint('attack');
+      animationTicker?.onFrame = (frame) {
+        if ([3, 4, 5].contains(frame)) {
+          isAttackAvailable = true;
+        }
+      };
+        animationTicker?.completed.then((_) {
+            debugPrint('completed');
+            isAttacking = false;
+            isAttackAvailable = false;
+            animationTicker?.reset();
+            // current = GameCharacterStates.idle;
+          
+        });
     }
 
     // if (isDoubleAttack) {
@@ -329,6 +354,13 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
       characterY < componentY + componentHeight &&
       characterY + hitbox.height > componentY
     );
+  }
+
+  void setInvicible() {
+    hitbox.collisionType = CollisionType.inactive;
+    Future.delayed(Duration(milliseconds: getHitRefreshTime), () {
+      hitbox.collisionType = CollisionType.active;
+    });
   }
 }
 

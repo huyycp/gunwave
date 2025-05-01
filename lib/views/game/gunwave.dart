@@ -13,11 +13,21 @@ import 'package:gunwave/views/game/components/stage.dart';
 import 'package:gunwave/views/game/components/shoot_button.dart';
 
 class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection {
-  Gunwave(this.ref, {this.isJoystickEnabled = false});
+  Gunwave(
+    this.ref, {
+    this.isJoystickEnabled = false,
+    required this.onStageCompleted,
+    required this.onStageFailed,
+  });
+
+  @override
+  bool get pauseWhenBackgrounded => false;
 
 
   WidgetRef ref;
   final bool isJoystickEnabled;
+  final void Function() onStageCompleted;
+  final void Function() onStageFailed;
   
   late final JoystickComponent joystick;
   late final Character character;
@@ -28,7 +38,12 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
   @override
   Future<void> onLoad() async {
     character = Character(GameCharacter.warrior);
-    stage = Stage(world: GameMap.medium, character: character);
+    stage = Stage(
+      world: GameMap.medium,
+      character: character,
+      onStageCompleted: onStageCompleted,
+      onStageFailed: onStageFailed,
+    );
     if (stage != null) world = stage!;
     camera = CameraComponent.withFixedResolution(
       width: size.x,

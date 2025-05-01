@@ -2,6 +2,7 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_riverpod/src/consumer.dart';
+import 'package:gunwave/theme/app_colors.dart';
 import 'package:gunwave/views/game/game_view_model.dart';
 import 'package:gunwave/views/game/gunwave.dart';
 import 'package:gunwave/widgets/app_button.dart';
@@ -20,37 +21,72 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
   @override
   Widget getView() {
     return Scaffold(
-      body: Stack(
-        children: [
-          GameWidget(game: Gunwave(ref, isJoystickEnabled: widget.joystickEnabled)),
-          // Positioned(
-          //   top: 20,
-          //   left: 20,
-          //   child: AppButton(
-          //     onPressed: () {
-          //       model.startGestureRecognition();
-          //     },
-          //     child: const Text("Start Gesture Recognition"),
-          //   ),
-          // ),
-          // Positioned(
-          //   top: 50,
-          //   left: 20,
-          //   child: AppButton(
-          //     onPressed: () {
-          //       model.stopGestureRecognition();
-          //     },
-          //     child: const Text("Stop Gesture Recognition"),
-          //   ),
-          // ),
-          // Positioned(
-          //   top: 70,
-          //   left: 20,
-          //   child: Text(
-          //     ref.watch(gameViewModel.select((value) => value.gesture ?? 'No gesture recognized')),
-          //   ),
-          // ), 
-        ],
+      body: GameWidget(game: Gunwave(
+        ref,
+        isJoystickEnabled: widget.joystickEnabled,
+        onStageCompleted: onStageCompleted,
+        onStageFailed: onStageFailed,
+      )),
+    );
+  }
+
+  void onStageCompleted() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.2),
+      builder: (context) => Dialog(
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: kColorSuccess.withOpacity(0.20),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("Stage Completed!"),
+              const SizedBox(height: 16),
+              AppButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+                child: const Text("Continue"),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  
+  void onStageFailed() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: kColorError.withOpacity(0.20),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("Stage Failed!"),
+              const SizedBox(height: 16),
+              AppButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+                child: const Text("Retry"),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

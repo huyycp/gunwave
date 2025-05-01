@@ -18,7 +18,7 @@
 46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46
 </data>
  </layer>
- <objectgroup id="2" name="collisions" locked="1">
+ <objectgroup id="2" name="collisions">
   <object id="1" type="boundary" x="0" y="128" width="576" height="64"/>
   <object id="2" type="boundary" x="576" y="201.419" width="322.442" height="54.581"/>
   <object id="3" type="boundary" x="896" y="256" width="384" height="64"/>
@@ -30,7 +30,7 @@
   <object id="12" type="boundary" x="1280" y="0" width="64" height="768"/>
   <object id="19" x="320" y="320" width="64" height="64"/>
  </objectgroup>
- <objectgroup id="3" name="spawn_points" locked="1">
+ <objectgroup id="3" name="spawn_points">
   <object id="14" type="character" x="64" y="256" width="192" height="192"/>
  </objectgroup>
 </map>

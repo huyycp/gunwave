@@ -15,12 +15,24 @@ class Stage extends World with HasGameRef<Gunwave> {
   Stage({
     required this.world,
     required this.character,
+    required this.onStageCompleted,
+    required this.onStageFailed,
   });
 
   final GameMap world;
   final Character character;
+  final void Function() onStageCompleted;
+  final void Function() onStageFailed;
+
+  /// Load world map
   late final TiledComponent component;
+  
   final List<CollisionComponent> collisionComponents = [];
+  
+
+  final List<Monster> monsters = [];
+
+  bool hasShownDialog = false;
 
   @override
   FutureOr<void> onLoad() async {
@@ -38,6 +50,13 @@ class Stage extends World with HasGameRef<Gunwave> {
     debugMode = true;
 
     return super.onLoad();
+  }
+
+  @override
+  void update(double dt) {
+
+    checkVictoryCondition();
+    super.update(dt);
   }
 
   void _addSpawnPointsLayer() {
@@ -62,6 +81,7 @@ class Stage extends World with HasGameRef<Gunwave> {
           posXBound: posXBound,
         );
         add(monster);
+        monsters.add(monster);
       } else {
         throw Exception('Unknown spawn point class: ${point.class_}');
       }
@@ -95,14 +115,21 @@ class Stage extends World with HasGameRef<Gunwave> {
     character.collisionComponents = collisionComponents;
   }
 
-  void shoot() {
-    final bullet = BulletComponent(
-      direction: character.scale.x > 0 ? 1 : -1,
-      position: Vector2(
-        character.position.x + (character.scale.x > 0 ? character.size.x : -character.size.x),
-        character.position.y + character.size.y / 2,
-      ),
-    );
-    add(bullet);
+  void checkVictoryCondition() {
+    if (hasShownDialog) return;
+    if (character.isDead) {
+      hasShownDialog = true;
+      Future.delayed(const Duration(seconds: 1), () {
+        character.velocity = Vector2.zero();
+        onStageFailed();
+      });
+    }
+    if (monsters.every((monster) => monster.isDead)) {
+      hasShownDialog = true;
+      Future.delayed(const Duration(seconds: 1), () {
+        character.velocity = Vector2.zero();
+        onStageCompleted();
+      });
+    }
   }
 }

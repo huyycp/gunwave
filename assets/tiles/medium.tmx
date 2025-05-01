@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="40" height="20" tilewidth="64" tileheight="64" infinite="0" nextlayerid="4" nextobjectid="13">
- <tileset firstgid="1" source="gunwave.tsx"/>
+ <tileset firstgid="1" source="tilemap__elevation.tsx"/>
  <tileset firstgid="41" source="tilemap__flat.tsx"/>
  <layer id="1" name="background" width="40" height="20">
   <data encoding="csv">

@@ -4,6 +4,7 @@ import 'package:gunwave/data/constants/game/game_hub.dart';
 import 'package:gunwave/data/constants/game/game_layer.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
 import 'package:gunwave/data/constants/game/game_monster.dart';
+import 'package:gunwave/data/constants/game/game_trap.dart';
 
 class GameConstants {
   GameConstants._();
@@ -23,5 +24,6 @@ class GameComponents {
   static const layers = GameLayers.instance;
   static const colissions = GameCollisions.instance;
   static const hub = GameHubs.instance;
+  static const trap = GameTraps.instance;
 }
 
