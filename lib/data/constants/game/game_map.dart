@@ -1,8 +1,7 @@
 import 'package:gunwave/data/constants/game/game_constants.dart';
 
 enum GameMap {
-  easy('easy', horizontalTile: 20, verticalTile: 12),
-  medium('medium', horizontalTile: 40, verticalTile: 20);
+  forest('forest', horizontalTile: 40, verticalTile: 20);
 
   final String name;
   final int horizontalTile;
@@ -18,5 +17,5 @@ class GameMaps {
   const GameMaps._();
   static const GameMaps instance = GameMaps._();
 
-  final easy = GameMap.easy;
+  final easy = GameMap.forest;
 }

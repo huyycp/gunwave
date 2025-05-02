@@ -1,5 +1,5 @@
 enum GameCollision {
-  block('block');
+  boundary('boundary');
 
   final String name;
 
@@ -10,5 +10,5 @@ class GameCollisions {
   const GameCollisions._();
   static const GameCollisions instance = GameCollisions._();
 
-  final block = GameCollision.block;
+  final boundary = GameCollision.boundary;
 }

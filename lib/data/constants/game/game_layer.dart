@@ -1,7 +1,8 @@
 enum GameLayer {
   background('background'),
   spawnPoints('spawn_points'),
-  collisions('collisions'),;
+  collisions('collisions'),
+  buildings('buildings'),;
 
   final String name;
 
@@ -15,4 +16,5 @@ class GameLayers{
   final background = GameLayer.background;
   final spawnPoints = GameLayer.spawnPoints;
   final collisions = GameLayer.collisions;
+  final buildings = GameLayer.buildings;
 }

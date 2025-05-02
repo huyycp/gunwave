@@ -10,7 +10,7 @@ import 'package:gunwave/data/constants/game/game_constants.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
 import 'package:gunwave/views/game/components/character.dart';
 import 'package:gunwave/views/game/components/stage.dart';
-import 'package:gunwave/views/game/components/shoot_button.dart';
+import 'package:gunwave/views/game/components/sub_components/attack_button.dart';
 
 class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection {
   Gunwave(
@@ -37,9 +37,9 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
 
   @override
   Future<void> onLoad() async {
-    character = Character(GameCharacter.warrior);
+    character = Character(GameCharacter.blueWarrior);
     stage = Stage(
-      world: GameMap.medium,
+      world: GameMap.forest,
       character: character,
       onStageCompleted: onStageCompleted,
       onStageFailed: onStageFailed,

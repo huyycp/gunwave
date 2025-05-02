@@ -21,7 +21,7 @@ class Trap extends SpriteAnimationComponent with HasGameRef<Gunwave>, CollisionC
 
   @override
   FutureOr<void> onLoad() {
-    // TODO: implement onLoad
+    onLoadAnimations();
     return super.onLoad();
   }
 
@@ -31,8 +31,11 @@ class Trap extends SpriteAnimationComponent with HasGameRef<Gunwave>, CollisionC
       SpriteAnimationData.sequenced(
         amount: 7,
         stepTime: stepTime,
-        textureSize: Vector2.all(64),
+        textureSize: Vector2.all(128),
       ),
     );
+
+    animation = idleAni;
+    
   }
 }

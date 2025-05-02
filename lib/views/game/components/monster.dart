@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gunwave/data/constants/game/game_constants.dart';
 import 'package:gunwave/data/constants/game/game_monster.dart';
 import 'package:gunwave/views/game/components/character.dart';
+import 'package:gunwave/views/game/components/sub_components/health_bar.dart';
 import 'package:gunwave/views/game/gunwave.dart';
 
 class Monster extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, CollisionCallbacks {
@@ -60,6 +61,13 @@ class Monster extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, Co
     ],
   );
 
+  late final healthBar = HealthBar(
+    maxHealth: hp,
+    currentHealth: hp,
+    width: hitbox.width,
+    position: Vector2(hitbox.x + hitbox.width / 2, hitbox.y - 10),
+  );
+
   double get monsterX => position.x + (scale.x > 0 ? hitbox.x : - hitbox.x - hitbox.width);
   double get monsterY => position.y + hitbox.y;
   bool get isDead => hp <= 0;  
@@ -71,6 +79,8 @@ class Monster extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, Co
 
     add(hitbox);
     add(attackbox);
+
+    add(healthBar);
     
     await super.onLoad();
   }

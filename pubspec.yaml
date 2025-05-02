@@ -36,7 +36,11 @@ flutter:
     - assets/images/hub/joystick/
     - assets/tiles/
     - assets/images/
+    - assets/images/buildings/tower/
+    - assets/images/effects/fire/
     - assets/images/terrain/
-    - assets/images/terrain/ground/
-    - assets/images/factions/knights/troops/warrior/blue/
-    - assets/images/factions/goblins/troops/torch/blue/
+    - assets/images/terrain/water/
+    - assets/images/terrain/water/foam/
+    - assets/images/terrain/water/rocks/
+    - assets/images/factions/knights/warrior/blue/
+    - assets/images/factions/monsters/torch/blue/

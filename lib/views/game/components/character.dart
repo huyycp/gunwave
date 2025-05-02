@@ -9,9 +9,10 @@ import 'package:gunwave/data/constants/game/game_character.dart';
 import 'package:gunwave/data/constants/game/game_constants.dart';
 import 'package:gunwave/utils/app_math.dart';
 import 'package:gunwave/utils/extensions/string_ex.dart';
-import 'package:gunwave/views/game/components/collision_component.dart';
-import 'package:gunwave/views/game/components/component_hitbox.dart';
+import 'package:gunwave/views/game/components/sub_components/collision_component.dart';
+import 'package:gunwave/views/game/components/sub_components/component_hitbox.dart';
 import 'package:gunwave/views/game/components/monster.dart';
+import 'package:gunwave/views/game/components/sub_components/health_bar.dart';
 import 'package:gunwave/views/game/gunwave.dart';
 
 class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, KeyboardHandler, CollisionCallbacks {
@@ -55,18 +56,23 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
   int str = 50;
 
   final hitbox = RectangleHitbox(
-    position: Vector2(64, 64),
-    size: Vector2(64, 64),
+    position: Vector2(72, 72),
+    size: Vector2(48, 56),
   );
 
   late final attackbox = PolygonHitbox(
     [
       Vector2(hitbox.x + hitbox.width, 64 / 3),
-      Vector2(hitbox.x + hitbox.width + 64 * 2 / 3, 64),
-      Vector2(hitbox.x + hitbox.width + 64 * 4 / 5, 64 * 3 / 2),
-      Vector2(hitbox.x + hitbox.width + 64 * 4 / 5, 64 * 2),
+      Vector2(64 + 64 + 64 * 2 / 3, 64),
+      Vector2(64 + 64 + 64 * 4 / 5, 64 * 3 / 2),
+      Vector2(64 + 64 + 64 * 4 / 5, 64 * 2),
       Vector2(hitbox.x + hitbox.width, 64 * 2),
     ],
+  );
+
+  late final movebox = RectangleHitbox(
+    position: Vector2(hitbox.x, hitbox.y + hitbox.height / 2),
+    size: Vector2(hitbox.width, hitbox.height / 2),
   );
 
   Map<String, int> collectedFruits = {};
@@ -80,6 +86,13 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
 
   int getHitRefreshTime = 500;
 
+  late final healthBar = HealthBar(
+      maxHealth: hp,
+      currentHealth: hp,
+      width: 60,
+      position: Vector2(hitbox.x + hitbox.width / 2, hitbox.y - 20), // Position above head
+    );
+
   @override
   FutureOr<void> onLoad() {
     onLoadAnimation();
@@ -89,6 +102,11 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
 
     add(hitbox);
     add(attackbox);
+    add(movebox);
+
+    add(healthBar);
+
+    priority = 5;
     
     return super.onLoad();
   }
@@ -121,11 +139,6 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
     final isDownKeyPressed =
       keysPressed.contains(LogicalKeyboardKey.arrowDown) ||
       keysPressed.contains(LogicalKeyboardKey.keyS);
-    final isAttackKeyPressed = 
-      keysPressed.contains(LogicalKeyboardKey.keyJ);
-
-    final isDoubleAttackKeyPressed = 
-      keysPressed.contains(LogicalKeyboardKey.keyK);
 
     if ((isLeftKeyPressed && isRightKeyPressed) ||
         (isUpKeyPressed && isDownKeyPressed)) {
@@ -174,8 +187,9 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
        !other.isDead
       ) {
         other.hp -= str;
-        debugPrint('Monster HP: ${other.hp}');
+        other.healthBar.updateHealth(other.hp);
         other.setInvicible();
+        debugPrint('Monster HP: ${other.hp}');
       }
 
       if (
@@ -185,6 +199,7 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
         // other.attackbox.collidingWith(hitbox)
       ) {
         hp -= other.str;
+        healthBar.updateHealth(hp);
         setInvicible();
         debugPrint('Character HP: $hp');
       }
@@ -265,10 +280,10 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
     for (var component in collisionComponents) {
       if (checkCollision(component)) {
 
-        final aPoint = Vector2(component.x - hitbox.width, component.y - hitbox.height);
-        final bPoint = Vector2(component.x + component.width, component.y - hitbox.height);
+        final aPoint = Vector2(component.x - movebox.width, component.y - movebox.height);
+        final bPoint = Vector2(component.x + component.width, component.y - movebox.height);
         final cPoint = Vector2(component.x + component.width, component.y + component.height);
-        final dPoint = Vector2(component.x - hitbox.width, component.y + component.height);
+        final dPoint = Vector2(component.x - movebox.width, component.y + component.height);
         
         double angCB = calculateAngle(cPoint, component.position, bPoint);
         double angCA = calculateAngle(cPoint, component.position, aPoint);
@@ -278,25 +293,40 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
         if (angCA < 0) angCA += 2 * pi;
         if (angCD < 0) angCD += 2 * pi;
 
-        double angCChar = calculateAngle(cPoint, component.position, Vector2(characterX, characterY));
+        debugPrint('component: ${component.position}');
+        debugPrint('movebox: ${movebox.position}');
+
+        debugPrint('angCB: ${angCB * 180 / pi}');
+        debugPrint('angCA: ${angCA * 180 / pi}');
+        debugPrint('angCD: ${angCD * 180 / pi}');
+
+        double angCChar = calculateAngle(cPoint, component.position, Vector2(characterX - hitbox.x + movebox.x, characterY - hitbox.y + movebox.y));
+
+        
         if (angCChar < 0) angCChar += 2 * pi;
 
-        if (angCChar > 0 && angCChar < angCB) {
+        debugPrint('angChar: ${angCChar * 180 / pi}');
+
+        if (angCChar >= 0 && angCChar < angCB) {
           // right
+          debugPrint('right');
           position.x = scale.x > 0 
-            ? component.x + component.width - hitbox.x
-            : component.x + component.width + hitbox.width + hitbox.x;
-        } else if (angCChar > angCB && angCChar < angCA) {
+            ? component.x + component.width - movebox.x
+            : component.x + component.width + movebox.width + movebox.x;
+        } else if (angCChar >= angCB && angCChar < angCA) {
           // top
-          position.y = component.y - hitbox.height - hitbox.y;
-        } else if (angCChar > angCA && angCChar < angCD) {
+          debugPrint('top');
+          position.y = component.y - movebox.height - movebox.y;
+        } else if (angCChar >= angCA && angCChar < angCD) {
           // left
+          debugPrint('left');
           position.x = scale.x > 0
-            ? component.x - hitbox.width - hitbox.x
-            : component.x + hitbox.x;
-        } else if (angCChar > angCD && angCChar < 2 * pi) {
+            ? component.x - movebox.width - movebox.x
+            : component.x + movebox.x;
+        } else if (angCChar >= angCD && angCChar < 2 * pi) {
           // bottom
-          position.y = component.y + component.height - hitbox.y;
+          debugPrint('bottom');
+          position.y = component.y + component.height - movebox.y;
         }
       }
     }
@@ -350,9 +380,9 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
     
     return (
       characterX < componentX + componentWidth &&
-      characterX + hitbox.width > componentX &&
-      characterY < componentY + componentHeight &&
-      characterY + hitbox.height > componentY
+      characterX + movebox.width > componentX &&
+      characterY - hitbox.y + movebox.y < componentY + componentHeight &&
+      characterY - hitbox.y + movebox.y + movebox.height > componentY
     );
   }
 
