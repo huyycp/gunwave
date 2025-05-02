@@ -112,13 +112,15 @@ class CameraFeedService: NSObject {
 
   private func setUpPreviewView(_ view: UIView) {
     videoPreviewLayer.videoGravity = videoGravity
-    videoPreviewLayer.connection?.videoOrientation = .portrait
+    videoPreviewLayer.connection?.videoOrientation = .landscapeRight
     // view.layer.addSublayer(videoPreviewLayer)
   }
 
   // MARK: notification methods
   @objc func orientationChanged(notification: Notification) {
-    switch UIImage.Orientation.from(deviceOrientation: UIDevice.current.orientation) {
+    let deviceOrientation = UIDevice.current.orientation
+    let imageOrientation = UIImage.Orientation.from(deviceOrientation: deviceOrientation)
+    switch imageOrientation {
     case .up:
       videoPreviewLayer.connection?.videoOrientation = .portrait
     case .left:
@@ -126,7 +128,7 @@ class CameraFeedService: NSObject {
     case .right:
       videoPreviewLayer.connection?.videoOrientation = .landscapeLeft
     default:
-      break
+      videoPreviewLayer.connection?.videoOrientation = .landscapeRight
     }
   }
 
@@ -294,7 +296,7 @@ class CameraFeedService: NSObject {
 
     if session.canAddOutput(videoDataOutput) {
       session.addOutput(videoDataOutput)
-      videoDataOutput.connection(with: .video)?.videoOrientation = .portrait
+      videoDataOutput.connection(with: .video)?.videoOrientation = .landscapeRight
       if videoDataOutput.connection(with: .video)?.isVideoOrientationSupported == true
           && cameraPosition == .front {
         videoDataOutput.connection(with: .video)?.isVideoMirrored = true
@@ -377,7 +379,10 @@ extension CameraFeedService: AVCaptureVideoDataOutputSampleBufferDelegate {
       if (imageBufferSize == nil) {
         imageBufferSize = CGSize(width: CVPixelBufferGetHeight(imageBuffer), height: CVPixelBufferGetWidth(imageBuffer))
       }
-    delegate?.didOutput(sampleBuffer: sampleBuffer, orientation: UIImage.Orientation.from(deviceOrientation: UIDevice.current.orientation))
+    let deviceOrientation = UIDevice.current.orientation
+    let imageOrientation = UIImage.Orientation.from(deviceOrientation: deviceOrientation)
+    print("Device Orientation: \(deviceOrientation.rawValue), Image Orientation: \(imageOrientation)")
+    delegate?.didOutput(sampleBuffer: sampleBuffer, orientation: imageOrientation)
   }
 }
 
@@ -387,12 +392,23 @@ extension UIImage.Orientation {
     switch deviceOrientation {
       case .portrait:
         return .up
+      case .portraitUpsideDown:
+        return .down
       case .landscapeLeft:
         return .left
       case .landscapeRight:
         return .right
-      default:
+      case .faceUp, .faceDown:
+        // For face up/down, maintain the last known orientation
+        let deviceOrientation = UIDevice.current.orientation
+        if deviceOrientation.isPortrait {
+          return .up
+        } else if deviceOrientation.isLandscape {
+          return deviceOrientation == .landscapeLeft ? .left : .right
+        }
         return .up
+      default:
+        return .right  // Default to landscape right
     }
   }
 }

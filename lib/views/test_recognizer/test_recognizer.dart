@@ -1,24 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  
-  // CRITICAL: Lock to ONLY landscape right for consistency
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.landscapeRight,
-  ]).then((_) {
-    // Force landscape orientation
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    // Log orientation status
-    print("Flutter orientation locked to landscape right");
-    runApp(GestureRecognizerApp());
-  });
-}
-
 class GestureRecognizerApp extends StatefulWidget {
+  const GestureRecognizerApp({super.key});
+
   @override
-  _GestureRecognizerAppState createState() => _GestureRecognizerAppState();
+  State createState() => _GestureRecognizerAppState();
 }
 
 class _GestureRecognizerAppState extends State<GestureRecognizerApp> with WidgetsBindingObserver {
@@ -62,7 +49,7 @@ class _GestureRecognizerAppState extends State<GestureRecognizerApp> with Widget
     // Re-enforce landscapeRight orientation whenever app state changes
     if (state == AppLifecycleState.resumed) {
       _setLandscapeOrientation();
-      print("📱 Re-enforced landscape right orientation after resume");
+      debugPrint("📱 Re-enforced landscape right orientation after resume");
     } else if (state == AppLifecycleState.inactive) {
       // Force landscape even when app becomes inactive
       _setLandscapeOrientation();
@@ -71,7 +58,7 @@ class _GestureRecognizerAppState extends State<GestureRecognizerApp> with Widget
 
   // This method doesn't use context or MediaQuery
   void _setLandscapeOrientation() {
-    print("📱 Setting app to landscape right orientation");
+    debugPrint("📱 Setting app to landscape right orientation");
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
     ]);
@@ -84,12 +71,12 @@ class _GestureRecognizerAppState extends State<GestureRecognizerApp> with Widget
     
     final orientation = MediaQuery.of(context).orientation;
     final size = MediaQuery.of(context).size;
-    print("Current orientation: ${orientation == Orientation.landscape ? 'LANDSCAPE' : 'PORTRAIT'}, size: ${size.width.toInt()}x${size.height.toInt()}");
+    debugPrint("Current orientation: ${orientation == Orientation.landscape ? 'LANDSCAPE' : 'PORTRAIT'}, size: ${size.width.toInt()}x${size.height.toInt()}");
     
     // If somehow not in landscape, force it again after a delay
     if (orientation != Orientation.landscape) {
-      print("⚠️ Detected portrait orientation - forcing landscape");
-      Future.delayed(Duration(milliseconds: 100), () {
+      debugPrint("⚠️ Detected portrait orientation - forcing landscape");
+      Future.delayed(const Duration(milliseconds: 100), () {
         _setLandscapeOrientation();
       });
     }
@@ -167,34 +154,11 @@ class _GestureRecognizerAppState extends State<GestureRecognizerApp> with Widget
                     ),
                     Text(
                       'Size: ${MediaQuery.of(context).size.width.toInt()}x${MediaQuery.of(context).size.height.toInt()}',
-                      style: TextStyle(fontSize: 14),
+                      style: const TextStyle(fontSize: 14),
                     ),
                     const SizedBox(height: 10),
                     
                     // Updated instruction - no need to rotate hand
-                    Container(
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            'Hand Gesture Recognition',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.pan_tool, color: Colors.blue),
-                              SizedBox(width: 8),
-                              Text('Use your hand naturally'),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
                     
                     const SizedBox(height: 20),
                     
@@ -260,12 +224,12 @@ class _GestureRecognizerAppState extends State<GestureRecognizerApp> with Widget
                 right: 20,
                 bottom: 20,
                 child: Container(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.7),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Column(
+                  child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(

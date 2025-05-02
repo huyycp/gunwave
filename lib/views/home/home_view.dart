@@ -1,7 +1,10 @@
+import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gunwave/recognizer_test.dart';
+import 'package:gunwave/views/game/game_view.dart';
+import 'package:gunwave/views/test_recognizer/test_recognizer.dart';
 import 'package:gunwave/views/home/home_view_model.dart';
+import 'package:gunwave/widgets/app_button.dart';
 import 'package:gunwave/widgets/base/base_view.dart';
 
 class HomeView extends BaseView {
@@ -12,9 +15,51 @@ class HomeView extends BaseView {
 }
 
 class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
+  bool joystickEnabled = false;
+
   @override
   Widget getView() {
-    return GestureRecognizerApp();
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AppButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GameView(joystickEnabled: joystickEnabled),
+                  ),
+                );
+              },
+              child: const Text('Game'),
+            ),
+            const SizedBox(height: 24),
+            AppButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const GestureRecognizerApp(),
+                  ),
+                );
+              },
+              child: const Text('Test Recognizer'),
+            ),
+            const SizedBox(height: 24),
+            AppButton(
+              onPressed: () {
+                setState(() {
+                  joystickEnabled = !joystickEnabled;
+                });
+              },
+              child: Text('Joystick $joystickEnabled'),
+            )
+          ],
+        )
+      ),
+    );
   }
 
   @override
