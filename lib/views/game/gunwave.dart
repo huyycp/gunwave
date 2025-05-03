@@ -37,6 +37,8 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
 
   @override
   Future<void> onLoad() async {
+    await images.loadAllImages();
+
     character = Character(GameCharacter.blueWarrior);
     stage = Stage(
       world: GameMap.forest,
@@ -52,13 +54,6 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
     );
 
     camera.viewfinder.anchor = Anchor.topLeft;
-  
-    await images.loadAllImages();
-
-    addAll([
-      world,
-      camera,
-    ]);
 
     if (isJoystickEnabled) {
       addJoystick();

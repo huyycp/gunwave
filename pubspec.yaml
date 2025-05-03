@@ -36,9 +36,11 @@ flutter:
     - assets/images/hub/joystick/
     - assets/tiles/
     - assets/images/
+    - assets/images/ui/buttons/
     - assets/images/buildings/tower/
     - assets/images/effects/fire/
     - assets/images/terrain/
+    - assets/images/resources/trees/
     - assets/images/terrain/water/
     - assets/images/terrain/water/foam/
     - assets/images/terrain/water/rocks/
