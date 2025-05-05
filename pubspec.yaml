@@ -37,6 +37,7 @@ flutter:
     - assets/tiles/
     - assets/images/
     - assets/images/ui/buttons/
+    - assets/images/ui/banners/
     - assets/images/buildings/tower/
     - assets/images/effects/fire/
     - assets/images/terrain/

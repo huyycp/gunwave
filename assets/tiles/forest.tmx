@@ -222,7 +222,7 @@
    </properties>
   </object>
  </objectgroup>
- <objectgroup id="2" name="collisions" visible="0" locked="1">
+ <objectgroup id="2" name="collisions">
   <object id="1" type="boundary" x="577.131" y="511.666" width="193.463" height="14.657"/>
   <object id="4" type="boundary" x="576" y="960" width="385.259" height="64"/>
   <object id="5" type="boundary" x="1215.39" y="1152" width="128.612" height="64"/>
@@ -237,7 +237,7 @@
   <object id="19" type="boundary" x="1792" y="512" width="319.644" height="64"/>
   <object id="20" type="boundary" x="2112" y="576" width="64" height="128.485"/>
   <object id="21" type="boundary" x="2240" y="766.614" width="64" height="65.9616"/>
-  <object id="22" type="boundary" x="2176" y="832" width="64" height="62.3704"/>
+  <object id="22" type="boundary" x="2176" y="832" width="64" height="125.016"/>
   <object id="23" type="boundary" x="2048" y="832" width="64" height="61.6104"/>
   <object id="25" type="boundary" x="1408" y="1024" width="64.4276" height="60.499"/>
   <object id="26" type="boundary" x="1344" y="1088" width="64.4276" height="60.499"/>
@@ -263,7 +263,7 @@
   <object id="48" type="boundary" x="769.781" y="446.346" width="70.987" height="9.995"/>
   <object id="49" type="boundary" x="768" y="256" width="253.888" height="64"/>
   <object id="50" type="boundary" x="1984" y="896" width="64" height="63.3467"/>
-  <object id="51" type="boundary" x="2112" y="896" width="64" height="124.984"/>
+  <object id="51" type="boundary" x="2112" y="957.189" width="64" height="63.7952"/>
   <object id="52" type="boundary" x="832.079" y="386.779" width="11.354" height="61.2193"/>
   <object id="53" type="boundary" x="832" y="386" width="125.514" height="14.0464"/>
   <object id="54" type="boundary" x="944.42" y="387.94" width="14.355" height="61.3714"/>

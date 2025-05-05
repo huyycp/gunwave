@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/data/constants/app_constant.dart';
+import 'package:gunwave/data/constants/game/game_building.dart';
+import 'package:gunwave/data/constants/game/game_character.dart';
 import 'package:gunwave/views/splash/splash_view_model.dart';
 import 'package:gunwave/widgets/base/base_view.dart';
 
@@ -30,7 +32,7 @@ class _SplashViewState extends BaseViewState<SplashView, SplashViewModel> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              '',
+              'assets/images/${GameBuildings.instance.blueTower.path}',
               width: 160,
               height: 160,
             ),

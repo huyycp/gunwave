@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/views/game/game_view.dart';
 import 'package:gunwave/views/home/widgets/background.dart';
+import 'package:gunwave/views/home/widgets/lobby.dart';
 import 'package:gunwave/views/test_recognizer/test_recognizer.dart';
 import 'package:gunwave/views/home/home_view_model.dart';
 import 'package:gunwave/widgets/app_button.dart';
@@ -65,20 +66,25 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
                 //   child: Text('Joystick $joystickEnabled'),
                 // ),
                 // const SizedBox(height: 16),
-                GameButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => GameView(joystickEnabled: joystickEnabled),
-                      ),
-                    );
-                  },
-                  child: const Text('Play')
-                ),
+                LobbyWidget(),
               ],
             ),
           ),
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  child: GameButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GameView(joystickEnabled: joystickEnabled),
+                        ),
+                      );
+                    },
+                    child: const Text('Play')
+                  ),
+                ),
         ],
       ),
     );
