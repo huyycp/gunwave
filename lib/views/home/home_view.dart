@@ -26,31 +26,30 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
       body: Stack(
         children: [
           _buildBackground(),
-          if (model.isStatusBoardVisible) ...[
-            const Center(
-              child: LobbyWidget(),
-            ),
-            Positioned(
-              top: 8,
-              left: 8,
-              child: GameButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => GameView(joystickEnabled: joystickEnabled),
-                    ),
-                  );
-                },
-                child: const Text('Fight')
-              ),
-            ),
-          ] else Center(
-            child: GameButton(
-              onPressed: () {
-                model.toggleStatusBoard();
-              },
-              child: const Text('Play')
+          if (model.isStatusBoardVisible)
+            ..._buildStatusBoard()
+          else Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GameButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => GameView(joystickEnabled: joystickEnabled),
+                      ),
+                    );
+                  },
+                  child: const Text('Play')
+                ),
+                GameButton(
+                  onPressed: () {
+                    model.toggleStatusBoard();
+                  },
+                  child: const Text('Status')
+                ),
+              ],
             ),
           )
         ],
@@ -69,6 +68,24 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
         ..viewfinder.anchor = Anchor.topLeft
         ..viewfinder.zoom = 1.0  // Use full size since we're scaling the component
     ));
+  }
+  
+  List<Widget> _buildStatusBoard() {
+    return [
+      const Center(
+        child: LobbyWidget(),
+      ),
+      Positioned(
+        top: 8,
+        left: 8,
+        child: GameButton(
+          onPressed: () {
+            model.toggleStatusBoard();
+          },
+          child: const Text('Back')
+        ),
+      ),
+    ];
   }
 
   @override
