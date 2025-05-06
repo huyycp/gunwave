@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/repositories/gesture_recognizer_repo.dart';
 import 'package:gunwave/widgets/base/base_view_model.dart';
@@ -21,7 +22,7 @@ class GameViewModel extends BaseViewModel {
       // Handle the recognized gesture
       this.gesture = gesture;
       // notifyListeners();
-      print("Gesture recognized: $gesture");
+      debugPrint("Gesture recognized: $gesture");
     });
   }
 

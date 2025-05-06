@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/app_constant.dart';
 import 'package:gunwave/data/constants/game/game_building.dart';
-import 'package:gunwave/data/constants/game/game_character.dart';
+import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/views/splash/splash_view_model.dart';
 import 'package:gunwave/widgets/base/base_view.dart';
 
@@ -39,7 +40,10 @@ class _SplashViewState extends BaseViewState<SplashView, SplashViewModel> {
             const SizedBox(height: 24),
             Text(
               AppConstant.appName,
-              style: Theme.of(context).textTheme.displaySmall
+              style: GoogleFonts.pressStart2p(
+                fontSize: 32,
+                color: GameColor.primary,
+              ),
             ),
           ],
         ),

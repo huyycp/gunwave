@@ -2,7 +2,6 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/src/consumer.dart';
 import 'package:gunwave/data/constants/game/game_character.dart';
 import 'package:gunwave/views/home/widgets/character_preview.dart';
 import 'package:gunwave/views/home/widgets/status_board.dart';
@@ -25,7 +24,7 @@ class LobbyWidgetState extends BaseWidgetState<LobbyWidget, LobbyWidgetModel> {
   @override
   Widget getWidget() {
     final size = MediaQuery.of(context).size;
-    return Container(
+    return SizedBox(
       height: size.height - 32,
       width: size.width - 72,
       child: Row(

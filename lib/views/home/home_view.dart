@@ -1,4 +1,3 @@
-import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
@@ -6,9 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/views/game/game_view.dart';
 import 'package:gunwave/views/home/widgets/background.dart';
 import 'package:gunwave/views/home/widgets/lobby.dart';
-import 'package:gunwave/views/test_recognizer/test_recognizer.dart';
 import 'package:gunwave/views/home/home_view_model.dart';
-import 'package:gunwave/widgets/app_button.dart';
 import 'package:gunwave/widgets/base/base_view.dart';
 import 'package:gunwave/widgets/game/game_button.dart';
 
@@ -24,67 +21,38 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
 
   @override
   Widget getView() {
+    ref.watch(homeViewModel);
     return Scaffold(
       body: Stack(
         children: [
           _buildBackground(),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // AppButton(
-                //   onPressed: () {
-                //     Navigator.push(
-                //       context,
-                //       MaterialPageRoute(
-                //         builder: (context) => GameView(joystickEnabled: joystickEnabled),
-                //       ),
-                //     );
-                //   },
-                //   child: const Text('Game'),
-                // ),
-                // const SizedBox(height: 16),
-                // AppButton(
-                //   onPressed: () {
-                //     Navigator.push(
-                //       context,
-                //       MaterialPageRoute(
-                //         builder: (context) => const GestureRecognizerApp(),
-                //       ),
-                //     );
-                //   },
-                //   child: const Text('Test Recognizer'),
-                // ),
-                // const SizedBox(height: 16),
-                // AppButton(
-                //   onPressed: () {
-                //     setState(() {
-                //       joystickEnabled = !joystickEnabled;
-                //     });
-                //   },
-                //   child: Text('Joystick $joystickEnabled'),
-                // ),
-                // const SizedBox(height: 16),
-                LobbyWidget(),
-              ],
+          if (model.isStatusBoardVisible) ...[
+            const Center(
+              child: LobbyWidget(),
             ),
-          ),
-                Positioned(
-                  top: 8,
-                  left: 8,
-                  child: GameButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => GameView(joystickEnabled: joystickEnabled),
-                        ),
-                      );
-                    },
-                    child: const Text('Play')
-                  ),
-                ),
+            Positioned(
+              top: 8,
+              left: 8,
+              child: GameButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => GameView(joystickEnabled: joystickEnabled),
+                    ),
+                  );
+                },
+                child: const Text('Fight')
+              ),
+            ),
+          ] else Center(
+            child: GameButton(
+              onPressed: () {
+                model.toggleStatusBoard();
+              },
+              child: const Text('Play')
+            ),
+          )
         ],
       ),
     );

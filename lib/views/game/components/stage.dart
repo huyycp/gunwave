@@ -1,12 +1,9 @@
 import 'dart:async';
 import 'package:flame/components.dart';
-import 'package:flame/game.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:gunwave/data/constants/game/game_building.dart';
 import 'package:gunwave/data/constants/game/game_constants.dart';
-import 'package:gunwave/data/constants/game/game_layer.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
-import 'package:gunwave/utils/enum_utils.dart';
 import 'package:gunwave/views/game/components/character.dart';
 import 'package:gunwave/views/game/components/sub_components/building.dart';
 import 'package:gunwave/views/game/components/sub_components/collision_component.dart';

@@ -6,5 +6,10 @@ final homeViewModel = ChangeNotifierProvider.autoDispose<HomeViewModel>(
 );
 
 class HomeViewModel extends BaseViewModel {
-  
+  bool isStatusBoardVisible = false;
+
+  void toggleStatusBoard() {
+    isStatusBoardVisible = !isStatusBoardVisible;
+    notifyListeners();
+  }
 }

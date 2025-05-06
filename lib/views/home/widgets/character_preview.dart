@@ -1,9 +1,6 @@
 import 'dart:async';
-import 'dart:ui';
-
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';  // Make sure this is imported
-import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter/material.dart';
 import 'package:gunwave/data/constants/game/game_character.dart';
 

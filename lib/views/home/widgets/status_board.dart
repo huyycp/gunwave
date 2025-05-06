@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/src/consumer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
@@ -103,19 +102,11 @@ class StatusBoardState extends BaseWidgetState<StatusBoard, StatusBoardWidgetMod
   }
 
   Widget _buildHeader() {
-    return Container(
-      // decoration: const BoxDecoration(
-      //   image: DecorationImage(
-      //     image: AssetImage('assets/images/ui/banners/banner_horizontal.png'),
-      //     fit: BoxFit.cover,
-      //   ),
-      // ),
-      child: Text(
-        "Status Board",
-        style: GoogleFonts.pressStart2p(
-          fontSize: 20,
-          color: GameColor.primary,
-        ),
+    return Text(
+      "Status Board",
+      style: GoogleFonts.pressStart2p(
+        fontSize: 20,
+        color: GameColor.primary,
       ),
     );
   }
