@@ -1,9 +1,7 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart';
 import 'package:gunwave/data/constants/game/game_constants.dart';
 import 'package:gunwave/data/constants/game/game_monster.dart';
-import 'package:gunwave/views/game/components/character.dart';
 import 'package:gunwave/views/game/components/sub_components/health_bar.dart';
 import 'package:gunwave/views/game/gunwave.dart';
 

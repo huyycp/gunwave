@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/theme/theme_provider.dart';
 import 'package:random_avatar/random_avatar.dart';
 import 'package:flutter/services.dart';
@@ -37,4 +38,10 @@ void showAppModalBottomSheet(BuildContext context, Widget child, {bool isDismiss
     backgroundColor: Colors.transparent,
     builder: (context) => child
   );
+}
+
+String getGameButtonPath(GameButtonState state, GameButtonSize size) {
+  final sizeText = size.text.isNotEmpty ? '_${size.text}' : '';
+  final stateText = state.text.isNotEmpty ? '_${state.text}' : '';
+  return 'assets/images/ui/buttons/button$sizeText$stateText.png';
 }
