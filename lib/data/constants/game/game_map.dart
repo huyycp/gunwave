@@ -1,9 +1,7 @@
 import 'package:gunwave/data/constants/game/game_constants.dart';
 
 enum GameMap {
-  forest('forest', horizontalTile: 40, verticalTile: 20),
-  forest1('forest', horizontalTile: 40, verticalTile: 20),
-  forest2('forest', horizontalTile: 40, verticalTile: 20);
+  forest('forest', horizontalTile: 40, verticalTile: 20);
 
   final String name;
   final int horizontalTile;
