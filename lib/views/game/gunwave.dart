@@ -14,6 +14,7 @@ import 'package:gunwave/views/game/components/sub_components/attack_button.dart'
 class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection {
   Gunwave(
     this.ref, {
+    required this.map,
     this.isJoystickEnabled = false,
     required this.onStageCompleted,
     required this.onStageFailed,
@@ -24,6 +25,7 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
 
 
   WidgetRef ref;
+  GameMap map;
   final bool isJoystickEnabled;
   final void Function() onStageCompleted;
   final void Function() onStageFailed;
@@ -40,7 +42,7 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
 
     character = Character(GameCharacter.blueWarrior);
     stage = Stage(
-      world: GameMap.forest,
+      world: map,
       character: character,
       onStageCompleted: onStageCompleted,
       onStageFailed: onStageFailed,

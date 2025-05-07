@@ -2,6 +2,8 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:gunwave/routes.dart';
 import 'package:gunwave/views/game/game_view.dart';
 import 'package:gunwave/views/home/widgets/background.dart';
 import 'package:gunwave/views/home/widgets/lobby.dart';
@@ -35,11 +37,7 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
               children: [
                 GameButton(
                   onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => GameView(joystickEnabled: joystickEnabled),
-                      ),
-                    );
+                  context.push(Routes.map);
                   },
                   child: const Text('Play')
                 ),

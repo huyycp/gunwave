@@ -23,6 +23,7 @@ dependencies:
   string_validator: 1.1.0
   flame: 1.26.1
   flame_tiled: 2.0.3
+  carousel_slider: 5.0.0
 
 dev_dependencies:
   flutter_test:

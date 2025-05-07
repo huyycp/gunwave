@@ -207,8 +207,8 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="13" name="buildings" visible="0" locked="1"/>
- <objectgroup id="3" name="spawn_points" visible="0" locked="1">
+ <objectgroup id="13" name="buildings" locked="1"/>
+ <objectgroup id="3" name="spawn_points" locked="1">
   <object id="11" name="character" type="character" x="640" y="640" width="192" height="192"/>
   <object id="12" name="torch" type="monster" x="1664" y="704" width="192" height="192">
    <properties>
@@ -222,7 +222,7 @@
    </properties>
   </object>
  </objectgroup>
- <objectgroup id="2" name="collisions">
+ <objectgroup id="2" name="collisions" locked="1">
   <object id="1" type="boundary" x="577.131" y="511.666" width="193.463" height="14.657"/>
   <object id="4" type="boundary" x="576" y="960" width="385.259" height="64"/>
   <object id="5" type="boundary" x="1215.39" y="1152" width="128.612" height="64"/>
