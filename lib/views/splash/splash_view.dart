@@ -19,9 +19,7 @@ class _SplashViewState extends BaseViewState<SplashView, SplashViewModel> {
   void onReady() {
     super.onReady();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(seconds: 1), () {
-        openApp();
-      });
+        model.init(openApp);
     });
   }
   

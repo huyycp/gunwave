@@ -40,7 +40,7 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
   Future<void> onLoad() async {
     await images.loadAllImages();
 
-    character = Character(GameCharacter.blueWarrior);
+    character = Character(GameCharacter.bluePawn);
     stage = Stage(
       world: map,
       character: character,

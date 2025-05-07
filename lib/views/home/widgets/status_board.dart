@@ -4,12 +4,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
+import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/widgets/base/base_widget.dart';
 import 'package:gunwave/widgets/base/base_widget_model.dart';
 import 'package:gunwave/widgets/game/game_button.dart';
 
 class StatusBoard extends BaseWidget {
-  const StatusBoard({super.key});
+  const StatusBoard(this.character, {super.key});
+
+  final CharacterModel character;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -38,10 +41,10 @@ class StatusBoardState extends BaseWidgetState<StatusBoard, StatusBoardWidgetMod
           const SizedBox(height: 4),
           _buildStatusPoint(),
           const SizedBox(height: 4),
-          _buildCharacterAttr('HP', 100),
-          _buildCharacterAttr('STR', 10),
-          _buildCharacterAttr('VIT', 5),
-          _buildCharacterAttr('AGI', 7),
+          _buildCharacterAttr('HP', widget.character.hp),
+          _buildCharacterAttr('STR', widget.character.str),
+          _buildCharacterAttr('VIT', widget.character.vit),
+          _buildCharacterAttr('AGI', widget.character.agi),
         ],
       ),
     );
@@ -59,7 +62,7 @@ class StatusBoardState extends BaseWidgetState<StatusBoard, StatusBoardWidgetMod
           ),
         ),
         Text(
-          '10',
+          widget.character.sp.toString(),
           style: GoogleFonts.pressStart2p(
             fontSize: 10,
             color: GameColor.primary,

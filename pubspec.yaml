@@ -24,6 +24,7 @@ dependencies:
   flame: 1.26.1
   flame_tiled: 2.0.3
   carousel_slider: 5.0.0
+  supabase_flutter: 2.9.0
 
 dev_dependencies:
   flutter_test:
@@ -34,6 +35,8 @@ flutter:
   uses-material-design: true
   
   assets:
+    - dev.env
+    - prod.env
     - assets/images/hub/joystick/
     - assets/tiles/
     - assets/images/
@@ -47,4 +50,14 @@ flutter:
     - assets/images/terrain/water/foam/
     - assets/images/terrain/water/rocks/
     - assets/images/factions/knights/warrior/blue/
+    - assets/images/factions/knights/warrior/red/
+    - assets/images/factions/knights/warrior/yellow/
+    - assets/images/factions/knights/warrior/purple/
+    - assets/images/factions/knights/pawn/blue/
+    - assets/images/factions/knights/pawn/red/
+    - assets/images/factions/knights/pawn/yellow/
+    - assets/images/factions/knights/pawn/purple/
     - assets/images/factions/monsters/torch/blue/
+    - assets/images/factions/monsters/torch/red/
+    - assets/images/factions/monsters/torch/yellow/
+    - assets/images/factions/monsters/torch/purple/

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
+import 'package:gunwave/data/constants/game/game_character.dart';
 import 'package:gunwave/theme/theme_provider.dart';
 import 'package:random_avatar/random_avatar.dart';
 import 'package:flutter/services.dart';
@@ -44,4 +45,18 @@ String getGameButtonPath(GameButtonState state, GameButtonSize size) {
   final sizeText = size.text.isNotEmpty ? '_${size.text}' : '';
   final stateText = state.text.isNotEmpty ? '_${state.text}' : '';
   return 'assets/images/ui/buttons/button$sizeText$stateText.png';
+}
+
+// Handle api response
+int intFromJson(dynamic json, {int defaultValue = 0}) {
+  return json != null ? (int.tryParse(json.toString()) ?? defaultValue) : defaultValue;
+}
+
+GameCharacter? characterFromFile(String filename) {
+  for (var character in GameCharacter.values) {
+    if ('${character.name}_${character.color.name}' == filename) {
+      return character;
+    }
+  }
+  return null;
 }

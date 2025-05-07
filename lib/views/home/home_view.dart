@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gunwave/routes.dart';
-import 'package:gunwave/views/game/game_view.dart';
 import 'package:gunwave/views/home/widgets/background.dart';
 import 'package:gunwave/views/home/widgets/lobby.dart';
 import 'package:gunwave/views/home/home_view_model.dart';
+import 'package:gunwave/views/home/widgets/login_widget.dart';
 import 'package:gunwave/widgets/base/base_view.dart';
 import 'package:gunwave/widgets/game/game_button.dart';
 
@@ -19,7 +19,19 @@ class HomeView extends BaseView {
 }
 
 class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
-  bool joystickEnabled = false;
+  @override
+  void onReady() {
+    super.onReady();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (model.userRepo.user != null) {
+        debugPrint("User: ${model.userRepo.user}");
+        model.toggleLoginForm();
+        model.userRepo.getAppUser().then((_) {
+          model.getCharacters();
+        });
+      }
+    });
+  }
 
   @override
   Widget getView() {
@@ -37,11 +49,11 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
               children: [
                 GameButton(
                   onPressed: () {
-                  context.push(Routes.map);
+                    context.push(Routes.map);
                   },
                   child: const Text('Play')
                 ),
-                GameButton(
+                if (model.characters.isNotEmpty) GameButton(
                   onPressed: () {
                     model.toggleStatusBoard();
                   },
@@ -49,7 +61,11 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
                 ),
               ],
             ),
-          )
+          ),
+          if (model.isLoginFormVisible)
+            Center(
+              child: _buildLoginForm(),
+            ),
         ],
       ),
     );
@@ -70,8 +86,8 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
   
   List<Widget> _buildStatusBoard() {
     return [
-      const Center(
-        child: LobbyWidget(),
+      Center(
+        child: LobbyWidget(characters: model.characters),
       ),
       Positioned(
         top: 8,
@@ -84,6 +100,22 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
         ),
       ),
     ];
+  }
+
+  Widget _buildLoginForm() {
+    return LoginWidget((isDone) {
+      if (isDone) {
+        model.toggleLoginForm();
+        model.getCharacters();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Login failed'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    });
   }
 
   @override
