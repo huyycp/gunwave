@@ -1,12 +1,14 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flame/components.dart';
+import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter_riverpod/src/consumer.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
 import 'package:gunwave/views/game/game_view.dart';
+import 'package:gunwave/views/home/widgets/background.dart';
 import 'package:gunwave/views/map/map_view_model.dart';
 import 'package:gunwave/widgets/app_image.dart';
 import 'package:gunwave/widgets/base/base_view.dart';
@@ -23,6 +25,16 @@ class MapView extends BaseView {
 }
 
 class MapViewState extends BaseViewState<MapView, MapViewModel> {
+  late final Widget _background = GameWidget(game: FlameGame(
+    world: Background(
+      backgroundPath: 'loading',
+      screenSize: Vector2(MediaQuery.sizeOf(context).width, MediaQuery.sizeOf(context).height),
+    ),
+    camera: CameraComponent()
+      ..viewfinder.anchor = Anchor.topLeft
+      ..viewfinder.zoom = 1.0  // Use full size since we're scaling the component
+  ));
+
   @override
   Widget getView() {
     ref.watch(mapViewModel);
@@ -31,6 +43,7 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
         color: const Color.fromARGB(255, 90, 190, 189),
         child: Stack(
           children: [
+            _background,
             Positioned(
               top: 8,
               left: 8,

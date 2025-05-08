@@ -4,9 +4,11 @@ import 'package:flame_tiled/flame_tiled.dart';
 
 class Background extends World {
   Background({
+    this.backgroundPath = 'background',
     required this.screenSize,
   });
 
+  final String backgroundPath;
   final Vector2 screenSize;
   
   // Original background image dimensions
@@ -24,7 +26,7 @@ class Background extends World {
     
     // Load the tiled component
     final component = await TiledComponent.load(
-      'background.tmx',
+      '$backgroundPath.tmx',
       Vector2.all(64),
     );
     

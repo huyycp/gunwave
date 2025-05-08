@@ -15,4 +15,12 @@ class CharacterRepository {
     if (userId == null) return [];
     return await _characterRemote.getCharacters(userId);
   }
+
+  Future<bool> updateAttr(String id, CharacterAttr attr) async {
+    return await _characterRemote.updateAttr(id, attr);
+  }
+
+  Future<bool> resetAttr(String id) async {
+    return await _characterRemote.resetAttr(id);
+  }
 }

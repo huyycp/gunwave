@@ -27,6 +27,6 @@ class UserRepository {
   Future<void> getAppUser() async {
     if (user == null) return;
     appUser = await _userRemote.getAppUser(user!.id);
-    debugPrint("App User: $appUser");
+    debugPrint("App User: ${appUser?.toJson()}");
   }
 }

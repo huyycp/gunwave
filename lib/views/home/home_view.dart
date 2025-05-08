@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gunwave/routes.dart';
 import 'package:gunwave/views/home/widgets/background.dart';
-import 'package:gunwave/views/home/widgets/lobby.dart';
 import 'package:gunwave/views/home/home_view_model.dart';
 import 'package:gunwave/views/home/widgets/login_widget.dart';
 import 'package:gunwave/widgets/base/base_view.dart';
@@ -19,6 +18,15 @@ class HomeView extends BaseView {
 }
 
 class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
+ late final _background = GameWidget(game: FlameGame(
+    world: Background(
+      screenSize: Vector2(MediaQuery.sizeOf(context).width, MediaQuery.sizeOf(context).height),
+    ),
+    camera: CameraComponent()
+      ..viewfinder.anchor = Anchor.topLeft
+      ..viewfinder.zoom = 1.0  // Use full size since we're scaling the component
+  ));
+ 
   @override
   void onReady() {
     super.onReady();
@@ -26,9 +34,7 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
       if (model.userRepo.user != null) {
         debugPrint("User: ${model.userRepo.user}");
         model.toggleLoginForm();
-        model.userRepo.getAppUser().then((_) {
-          model.getCharacters();
-        });
+        model.userRepo.getAppUser();
       }
     });
   }
@@ -39,10 +45,8 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
     return Scaffold(
       body: Stack(
         children: [
-          _buildBackground(),
-          if (model.isStatusBoardVisible)
-            ..._buildStatusBoard()
-          else Center(
+          _background,
+          Center(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
@@ -53,9 +57,9 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
                   },
                   child: const Text('Play')
                 ),
-                if (model.characters.isNotEmpty) GameButton(
+                GameButton(
                   onPressed: () {
-                    model.toggleStatusBoard();
+                    context.push(Routes.character);
                   },
                   child: const Text('Status')
                 ),
@@ -71,42 +75,10 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
     );
   }
 
-  Widget _buildBackground() {
-    final screenSize = MediaQuery.of(context).size;
-    
-    return GameWidget(game: FlameGame(
-      world: Background(
-        screenSize: Vector2(screenSize.width, screenSize.height),
-      ),
-      camera: CameraComponent()
-        ..viewfinder.anchor = Anchor.topLeft
-        ..viewfinder.zoom = 1.0  // Use full size since we're scaling the component
-    ));
-  }
-  
-  List<Widget> _buildStatusBoard() {
-    return [
-      Center(
-        child: LobbyWidget(characters: model.characters),
-      ),
-      Positioned(
-        top: 8,
-        left: 8,
-        child: GameButton(
-          onPressed: () {
-            model.toggleStatusBoard();
-          },
-          child: const Text('Back')
-        ),
-      ),
-    ];
-  }
-
   Widget _buildLoginForm() {
     return LoginWidget((isDone) {
       if (isDone) {
         model.toggleLoginForm();
-        model.getCharacters();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

@@ -12,6 +12,11 @@ class CharacterModel {
     required this.vit,
     required this.agi,
     required this.sp,
+    required this.baseHp,
+    required this.baseStr,
+    required this.baseVit,
+    required this.baseAgi,
+    required this.totalSp,
   });
 
   final String id;
@@ -22,15 +27,25 @@ class CharacterModel {
   
   final String filename;
   
-  final int hp;
+  int hp;
 
-  final int str;
+  int str;
   
-  final int vit;
+  int vit;
   
-  final int agi;
+  int agi;
   
-  final int sp;
+  int sp;
+
+  int baseHp;
+
+  int baseStr;
+
+  int baseVit;
+
+  int baseAgi;
+
+  int totalSp;
 
   GameCharacter? get character => characterFromFile(filename);
 
@@ -44,6 +59,11 @@ class CharacterModel {
     vit: intFromJson(json['vit'], defaultValue: 0),
     agi: intFromJson(json['agi'], defaultValue: 0),
     sp: intFromJson(json['sp'], defaultValue: 0),
+    baseHp: intFromJson(json['base_hp'], defaultValue: 0),
+    baseStr: intFromJson(json['base_str'], defaultValue: 0),
+    baseVit: intFromJson(json['base_vit'], defaultValue: 0),
+    baseAgi: intFromJson(json['base_agi'], defaultValue: 0),
+    totalSp: intFromJson(json['total_sp'], defaultValue: 0),
   );
 
   Map<String, dynamic> toJson() => {
@@ -56,5 +76,17 @@ class CharacterModel {
     'vit': vit,
     'agi': agi,
     'sp': sp,
+    'base_hp': baseHp,
+    'base_str': baseStr,
+    'base_vit': baseVit,
+    'base_agi': baseAgi,
+    'total_sp': totalSp,
   };
+}
+
+enum CharacterAttr {
+  hp,
+  str,
+  vit,
+  agi,
 }

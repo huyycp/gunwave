@@ -27,4 +27,23 @@ class CharacterRemoteDataSource {
       return CharacterModel.fromJson(json);
     }).toList();
   }
+
+  Future<bool> updateAttr(String id, CharacterAttr attr) async {
+    final result = await client.rpc('update_character_status', params: {
+      'character_id': id,
+      'attr': attr.name,
+    });
+
+    debugPrint("Update character attr: $result");
+    return result;
+  }
+
+  Future<bool> resetAttr(String id) async {
+    final result = await client.rpc('reset_character_status', params: {
+      'character_id': id,
+    });
+
+    debugPrint("Reset character attr: $result");
+    return result;
+  }
 }

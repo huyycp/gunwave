@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gunwave/views/character/character_view.dart';
 import 'package:gunwave/views/home/home_view.dart';
 import 'package:gunwave/views/map/map_view.dart';
 import 'package:gunwave/views/splash/splash_view.dart';
@@ -11,6 +12,7 @@ class Routes {
   static const splash = '/splash';
   static const home = '/home';
   static const map = '/map';
+  static const character = '/character';
 
   static final GoRouter config = GoRouter(
     initialLocation: splash,
@@ -20,6 +22,7 @@ class Routes {
       _buildSplashRoute(),
       _buildHomeRoute(),
       _buildMapRoute(),
+      _buildCharacterRoute(),
     ],
   );
   
@@ -44,6 +47,14 @@ class Routes {
       path: map,
       name: map,
       pageBuilder: (context, state) => const NoTransitionPage(child: MapView()),
+    );
+  }
+
+  static GoRoute _buildCharacterRoute() {
+    return GoRoute(
+      path: character,
+      name: character,
+      pageBuilder: (context, state) => const NoTransitionPage(child: CharacterView()),
     );
   }
 }
