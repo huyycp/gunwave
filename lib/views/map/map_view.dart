@@ -1,0 +1,200 @@
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter_riverpod/src/consumer.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:gunwave/data/constants/game/game_color.dart';
+import 'package:gunwave/data/constants/game/game_map.dart';
+import 'package:gunwave/views/game/game_view.dart';
+import 'package:gunwave/views/map/map_view_model.dart';
+import 'package:gunwave/widgets/app_image.dart';
+import 'package:gunwave/widgets/base/base_view.dart';
+import 'package:gunwave/widgets/game/game_button.dart';
+
+class MapView extends BaseView {
+  const MapView({super.key});
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() {
+    return MapViewState();
+  }
+
+}
+
+class MapViewState extends BaseViewState<MapView, MapViewModel> {
+  @override
+  Widget getView() {
+    ref.watch(mapViewModel);
+    return Scaffold(
+      body: Container(
+        color: const Color.fromARGB(255, 90, 190, 189),
+        child: Stack(
+          children: [
+            Positioned(
+              top: 8,
+              left: 8,
+              child: _buildBackBtn(),
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: _buildFightBtn(),
+            ),
+            Positioned.fill(top: 40, child: _buildMapCarousel())
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBackBtn() {
+    return GameButton(
+      onPressed: () {
+        context.pop();
+      },
+      child: const Text('Back'),
+    );
+  }
+
+  Widget _buildMapCarousel() {
+    const maps = GameMap.values;
+    return CarouselSlider(
+      options: CarouselOptions(
+        viewportFraction: 0.7,
+        enableInfiniteScroll: false,
+        scrollPhysics: const BouncingScrollPhysics(),
+        onPageChanged: (index, reason) {
+          model.setMap(maps[index]);
+        },
+      ),
+      items: maps.map((map) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        spacing: 8,
+        children: [
+          Container(
+            height: MediaQuery.sizeOf(context).height * 0.6,
+            margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: GameColor.primary.withOpacity(0.5),
+                  blurRadius: 10,
+                  spreadRadius: 5,
+                ),
+              ]
+            ),
+            child: AppImage('assets/tiles/${map.name}.png', borderRadius: BorderRadius.circular(12)),
+          ),
+          Text(
+            map.name,
+            style: GoogleFonts.pressStart2p(
+              fontSize: 20,
+              color: GameColor.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      )).toList(),
+    );
+  }
+
+  Widget _buildFightBtn() {
+    return GameButton(
+      onPressed: () {
+        showPlayModeDialog();
+        
+
+        // Navigator.of(context).push(
+        //   MaterialPageRoute(
+        //     builder: (context) => GameView(
+        //       map: model.currentMap,
+        //       joystickEnabled: model.isJoystickEnabled,
+        //     ),
+        //   ),
+        // );
+      },
+      child: const Text('Fight'),
+    );
+  }
+
+  void showPlayModeDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => Dialog(
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            // color: const Color.fromARGB(255, 117, 209, 255),
+            image: const DecorationImage(
+              image: AssetImage('assets/images/ui/banners/carved_slide.png'),
+              fit: BoxFit.fill,
+              scale: 0.1,
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 8,
+            children: [
+              Text(
+                'Play Mode',
+                style: GoogleFonts.pressStart2p(
+                  fontSize: 20,
+                  color: GameColor.primary,
+                ),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: 8,
+                children: [
+                  GameButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => GameView(
+                          map: model.currentMap,
+                          joystickEnabled: true,
+                        ),
+                      ),
+                    );
+                    },
+                    child: const Text('Joystick'),
+                  ),
+                  GameButton(
+                    onPressed: () {
+                      
+                    },
+                    child: const Text('Gestures'),
+                  ),
+                  GameButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => GameView(
+                            map: model.currentMap,
+                            joystickEnabled: false,
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text('Keyboard'),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  MapViewModel getViewModel() {
+    return ref.read(mapViewModel);
+  }
+}
