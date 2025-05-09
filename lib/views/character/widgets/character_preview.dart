@@ -10,12 +10,12 @@ class CharacterPreview extends FlameGame with HasGameRef<FlameGame> {
     required this.character,
   });
 
-  final GameCharacter? character;
+  final GameCharacters? character;
   
   @override
   FutureOr<void> onLoad() async {
     if (character == null) return super.onLoad();
-
+    game.images.prefix = '';
     await game.images.loadAllImages();
 
     final component = SpriteAnimationComponent(

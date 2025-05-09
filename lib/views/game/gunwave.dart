@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/data/constants/game/game_character.dart';
 import 'package:gunwave/data/constants/game/game_constants.dart';
+import 'package:gunwave/data/constants/game/game_hub.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
 import 'package:gunwave/views/game/components/character.dart';
 import 'package:gunwave/views/game/components/stage.dart';
@@ -25,7 +26,7 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
 
 
   WidgetRef ref;
-  GameMap map;
+  GameMaps map;
   final bool isJoystickEnabled;
   final void Function() onStageCompleted;
   final void Function() onStageFailed;
@@ -38,9 +39,10 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
 
   @override
   Future<void> onLoad() async {
+    images.prefix = '';
     await images.loadAllImages();
 
-    character = Character(GameCharacter.bluePawn);
+    character = Character(GameCharacters.bluePawn);
     stage = Stage(
       world: map,
       character: character,
@@ -82,11 +84,11 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
   void addJoystick() {
     joystick = JoystickComponent(
       knob: SpriteComponent(
-        sprite: Sprite(images.fromCache(GameComponents.hub.joystickKnob.path)),
+        sprite: Sprite(images.fromCache(GameHubs.joystickKnob.path)),
         size: Vector2.all(64),
       ),
       background: SpriteComponent(
-        sprite: Sprite(images.fromCache(GameComponents.hub.joystickBackground.path)),
+        sprite: Sprite(images.fromCache(GameHubs.joystickBackground.path)),
         size: Vector2.all(128),
       ),
       margin: const EdgeInsets.only(left: 60, bottom: 40),

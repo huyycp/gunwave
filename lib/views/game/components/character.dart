@@ -16,7 +16,7 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
   
   Character(this.character);
 
-  final GameCharacter character;
+  final GameCharacters character;
   
   final double stepTime = 0.08;
   late final SpriteAnimation idleAni;

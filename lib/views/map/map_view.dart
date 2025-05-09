@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
+import 'package:gunwave/data/constants/game/game_ui.dart';
 import 'package:gunwave/views/game/game_view.dart';
 import 'package:gunwave/views/home/widgets/background.dart';
 import 'package:gunwave/views/map/map_view_model.dart';
@@ -21,13 +22,12 @@ class MapView extends BaseView {
   ConsumerState<ConsumerStatefulWidget> createState() {
     return MapViewState();
   }
-
 }
 
 class MapViewState extends BaseViewState<MapView, MapViewModel> {
   late final Widget _background = GameWidget(game: FlameGame(
     world: Background(
-      backgroundPath: 'loading',
+      backgroundPath: GameMaps.loading,
       screenSize: Vector2(MediaQuery.sizeOf(context).width, MediaQuery.sizeOf(context).height),
     ),
     camera: CameraComponent()
@@ -71,7 +71,7 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
   }
 
   Widget _buildMapCarousel() {
-    const maps = GameMap.values;
+    final maps = GameMaps.values;
     return CarouselSlider(
       options: CarouselOptions(
         viewportFraction: 0.7,
@@ -94,19 +94,19 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: GameColor.primary.withOpacity(0.5),
+                  color: GameColors.primary.withOpacity(0.5),
                   blurRadius: 10,
                   spreadRadius: 5,
                 ),
               ]
             ),
-            child: AppImage('assets/tiles/${map.name}.png', borderRadius: BorderRadius.circular(12)),
+            child: AppImage(map.imagePath, borderRadius: BorderRadius.circular(12)),
           ),
           Text(
             map.name,
             style: GoogleFonts.pressStart2p(
               fontSize: 20,
-              color: GameColor.primary,
+              color: GameColors.primary,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -144,8 +144,8 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             // color: const Color.fromARGB(255, 117, 209, 255),
-            image: const DecorationImage(
-              image: AssetImage('assets/images/ui/banners/carved_slide.png'),
+            image: DecorationImage(
+              image: AssetImage(GameBanners.carvedSlide.path),
               fit: BoxFit.fill,
               scale: 0.1,
             ),
@@ -158,7 +158,7 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
                 'Play Mode',
                 style: GoogleFonts.pressStart2p(
                   fontSize: 20,
-                  color: GameColor.primary,
+                  color: GameColors.primary,
                 ),
               ),
               Row(

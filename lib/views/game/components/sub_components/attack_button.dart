@@ -1,7 +1,7 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:gunwave/data/constants/game/game_constants.dart';
+import 'package:gunwave/data/constants/game/game_hub.dart';
 import 'package:gunwave/views/game/gunwave.dart';
 
 class AttachButton extends SpriteComponent with HasGameRef<Gunwave>, TapCallbacks, DoubleTapCallbacks {
@@ -17,7 +17,7 @@ class AttachButton extends SpriteComponent with HasGameRef<Gunwave>, TapCallback
   Future<void> onLoad() async {
     add(RectangleHitbox());
 
-    sprite = Sprite(game.images.fromCache(GameComponents.hub.joystickKnob.path));
+    sprite = Sprite(game.images.fromCache(GameHubs.joystickKnob.path));
     
     priority = 1;
 

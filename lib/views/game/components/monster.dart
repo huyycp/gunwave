@@ -14,7 +14,7 @@ class Monster extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, Co
     required this.posXBound,
   });
 
-  final GameMonster monster;
+  final GameMonsters monster;
   final double negXBound;
   final double posXBound;
 

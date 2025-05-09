@@ -1,14 +1,15 @@
 import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame_tiled/flame_tiled.dart';
+import 'package:gunwave/data/constants/game/game_map.dart';
 
 class Background extends World {
   Background({
-    this.backgroundPath = 'background',
+    required this.backgroundPath,
     required this.screenSize,
   });
 
-  final String backgroundPath;
+  final GameMaps backgroundPath;
   final Vector2 screenSize;
   
   // Original background image dimensions
@@ -17,6 +18,7 @@ class Background extends World {
 
   @override
   FutureOr<void> onLoad() async {
+
     // Calculate scaling factors
     final scaleX = screenSize.x / originalWidth;
     final scaleY = screenSize.y / originalHeight;
@@ -26,7 +28,7 @@ class Background extends World {
     
     // Load the tiled component
     final component = await TiledComponent.load(
-      '$backgroundPath.tmx',
+      '${backgroundPath.name}.tmx',
       Vector2.all(64),
     );
     

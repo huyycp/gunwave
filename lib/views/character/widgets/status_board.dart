@@ -66,14 +66,14 @@ class StatusBoardState extends BaseWidgetState<StatusBoard, StatusBoardWidgetMod
           'Status Point:',
           style: GoogleFonts.pressStart2p(
             fontSize: 10,
-            color: GameColor.primary,
+            color: GameColors.primary,
           ),
         ),
         Text(
           widget.character.sp.toString(),
           style: GoogleFonts.pressStart2p(
             fontSize: 10,
-            color: GameColor.primary,
+            color: GameColors.primary,
           ),
         ),
       ],
@@ -88,7 +88,7 @@ class StatusBoardState extends BaseWidgetState<StatusBoard, StatusBoardWidgetMod
             attr.name.toUpperCase(),
             style: GoogleFonts.pressStart2p(
               fontSize: 16,
-              color: GameColor.primary,
+              color: GameColors.primary,
             ),
           ),
         ),
@@ -97,7 +97,7 @@ class StatusBoardState extends BaseWidgetState<StatusBoard, StatusBoardWidgetMod
             value.toString(),
             style: GoogleFonts.pressStart2p(
               fontSize: 16,
-              color: GameColor.primary,
+              color: GameColors.primary,
             ),
           ),
         ),
@@ -121,7 +121,7 @@ class StatusBoardState extends BaseWidgetState<StatusBoard, StatusBoardWidgetMod
       "Status Board",
       style: GoogleFonts.pressStart2p(
         fontSize: 20,
-        color: GameColor.primary,
+        color: GameColors.primary,
       ),
     );
   }

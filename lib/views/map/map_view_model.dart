@@ -9,9 +9,9 @@ final mapViewModel = ChangeNotifierProvider.autoDispose<MapViewModel>(
 
 class MapViewModel extends BaseViewModel {
 
-  GameMap currentMap = GameMap.values.first;
+  GameMaps currentMap = GameMaps.values.first;
 
-  void setMap(GameMap map) {
+  void setMap(GameMaps map) {
     currentMap = map;
     debugPrint("Map changed to: ${currentMap.name}");
     notifyListeners();

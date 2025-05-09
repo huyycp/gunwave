@@ -5,7 +5,7 @@
  <tileset firstgid="74" source="rocks_sm.tsx"/>
  <tileset firstgid="106" source="rocks_lg.tsx"/>
  <tileset firstgid="138" source="rocks_md.tsx"/>
- <layer id="1" name="water" width="30" height="17">
+ <layer id="1" name="water" width="30" height="17" locked="1">
   <data encoding="csv">
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -26,7 +26,7 @@
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 </data>
  </layer>
- <layer id="2" name="foam" width="30" height="17">
+ <layer id="2" name="foam" width="30" height="17" locked="1">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,26,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -47,7 +47,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="3" name="rocks" width="30" height="17">
+ <layer id="3" name="rocks" width="30" height="17" locked="1">
   <data encoding="csv">
 0,0,74,75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,90,91,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

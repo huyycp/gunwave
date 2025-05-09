@@ -1,22 +1,20 @@
-import 'package:gunwave/data/constants/game/game_color.dart';
-
-enum GameBuilding {
-
-  blueTower('tower', GameColor.blue);
-
-  final String name;
-  final GameColor color;
-
-  const GameBuilding(this.name, this.color);
-
-  String get path => 'buildings/$name/${name}_${color.name}.png';
-}
+import 'package:gunwave/gen/assets.gen.dart';
 
 class GameBuildings {
-  const GameBuildings._();
-  static const GameBuildings instance = GameBuildings._();
+  const GameBuildings._(this.name, this.path);
 
-  final name = 'building';
+  final String name;
+  final String path;
 
-  final blueTower = GameBuilding.blueTower;
+  static const className = 'building';
+  static final basePath = Assets.images.buildings;
+
+  static final values = [
+    blueTower,
+  ];
+
+  static final GameBuildings blueTower = GameBuildings._(
+    'tower',
+    basePath.tower.towerBlue.path,
+  );
 }

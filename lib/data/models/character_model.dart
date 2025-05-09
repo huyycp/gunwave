@@ -47,7 +47,7 @@ class CharacterModel {
 
   int totalSp;
 
-  GameCharacter? get character => characterFromFile(filename);
+  GameCharacters? get character => characterFromFile(filename);
 
   factory CharacterModel.fromJson(Map<String, dynamic> json) => CharacterModel(
     id: json['id']?.toString() ?? '',

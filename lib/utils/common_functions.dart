@@ -52,9 +52,9 @@ int intFromJson(dynamic json, {int defaultValue = 0}) {
   return json != null ? (int.tryParse(json.toString()) ?? defaultValue) : defaultValue;
 }
 
-GameCharacter? characterFromFile(String filename) {
-  for (var character in GameCharacter.values) {
-    if ('${character.name}_${character.color.name}' == filename) {
+GameCharacters? characterFromFile(String filename) {
+  for (var character in GameCharacters.values) {
+    if (character.name == filename) {
       return character;
     }
   }

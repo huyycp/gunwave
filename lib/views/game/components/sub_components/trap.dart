@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:gunwave/data/constants/game/game_trap.dart';
+import 'package:gunwave/data/constants/game/game_effect.dart';
 import 'package:gunwave/views/game/gunwave.dart';
 
 class Trap extends SpriteAnimationComponent with HasGameRef<Gunwave>, CollisionCallbacks {
@@ -12,7 +12,7 @@ class Trap extends SpriteAnimationComponent with HasGameRef<Gunwave>, CollisionC
     required super.size,
   });
 
-  final GameTrap trap;
+  final GameEffects trap;
 
   late final SpriteAnimation idleAni;
 

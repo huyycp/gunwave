@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
+import 'package:gunwave/data/constants/game/game_map.dart';
 import 'package:gunwave/views/character/character_view_model.dart';
 import 'package:gunwave/views/character/widgets/character_preview.dart';
 import 'package:gunwave/views/character/widgets/status_board.dart';
@@ -25,7 +26,7 @@ class CharacterView extends BaseView {
 class CharacterViewState extends BaseViewState<CharacterView, CharacterViewModel> {
   late final Widget _background = GameWidget(game: FlameGame(
     world: Background(
-      backgroundPath: 'loading',
+      backgroundPath: GameMaps.loading,
       screenSize: Vector2(MediaQuery.sizeOf(context).width, MediaQuery.sizeOf(context).height),
     ),
     camera: CameraComponent()
@@ -69,7 +70,7 @@ class CharacterViewState extends BaseViewState<CharacterView, CharacterViewModel
                   ),
                 ),
               ) 
-              : Center(child: CircularProgressIndicator(color: GameColor.primary)),
+              : const Center(child: CircularProgressIndicator(color: GameColors.primary)),
           ),
           Positioned(
             top: 12,
@@ -133,7 +134,7 @@ class CharacterViewState extends BaseViewState<CharacterView, CharacterViewModel
       model.characters[model.selectedCharacterIndex].name,
       style: GoogleFonts.pressStart2p(
         fontSize: 16,
-        color: GameColor.primary,
+        color: GameColors.primary,
       ),
       textAlign: TextAlign.center,
     );

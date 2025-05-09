@@ -1,14 +1,7 @@
 import 'dart:ui';
 
-enum GameColor {
-  red('red'),
-  blue('blue'),
-  yellow('yellow'),
-  purple('purple');
+class GameColors {
+  const GameColors._();
 
-  final String name;
-
-  const GameColor(this.name);
-
-  static Color get primary => const Color(0xFF1A2E53);
+  static const Color primary = Color(0xFF1A2E53);
 }

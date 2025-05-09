@@ -1,20 +1,17 @@
-enum GameLayer {
-  background('background'),
-  spawnPoints('spawn_points'),
-  collisions('collisions'),
-  buildings('buildings'),;
+class GameLayers{
+  const GameLayers._(this.name);
 
   final String name;
 
-  const GameLayer(this.name);
-}
+  static final values = [
+    background,
+    spawnPoints,
+    collisions,
+    buildings,
+  ];
 
-class GameLayers{
-  const GameLayers._();
-  static const GameLayers instance = GameLayers._();
-
-  final background = GameLayer.background;
-  final spawnPoints = GameLayer.spawnPoints;
-  final collisions = GameLayer.collisions;
-  final buildings = GameLayer.buildings;
+  static const background = GameLayers._('background');
+  static const spawnPoints = GameLayers._('spawn_points');
+  static const collisions = GameLayers._('collisions');
+  static const buildings = GameLayers._('buildings');
 }

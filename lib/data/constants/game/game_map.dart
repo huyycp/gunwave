@@ -1,21 +1,24 @@
-import 'package:gunwave/data/constants/game/game_constants.dart';
-
-enum GameMap {
-  forest('forest', horizontalTile: 40, verticalTile: 20);
-
-  final String name;
-  final int horizontalTile;
-  final int verticalTile;
-
-  double get width => horizontalTile * GameConstants.tileSize;
-  double get height => verticalTile * GameConstants.tileSize;
-
-  const GameMap(this.name, {this.horizontalTile = 0, this.verticalTile = 0});
-}
+import 'package:gunwave/gen/assets.gen.dart';
 
 class GameMaps {
-  const GameMaps._();
-  static const GameMaps instance = GameMaps._();
+  const GameMaps._(this.name, this.path, this.imagePath);
 
-  final easy = GameMap.forest;
+  final String name;
+  
+  /// Path to tmx
+  final String path;
+
+  /// Path to png
+  final String imagePath;
+
+  static const className = 'maps';
+  static const basePath = Assets.tiles;
+
+  static final values = [
+    forest,
+  ];
+
+  static final forest = GameMaps._('forest', basePath.forestTmx, basePath.forestPng.path);
+  static final loading = GameMaps._('loading', basePath.loading, '');
+  static final background = GameMaps._('background', basePath.background, '');
 }

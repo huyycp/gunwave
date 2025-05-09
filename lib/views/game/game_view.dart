@@ -15,7 +15,7 @@ class GameView extends BaseView {
     super.key,
   });
 
-  final GameMap map;
+  final GameMaps map;
   final bool joystickEnabled;
 
   @override
