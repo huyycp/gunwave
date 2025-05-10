@@ -36,6 +36,12 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
   ));
 
   @override
+  void onReady() {
+    super.onReady();
+    model.getMaps();
+  }
+
+  @override
   Widget getView() {
     ref.watch(mapViewModel);
     return Scaffold(
@@ -49,12 +55,17 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
               left: 8,
               child: _buildBackBtn(),
             ),
-            Positioned(
+            if (model.maps.isNotEmpty) Positioned(
               top: 8,
               right: 8,
               child: _buildFightBtn(),
             ),
-            Positioned.fill(top: 40, child: _buildMapCarousel())
+            Positioned.fill(
+              top: 40,
+              child: model.isLoading 
+                ? const Center(child: CircularProgressIndicator(color: GameColors.primary))
+                : _buildMapCarousel()
+            ),
           ],
         ),
       ),
@@ -71,14 +82,14 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
   }
 
   Widget _buildMapCarousel() {
-    final maps = GameMaps.values;
+    final maps = model.maps;
     return CarouselSlider(
       options: CarouselOptions(
         viewportFraction: 0.7,
         enableInfiniteScroll: false,
         scrollPhysics: const BouncingScrollPhysics(),
         onPageChanged: (index, reason) {
-          model.setMap(maps[index]);
+          model.setMap(index);
         },
       ),
       items: maps.map((map) => Column(
@@ -100,7 +111,7 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
                 ),
               ]
             ),
-            child: AppImage(map.imagePath, borderRadius: BorderRadius.circular(12)),
+            child: AppImage(map.map.imagePath, borderRadius: BorderRadius.circular(12)),
           ),
           Text(
             map.name,
@@ -170,7 +181,7 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
                       Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => GameView(
-                          map: model.currentMap,
+                          map: model.maps[model.currentMapIndex],
                           joystickEnabled: true,
                         ),
                       ),
@@ -189,7 +200,7 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => GameView(
-                            map: model.currentMap,
+                            map: model.maps[model.currentMapIndex],
                             joystickEnabled: false,
                           ),
                         ),

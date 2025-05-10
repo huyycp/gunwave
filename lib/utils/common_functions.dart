@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_character.dart';
+import 'package:gunwave/data/constants/game/game_map.dart';
+import 'package:gunwave/data/constants/game/game_monster.dart';
 import 'package:gunwave/theme/theme_provider.dart';
 import 'package:random_avatar/random_avatar.dart';
 import 'package:flutter/services.dart';
@@ -50,13 +52,4 @@ String getGameButtonPath(GameButtonState state, GameButtonSize size) {
 // Handle api response
 int intFromJson(dynamic json, {int defaultValue = 0}) {
   return json != null ? (int.tryParse(json.toString()) ?? defaultValue) : defaultValue;
-}
-
-GameCharacters? characterFromFile(String filename) {
-  for (var character in GameCharacters.values) {
-    if (character.name == filename) {
-      return character;
-    }
-  }
-  return null;
 }

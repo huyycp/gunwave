@@ -8,6 +8,7 @@ import 'package:gunwave/data/constants/game/game_character.dart';
 import 'package:gunwave/data/constants/game/game_constants.dart';
 import 'package:gunwave/data/constants/game/game_hub.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
+import 'package:gunwave/data/models/map_model.dart';
 import 'package:gunwave/views/game/components/character.dart';
 import 'package:gunwave/views/game/components/stage.dart';
 import 'package:gunwave/views/game/components/sub_components/attack_button.dart';
@@ -26,7 +27,7 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
 
 
   WidgetRef ref;
-  GameMaps map;
+  MapModel map;
   final bool isJoystickEnabled;
   final void Function() onStageCompleted;
   final void Function() onStageFailed;

@@ -1,5 +1,7 @@
+import 'package:flame/game.dart';
 import 'package:gunwave/data/constants/game/game_character.dart';
 import 'package:gunwave/utils/common_functions.dart';
+import 'package:gunwave/utils/enum_utils.dart';
 
 class CharacterModel {
   CharacterModel({
@@ -47,7 +49,7 @@ class CharacterModel {
 
   int totalSp;
 
-  GameCharacters? get character => characterFromFile(filename);
+  GameCharacters get character => enumFromString(GameCharacters.values, filename, GameCharacters.blueWarrior);
 
   factory CharacterModel.fromJson(Map<String, dynamic> json) => CharacterModel(
     id: json['id']?.toString() ?? '',

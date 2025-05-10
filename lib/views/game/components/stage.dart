@@ -8,6 +8,7 @@ import 'package:gunwave/data/constants/game/game_effect.dart';
 import 'package:gunwave/data/constants/game/game_layer.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
 import 'package:gunwave/data/constants/game/game_monster.dart';
+import 'package:gunwave/data/models/map_model.dart';
 import 'package:gunwave/views/game/components/character.dart';
 import 'package:gunwave/views/game/components/sub_components/building.dart';
 import 'package:gunwave/views/game/components/sub_components/collision_component.dart';
@@ -23,7 +24,7 @@ class Stage extends World with HasGameRef<Gunwave> {
     required this.onStageFailed,
   });
 
-  final GameMaps world;
+  final MapModel world;
   final Character character;
   final void Function() onStageCompleted;
   final void Function() onStageFailed;
@@ -77,15 +78,18 @@ class Stage extends World with HasGameRef<Gunwave> {
       } else if (point.class_ == GameComponents.monster) {
         final negXBound = point.properties.getValue('negXBound') ?? 0;
         final posXBound = point.properties.getValue('posXBound') ?? 0;
-        final monster = Monster(
-          monster: GameMonsters.redTorch,
-          position: point.position,
-          size: Vector2(point.width, point.height),
-          negXBound: negXBound,
-          posXBound: posXBound,
-        );
-        add(monster);
-        monsters.add(monster);
+        int index = world.monsters.indexWhere((monster) => monster.filename == point.name);
+        if (index != -1) {
+          final monster = Monster(
+            monster: world.monsters[index].monster,
+            position: point.position,
+            size: Vector2(point.width, point.height),
+            negXBound: negXBound,
+            posXBound: posXBound,
+          );
+          add(monster);
+          monsters.add(monster);
+        }
       } else if (point.class_ == GameComponents.effect) {
         final trap = Trap(
           trap: GameEffects.fire,
