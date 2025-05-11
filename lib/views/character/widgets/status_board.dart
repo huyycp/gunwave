@@ -1,12 +1,14 @@
+import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
+import 'package:gunwave/data/constants/game/game_ui.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/repositories/character_repository.dart';
 import 'package:gunwave/utils/exception/app_exception.dart';
+import 'package:gunwave/views/game/components/sub_components/app_banner.dart';
 import 'package:gunwave/widgets/base/base_widget.dart';
 import 'package:gunwave/widgets/base/base_widget_model.dart';
 import 'package:gunwave/widgets/game/game_button.dart';
@@ -28,31 +30,48 @@ class StatusBoard extends BaseWidget {
 class StatusBoardState extends BaseWidgetState<StatusBoard, StatusBoardWidgetModel> {
   late final provider = ChangeNotifierProvider<StatusBoardWidgetModel>((ref) => StatusBoardWidgetModel(ref));
 
+  final _background = GameWidget(
+    game: FlameGame(
+      children: [
+        AppBanner(
+          banner: GameBanners.bannerVertical,
+          xCount: 5,
+          yCount: 5,
+        )
+      ]  
+    ),
+  );
+
   @override
   Widget getWidget() {
     ref.watch(provider);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 24),
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/images/ui/banners/carved_square.png'),
-          // fit: BoxFit.fill,
-          scale: 0.1
-        ),
-      ),
-      clipBehavior: Clip.hardEdge,
-      child: Column(
+      // decoration: const BoxDecoration(
+      //   image: DecorationImage(
+      //     image: AssetImage('assets/images/ui/banners/carved_square.png'),
+      //     // fit: BoxFit.fill,
+      //     scale: 0.1
+      //   ),
+      // ),
+      // clipBehavior: Clip.hardEdge,
+      child: Stack(
         children: [
-          _buildHeader(),
-          const SizedBox(height: 4),
-          _buildStatusPoint(),
-          const SizedBox(height: 4),
-          _buildCharacterAttr(CharacterAttr.hp, widget.character.hp),
-          _buildCharacterAttr(CharacterAttr.str, widget.character.str),
-          _buildCharacterAttr(CharacterAttr.vit, widget.character.vit),
-          _buildCharacterAttr(CharacterAttr.agi, widget.character.agi),
-          const SizedBox(height: 4),
-          _buildResetButton(),
+          _background,
+          Column(
+            children: [
+              _buildHeader(),
+              const SizedBox(height: 4),
+              _buildStatusPoint(),
+              const SizedBox(height: 4),
+              _buildCharacterAttr(CharacterAttr.hp, widget.character.hp),
+              _buildCharacterAttr(CharacterAttr.str, widget.character.str),
+              _buildCharacterAttr(CharacterAttr.vit, widget.character.vit),
+              _buildCharacterAttr(CharacterAttr.agi, widget.character.agi),
+              const SizedBox(height: 4),
+              _buildResetButton(),
+            ],
+          ),
         ],
       ),
     );

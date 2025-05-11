@@ -9,6 +9,10 @@ class GameBanners {
   static const className = 'banners';
   static final basePath = Assets.images.ui.banners;
 
+  bool get isVertical => this == bannerVertical || this == bannerDown || this == bannerUp;
+  bool get isHorizontal => this == bannerHozizontal || this == bannerLeft || this == bannerRight;
+  bool get isCarved => this == carved || this == carvedSlide || this == carvedSquare;
+
   static final values = [
     bannerDown,
     bannerUp,
