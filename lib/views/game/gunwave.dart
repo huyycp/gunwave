@@ -8,6 +8,7 @@ import 'package:gunwave/data/constants/game/game_character.dart';
 import 'package:gunwave/data/constants/game/game_constants.dart';
 import 'package:gunwave/data/constants/game/game_hub.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
+import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/data/models/map_model.dart';
 import 'package:gunwave/views/game/components/character.dart';
 import 'package:gunwave/views/game/components/stage.dart';
@@ -17,6 +18,7 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
   Gunwave(
     this.ref, {
     required this.map,
+    required this.gameCharacters,
     this.isJoystickEnabled = false,
     required this.onStageCompleted,
     required this.onStageFailed,
@@ -28,22 +30,23 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
 
   WidgetRef ref;
   MapModel map;
+  final CharacterModel gameCharacters;
   final bool isJoystickEnabled;
   final void Function() onStageCompleted;
   final void Function() onStageFailed;
   
   late final JoystickComponent joystick;
-  late final Character character;
   Stage? stage;
 
   double accoumulatedTime = 0;
+
+  late final Character character = Character(gameCharacters);
 
   @override
   Future<void> onLoad() async {
     images.prefix = '';
     await images.loadAllImages();
 
-    character = Character(GameCharacters.bluePawn);
     stage = Stage(
       world: map,
       character: character,

@@ -33,10 +33,10 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
   void onReady() {
     super.onReady();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (model.userRepo.user != null) {
-        debugPrint("User: ${model.userRepo.user}");
+      if (model.userRepo.appUser == null) {
+        // debugPrint("User: ${model.userRepo.user}");
         model.toggleLoginForm();
-        model.userRepo.getAppUser();
+      // model.userRepo.getAppUser();
       }
     });
   }

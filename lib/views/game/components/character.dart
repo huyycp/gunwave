@@ -4,9 +4,9 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:gunwave/data/constants/game/game_character.dart';
 import 'package:gunwave/data/constants/game/game_constants.dart';
 import 'package:gunwave/data/constants/game/game_effect.dart';
+import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/utils/app_math.dart';
 import 'package:gunwave/views/game/components/sub_components/collision_component.dart';
 import 'package:gunwave/views/game/components/monster.dart';
@@ -18,7 +18,7 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
   
   Character(this.character);
 
-  final GameCharacters character;
+  final CharacterModel character;
   
   final double stepTime = 0.08;
   late final SpriteAnimation idleAni;
@@ -51,8 +51,10 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
   bool isAttackAvailable = false;
   bool isDoubleAttack = false;
 
-  int hp = 200;
-  int str = 50;
+  late int hp = character.hp;
+  late int str = character.str;
+  late int vit = character.vit;
+  late int agi = character.agi;
 
   final hitbox = RectangleHitbox(
     position: Vector2(72, 72),
@@ -81,12 +83,12 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
   double get characterX => scale.x > 0 ? position.x + hitbox.x : position.x - hitbox.x - hitbox.width;
   double get characterY => position.y + hitbox.y;
 
-  bool get isDead => hp <= 0;
+  bool get isDead => character.hp <= 0;
 
   int getHitRefreshTime = 500;
 
   late final healthBar = HealthBar(
-    maxHealth: hp,
+    maxHealth: character.hp,
     currentHealth: hp,
     width: 60,
     position: Vector2(hitbox.x + hitbox.width / 2, hitbox.y - 20), // Position above head
@@ -257,7 +259,7 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
   }) {
   
     return SpriteAnimation.fromFrameData(
-      game.images.fromCache(character.path),
+      game.images.fromCache(character.character!.path),
       SpriteAnimationData.sequenced(
         amount: frameAmount,
         amountPerRow: framePerRow,

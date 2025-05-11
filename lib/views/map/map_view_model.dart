@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/data/models/map_model.dart';
 import 'package:gunwave/repositories/map_repository.dart';
 import 'package:gunwave/widgets/base/base_view_model.dart';
@@ -17,6 +18,7 @@ class MapViewModel extends BaseViewModel {
 
   List<MapModel> maps = [];
   int currentMapIndex = 0;
+  CharacterModel? selectedCharacter;
 
   bool isLoading = false;
 
@@ -39,6 +41,11 @@ class MapViewModel extends BaseViewModel {
     }
   }
 
+  void selectCharacter(CharacterModel character) {
+    selectedCharacter = character;
+    debugPrint("Character selected: ${character.name}");
+    // notifyListeners();
+  }
 
   void setLoading(bool loading) {
     isLoading = loading;

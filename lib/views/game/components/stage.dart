@@ -52,7 +52,7 @@ class Stage extends World with HasGameRef<Gunwave> {
     _addBuildingsLayer();
     _addCollisionLayer();
 
-    debugMode = true;
+    // debugMode = true;
 
     return super.onLoad();
   }
@@ -81,7 +81,7 @@ class Stage extends World with HasGameRef<Gunwave> {
         int index = world.monsters.indexWhere((monster) => monster.filename == point.name);
         if (index != -1) {
           final monster = Monster(
-            monster: world.monsters[index].monster!,
+            monster: world.monsters[index],
             position: point.position,
             size: Vector2(point.width, point.height),
             negXBound: negXBound,

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/data/data_sources/remote/api/supabase_api.dart';
 import 'package:gunwave/data/models/user_model.dart';
@@ -23,10 +24,11 @@ class UserRemoteDataSource {
 
   Future<UserModel?> getAppUser(String authId) async {
     final response = await client
-        .from(usersTable)
-        .select()
-        .eq('auth_id', authId)
-        .single();
+      .from(usersTable)
+      .select('*, characters(*)')
+      .eq('auth_id', authId)
+      .single();
+    debugPrint("User with characters: $response");
     return UserModel.fromJson(response);
   }
 }

@@ -7,7 +7,7 @@ final homeViewModel = ChangeNotifierProvider.autoDispose<HomeViewModel>(
 
 class HomeViewModel extends BaseViewModel {
 
-  bool isLoginFormVisible = true;
+  bool isLoginFormVisible = false;
 
   void toggleLoginForm() {
     isLoginFormVisible = !isLoginFormVisible;

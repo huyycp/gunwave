@@ -20,8 +20,7 @@ class CharacterRemoteDataSource {
   Future<List<CharacterModel>> getCharacters(String userId) async {
     final response = await client
         .from(charactersTable)
-        .select()
-        .eq('user_id', userId);
+        .select();
     debugPrint("Characters: $response");
     return response.map((json) {
       return CharacterModel.fromJson(json);
