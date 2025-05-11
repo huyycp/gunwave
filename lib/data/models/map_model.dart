@@ -1,7 +1,6 @@
 import 'package:gunwave/data/constants/game/game_map.dart';
 import 'package:gunwave/data/models/monster_model.dart';
 import 'package:gunwave/utils/common_functions.dart';
-import 'package:gunwave/utils/enum_utils.dart';
 import 'package:gunwave/utils/list_utils.dart';
 
 class MapModel {
@@ -17,7 +16,7 @@ class MapModel {
   final String filename;
   final List<MonsterModel> monsters;
 
-  GameMaps get map => enumFromString(GameMaps.values, filename, GameMaps.forest);
+  GameMaps? get map => mapFromFile(filename);
 
   factory MapModel.fromJson(Map<String, dynamic> json) => MapModel(
     id: json['id']?.toString() ?? '',

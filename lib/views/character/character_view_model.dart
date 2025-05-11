@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/repositories/character_repository.dart';
@@ -30,6 +31,7 @@ class CharacterViewModel extends BaseViewModel {
   void onCharacterSelected(int index) {
     if (index < 0 || index >= characters.length) return;
     selectedCharacterIndex = index;
+    debugPrint("Character selected: ${characters[index].name}");
     notifyListeners(); 
   }
 }

@@ -52,7 +52,7 @@ class Stage extends World with HasGameRef<Gunwave> {
     _addBuildingsLayer();
     _addCollisionLayer();
 
-    // debugMode = true;
+    debugMode = true;
 
     return super.onLoad();
   }
@@ -81,7 +81,7 @@ class Stage extends World with HasGameRef<Gunwave> {
         int index = world.monsters.indexWhere((monster) => monster.filename == point.name);
         if (index != -1) {
           final monster = Monster(
-            monster: world.monsters[index].monster,
+            monster: world.monsters[index].monster!,
             position: point.position,
             size: Vector2(point.width, point.height),
             negXBound: negXBound,
@@ -91,12 +91,16 @@ class Stage extends World with HasGameRef<Gunwave> {
           monsters.add(monster);
         }
       } else if (point.class_ == GameComponents.effect) {
-        final trap = Trap(
-          trap: GameEffects.fire,
-          position: point.position,
-          size: Vector2(point.width, point.height),
-        );
-        add(trap);
+        if (point.name == GameEffects.fire.name) {
+          final effect = GameEffects.fire;
+          final effectComponent = Trap(
+            trap: effect,
+            position: point.position,
+            size: Vector2(point.width, point.height),
+            isVisibleOnTriggered: true,
+          );
+          add(effectComponent);
+        }
       } else if (point.class_ == GameComponents.building) {
         if (point.name == GameBuildings.blueTower.name) {
           final buildingComponent = Building(

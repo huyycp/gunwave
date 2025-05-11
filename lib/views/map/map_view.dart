@@ -111,7 +111,7 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
                 ),
               ]
             ),
-            child: AppImage(map.map.imagePath, borderRadius: BorderRadius.circular(12)),
+            child: AppImage(map.map?.imagePath ?? '', borderRadius: BorderRadius.circular(12)),
           ),
           Text(
             map.name,

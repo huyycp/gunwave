@@ -47,14 +47,6 @@ class StatusBoardState extends BaseWidgetState<StatusBoard, StatusBoardWidgetMod
     ref.watch(provider);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 24),
-      // decoration: const BoxDecoration(
-      //   image: DecorationImage(
-      //     image: AssetImage('assets/images/ui/banners/carved_square.png'),
-      //     // fit: BoxFit.fill,
-      //     scale: 0.1
-      //   ),
-      // ),
-      // clipBehavior: Clip.hardEdge,
       child: Stack(
         children: [
           _background,

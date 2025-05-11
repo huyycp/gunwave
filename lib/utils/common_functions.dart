@@ -53,3 +53,24 @@ String getGameButtonPath(GameButtonState state, GameButtonSize size) {
 int intFromJson(dynamic json, {int defaultValue = 0}) {
   return json != null ? (int.tryParse(json.toString()) ?? defaultValue) : defaultValue;
 }
+
+GameCharacters? characterFromFile(String filename, {GameCharacters? defaultFile}) {
+  return GameCharacters.values.firstWhere(
+    (character) => character.name == filename,
+    orElse: () => defaultFile ?? GameCharacters.blueWarrior,
+  );
+}
+
+GameMonsters? monsterFromFile(String filename, {GameMonsters? defaultFile}) {
+  return GameMonsters.values.firstWhere(
+    (monster) => monster.name == filename,
+    orElse: () => defaultFile ?? GameMonsters.blueTorch,
+  );
+}
+
+GameMaps? mapFromFile(String filename, {GameMaps? defaultFile}) {
+  return GameMaps.values.firstWhere(
+    (map) => map.name == filename,
+    orElse: () => defaultFile ?? GameMaps.forest,
+  );
+}

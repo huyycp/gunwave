@@ -21,7 +21,7 @@ class MonsterModel {
   int vit;
   int agi;
 
-  GameMonsters get monster => enumFromString(GameMonsters.values, filename, GameMonsters.blueTorch);
+  GameMonsters? get monster => monsterFromFile(filename);
 
   factory MonsterModel.fromJson(Map<String, dynamic> json) => MonsterModel(
     id: json['id']?.toString() ?? '',

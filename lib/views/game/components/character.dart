@@ -6,10 +6,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:gunwave/data/constants/game/game_character.dart';
 import 'package:gunwave/data/constants/game/game_constants.dart';
+import 'package:gunwave/data/constants/game/game_effect.dart';
 import 'package:gunwave/utils/app_math.dart';
 import 'package:gunwave/views/game/components/sub_components/collision_component.dart';
 import 'package:gunwave/views/game/components/monster.dart';
 import 'package:gunwave/views/game/components/sub_components/health_bar.dart';
+import 'package:gunwave/views/game/components/sub_components/trap.dart';
 import 'package:gunwave/views/game/gunwave.dart';
 
 class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, KeyboardHandler, CollisionCallbacks {
@@ -84,11 +86,25 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
   int getHitRefreshTime = 500;
 
   late final healthBar = HealthBar(
-      maxHealth: hp,
-      currentHealth: hp,
-      width: 60,
-      position: Vector2(hitbox.x + hitbox.width / 2, hitbox.y - 20), // Position above head
-    );
+    maxHealth: hp,
+    currentHealth: hp,
+    width: 60,
+    position: Vector2(hitbox.x + hitbox.width / 2, hitbox.y - 20), // Position above head
+  );
+
+  late final fireEffect = SpriteAnimationComponent(
+    animation: SpriteAnimation.fromFrameData(
+      game.images.fromCache(GameEffects.fire.path),
+      SpriteAnimationData.sequenced(
+        amount: 7, // Adjust frame count as needed
+        stepTime: 0.08, // Adjust animation speed as needed
+        textureSize: Vector2(128, 128),
+        loop: true,
+      ),
+    ),
+    size: Vector2(48, 48),
+    position: Vector2(hitbox.x + hitbox.width / 2 - 24, hitbox.y), // Position above head
+  );
 
   @override
   FutureOr<void> onLoad() {
@@ -161,18 +177,8 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
     if (event.logicalKey == LogicalKeyboardKey.keyJ) {
       triggerAttack = event is KeyDownEvent;
     }
-
-    // if (isDoubleAttackKeyPressed && !isAttacking) {
-    //   isAttacking = true;
-    //   isDoubleAttack = true;
-    // } else {
-    //   isAttacking = false;
-    //   isDoubleAttack = false;
-    // }
-
     return super.onKeyEvent(event, keysPressed);
   }
-
 
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
@@ -199,6 +205,21 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
         healthBar.updateHealth(hp);
         setInvicible();
         debugPrint('Character HP: $hp');
+      }
+    }
+    if (other is Trap) {
+      if (other.trap == GameEffects.fire) {
+        if (
+          other.hitbox.collidingWith(hitbox) &&
+          hitbox.collisionType == CollisionType.active && 
+          !isDead
+        ) {
+          hp -= other.damage;
+          healthBar.updateHealth(hp);
+          setInvicible();
+          setFireEffect();
+          debugPrint('Character HP: $hp');
+        }
       }
     }
     super.onCollision(intersectionPoints, other);
@@ -387,6 +408,13 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
     hitbox.collisionType = CollisionType.inactive;
     Future.delayed(Duration(milliseconds: getHitRefreshTime), () {
       hitbox.collisionType = CollisionType.active;
+    });
+  }
+
+  void setFireEffect() {
+    add(fireEffect);
+    Future.delayed(const Duration(milliseconds: 500), () {
+      fireEffect.removeFromParent();
     });
   }
 }
