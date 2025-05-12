@@ -1,19 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gunwave/data/constants/game/game_map.dart';
+import 'package:gunwave/data/models/map_model.dart';
+import 'package:gunwave/repositories/map_repository.dart';
 import 'package:gunwave/widgets/base/base_view_model.dart';
 
-final mapViewModel = ChangeNotifierProvider.autoDispose<MapViewModel>(
-  (ref) => MapViewModel()
+final mapViewModel = ChangeNotifierProvider<MapViewModel>(
+  (ref) => MapViewModel(ref)
 );
 
 class MapViewModel extends BaseViewModel {
+  MapViewModel(ChangeNotifierProviderRef ref) {
+    _mapRepo = ref.read(mapRepoProvider);
+  }
 
-  GameMap currentMap = GameMap.values.first;
+  late final MapRepository _mapRepo;
 
-  void setMap(GameMap map) {
-    currentMap = map;
-    debugPrint("Map changed to: ${currentMap.name}");
+  List<MapModel> maps = [];
+  int currentMapIndex = 0;
+
+  bool isLoading = false;
+
+  void setMap(int index) {
+    currentMapIndex = index;
+    debugPrint("Map changed to: ${maps[index].name}");
+    notifyListeners();
+  }
+
+  Future<void> getMaps() async {
+    if (maps.isEmpty) setLoading(true);
+    try {
+      maps = await _mapRepo.getMaps();
+      debugPrint("Maps loaded: ${maps.length}");
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Error loading maps: $e");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+
+  void setLoading(bool loading) {
+    isLoading = loading;
     notifyListeners();
   }
 }

@@ -2,8 +2,13 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:gunwave/data/constants/game/game_building.dart';
-import 'package:gunwave/data/constants/game/game_constants.dart';
+import 'package:gunwave/data/constants/game/game_collision.dart';
+import 'package:gunwave/data/constants/game/game_components.dart';
+import 'package:gunwave/data/constants/game/game_effect.dart';
+import 'package:gunwave/data/constants/game/game_layer.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
+import 'package:gunwave/data/constants/game/game_monster.dart';
+import 'package:gunwave/data/models/map_model.dart';
 import 'package:gunwave/views/game/components/character.dart';
 import 'package:gunwave/views/game/components/sub_components/building.dart';
 import 'package:gunwave/views/game/components/sub_components/collision_component.dart';
@@ -19,7 +24,7 @@ class Stage extends World with HasGameRef<Gunwave> {
     required this.onStageFailed,
   });
 
-  final GameMap world;
+  final MapModel world;
   final Character character;
   final void Function() onStageCompleted;
   final void Function() onStageFailed;
@@ -38,7 +43,7 @@ class Stage extends World with HasGameRef<Gunwave> {
   FutureOr<void> onLoad() async {
     component = await TiledComponent.load(
       '${world.name}.tmx',
-      Vector2.all(64)
+      Vector2.all(64),
     );
 
     add(component);
@@ -60,39 +65,42 @@ class Stage extends World with HasGameRef<Gunwave> {
   }
 
   void _addSpawnPointsLayer() {
-    final spawnPointsLayer = component.tileMap.getLayer<ObjectGroup>(GameComponents.layers.spawnPoints.name);
+    final spawnPointsLayer = component.tileMap.getLayer<ObjectGroup>(GameLayers.spawnPoints.name);
 
     if (spawnPointsLayer == null) {
       throw Exception('SpawnPoints layer not found in the map.');
     }
 
     for (var point in spawnPointsLayer.objects) {
-      if (point.class_ == GameComponents.characters.name) {
+      if (point.class_ == GameComponents.character) {
         character.position = point.position;
         add(character);
-      } else if (point.class_ == GameComponents.monsters.name) {
+      } else if (point.class_ == GameComponents.monster) {
         final negXBound = point.properties.getValue('negXBound') ?? 0;
         final posXBound = point.properties.getValue('posXBound') ?? 0;
-        final monster = Monster(
-          monster: GameComponents.monsters.blueTorch,
-          position: point.position,
-          size: Vector2(point.width, point.height),
-          negXBound: negXBound,
-          posXBound: posXBound,
-        );
-        add(monster);
-        monsters.add(monster);
-      } else if (point.class_ == GameComponents.trap.name) {
+        int index = world.monsters.indexWhere((monster) => monster.filename == point.name);
+        if (index != -1) {
+          final monster = Monster(
+            monster: world.monsters[index].monster,
+            position: point.position,
+            size: Vector2(point.width, point.height),
+            negXBound: negXBound,
+            posXBound: posXBound,
+          );
+          add(monster);
+          monsters.add(monster);
+        }
+      } else if (point.class_ == GameComponents.effect) {
         final trap = Trap(
-          trap: GameComponents.trap.fire,
+          trap: GameEffects.fire,
           position: point.position,
           size: Vector2(point.width, point.height),
         );
         add(trap);
-      } else if (point.class_ == GameComponents.building.name) {
-        if (point.name == GameBuilding.blueTower.name) {
+      } else if (point.class_ == GameComponents.building) {
+        if (point.name == GameBuildings.blueTower.name) {
           final buildingComponent = Building(
-          building: GameBuilding.blueTower,
+          building: GameBuildings.blueTower,
           position: point.position,
           size: Vector2(point.width, point.height),
         );
@@ -126,7 +134,7 @@ class Stage extends World with HasGameRef<Gunwave> {
   }
 
   void _addCollisionLayer() {
-    final collisions = component.tileMap.getLayer<ObjectGroup>(GameComponents.layers.collisions.name);
+    final collisions = component.tileMap.getLayer<ObjectGroup>(GameLayers.collisions.name);
 
     if (collisions == null) {
       throw Exception('Collisions layer not found in the map.');
@@ -134,7 +142,7 @@ class Stage extends World with HasGameRef<Gunwave> {
 
     for (var point in collisions.objects) {
       final CollisionComponent component;
-      if (point.class_ == GameComponents.colissions.boundary.name) {
+      if (point.class_ == GameCollisions.boundary.name) {
         component = CollisionComponent(
           position: point.position,
           size: point.size,

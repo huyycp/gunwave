@@ -1,14 +1,9 @@
-enum GameCollision {
-  boundary('boundary');
+class GameCollisions {
+  const GameCollisions._(this.name);
 
   final String name;
 
-  const GameCollision(this.name);
-}
-
-class GameCollisions {
-  const GameCollisions._();
-  static const GameCollisions instance = GameCollisions._();
-
-  final boundary = GameCollision.boundary;
+  static const boundary = GameCollisions._(
+    'boundary',
+  );
 }

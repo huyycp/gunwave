@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/app_constant.dart';
-import 'package:gunwave/data/constants/game/game_building.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
+import 'package:gunwave/gen/assets.gen.dart';
 import 'package:gunwave/views/splash/splash_view_model.dart';
 import 'package:gunwave/widgets/base/base_view.dart';
 
@@ -19,9 +19,7 @@ class _SplashViewState extends BaseViewState<SplashView, SplashViewModel> {
   void onReady() {
     super.onReady();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(seconds: 1), () {
-        openApp();
-      });
+        model.init(openApp);
     });
   }
   
@@ -33,7 +31,7 @@ class _SplashViewState extends BaseViewState<SplashView, SplashViewModel> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/images/${GameBuildings.instance.blueTower.path}',
+              Assets.images.buildings.tower.towerBlue.path,
               width: 160,
               height: 160,
             ),
@@ -42,7 +40,7 @@ class _SplashViewState extends BaseViewState<SplashView, SplashViewModel> {
               AppConstant.appName,
               style: GoogleFonts.pressStart2p(
                 fontSize: 32,
-                color: GameColor.primary,
+                color: GameColors.primary,
               ),
             ),
           ],

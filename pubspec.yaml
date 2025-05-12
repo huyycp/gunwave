@@ -24,27 +24,70 @@ dependencies:
   flame: 1.26.1
   flame_tiled: 2.0.3
   carousel_slider: 5.0.0
+  supabase_flutter: 2.9.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+  build_runner:
+  flutter_gen_runner:
 
 flutter:
   uses-material-design: true
   
   assets:
-    - assets/images/hub/joystick/
+    - dev.env
+    - prod.env
     - assets/tiles/
     - assets/images/
-    - assets/images/ui/buttons/
+    - assets/images/hub/joystick/
     - assets/images/ui/banners/
+    - assets/images/ui/buttons/
+    - assets/images/ui/icons/
+    - assets/images/ui/pointers/
+    - assets/images/ui/ribbons/
+    - assets/images/deco/
+    - assets/images/buildings/castle/
+    - assets/images/buildings/house/
     - assets/images/buildings/tower/
+    - assets/images/buildings/wood_house/
+    - assets/images/buildings/wood_tower/
+    - assets/images/effects/explosion/
     - assets/images/effects/fire/
-    - assets/images/terrain/
+    - assets/images/resources/dynamite/
+    - assets/images/resources/gold_bag/
+    - assets/images/resources/gold_mine/
+    - assets/images/resources/meat/
+    - assets/images/resources/sheep/
     - assets/images/resources/trees/
+    - assets/images/resources/wood/
+    - assets/images/terrain/
     - assets/images/terrain/water/
     - assets/images/terrain/water/foam/
     - assets/images/terrain/water/rocks/
+    - assets/images/factions/knights/dead/
     - assets/images/factions/knights/warrior/blue/
+    - assets/images/factions/knights/warrior/red/
+    - assets/images/factions/knights/warrior/yellow/
+    - assets/images/factions/knights/warrior/purple/
+    - assets/images/factions/knights/archer/blue/
+    - assets/images/factions/knights/archer/red/
+    - assets/images/factions/knights/archer/yellow/
+    - assets/images/factions/knights/archer/purple/
+    - assets/images/factions/knights/pawn/blue/
+    - assets/images/factions/knights/pawn/red/
+    - assets/images/factions/knights/pawn/yellow/
+    - assets/images/factions/knights/pawn/purple/
+    - assets/images/factions/monsters/barrel/blue/
+    - assets/images/factions/monsters/barrel/red/
+    - assets/images/factions/monsters/barrel/yellow/
+    - assets/images/factions/monsters/barrel/purple/
     - assets/images/factions/monsters/torch/blue/
+    - assets/images/factions/monsters/torch/red/
+    - assets/images/factions/monsters/torch/yellow/
+    - assets/images/factions/monsters/torch/purple/
+    - assets/images/factions/monsters/tnt/blue/
+    - assets/images/factions/monsters/tnt/red/
+    - assets/images/factions/monsters/tnt/yellow/
+    - assets/images/factions/monsters/tnt/purple/

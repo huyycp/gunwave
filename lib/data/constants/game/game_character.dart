@@ -1,47 +1,62 @@
-import 'package:gunwave/data/constants/game/game_color.dart';
-
-enum GameCharacter {
-  blueArcher('archer', GameColor.blue),
-  redArcher('archer', GameColor.red),
-  yellowArcher('archer', GameColor.yellow),
-  purpleArcher('archer', GameColor.purple),
-
-  bluePawn('pawn', GameColor.blue),
-  redPawn('pawn', GameColor.red),
-  yellowPawn('pawn', GameColor.yellow),
-  purplePawn('pawn', GameColor.purple),
-
-  blueWarrior('warrior', GameColor.blue),
-  redWarrior('warrior', GameColor.red),
-  yellowWarrior('warrior', GameColor.yellow),
-  purpleWarrior('warrior', GameColor.purple);
-
-  final String name;
-  final GameColor color;
-
-  const GameCharacter(this.name, this.color); 
-
-  String get path => 'factions/knights/$name/${color.name}/${name}_${color.name}.png';
-}
+import 'package:gunwave/gen/assets.gen.dart';
 
 class GameCharacters {
-  const GameCharacters._();
-  static const GameCharacters instance = GameCharacters._();
+  const GameCharacters._(this.name, this.path);
 
-  final name = 'character';
+  final String name;
+  final String path;
 
-  final blueArcher = GameCharacter.blueArcher;
-  final redArcher = GameCharacter.redArcher;
-  final yellowArcher = GameCharacter.yellowArcher;
-  final purpleArcher = GameCharacter.purpleArcher;
+  static const className = 'character';
+  static final basePath = Assets.images.factions.knights;
 
-  final bluePawn = GameCharacter.bluePawn;
-  final redPawn = GameCharacter.redPawn;
-  final yellowPawn = GameCharacter.yellowPawn;
-  final purplePawn = GameCharacter.purplePawn;
+  static final values = [
+    blueWarrior,
+    redWarrior,
+    yellowWarrior,
+    purpleWarrior,
+    bluePawn,
+    redPawn,
+    yellowPawn,
+    purplePawn,
+  ];
 
-  final blueWarrior = GameCharacter.blueWarrior;
-  final redWarrior = GameCharacter.redWarrior;
-  final yellowWarrior = GameCharacter.yellowWarrior;
-  final purpleWarrior = GameCharacter.purpleWarrior;
+  static final blueWarrior = GameCharacters._(
+    'warrior_blue',
+    basePath.warrior.blue.warriorBluePng.path,
+  );
+
+  static final redWarrior = GameCharacters._(
+    'warrior_red',
+    basePath.warrior.red.warriorRedPng.path,
+  );
+
+  static final yellowWarrior = GameCharacters._(
+    'warrior_yellow',
+    basePath.warrior.yellow.warriorYellowPng.path,
+  );
+
+  static final purpleWarrior = GameCharacters._(
+    'warrior_purple',
+    basePath.warrior.purple.warriorPurplePng.path,
+  );
+
+  static final bluePawn = GameCharacters._(
+    'pawn_blue',
+    basePath.pawn.blue.pawnBluePng.path,
+  );
+
+  static final redPawn = GameCharacters._(
+    'pawn_red',
+    basePath.pawn.red.pawnRedPng.path,
+  );
+
+  static final yellowPawn = GameCharacters._(
+    'pawn_yellow',
+    basePath.pawn.yellow.pawnYellowPng.path,
+  );
+
+  static final purplePawn = GameCharacters._(
+    'pawn_purple',
+    basePath.pawn.purple.pawnPurplePng.path,
+  );
 }

@@ -9,7 +9,7 @@ class Building extends SpriteComponent with HasGameRef<Gunwave> {
     required super.size,
   });
 
-  final GameBuilding building;
+  final GameBuildings building;
 
   @override
   Future<void> onLoad() async {

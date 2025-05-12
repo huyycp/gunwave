@@ -106,7 +106,7 @@ class _GameButtonState extends State<GameButton> {
                 padding: buttonPadding,
                 child: DefaultTextStyle(
                   style: GoogleFonts.pressStart2p(
-                    color: isEnabled ? GameColor.primary : Colors.brown.withOpacity(0.5),
+                    color: isEnabled ? GameColors.primary : Colors.brown.withOpacity(0.5),
                     fontSize: widget.size == GameButtonSize.small ? 14 : 
                              widget.size == GameButtonSize.medium ? 18 : 24,
                     fontWeight: FontWeight.bold,

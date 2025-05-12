@@ -1,7 +1,7 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gunwave/data/constants/game/game_map.dart';
+import 'package:gunwave/data/models/map_model.dart';
 import 'package:gunwave/theme/app_colors.dart';
 import 'package:gunwave/views/game/game_view_model.dart';
 import 'package:gunwave/views/game/gunwave.dart';
@@ -15,7 +15,7 @@ class GameView extends BaseView {
     super.key,
   });
 
-  final GameMap map;
+  final MapModel map;
   final bool joystickEnabled;
 
   @override

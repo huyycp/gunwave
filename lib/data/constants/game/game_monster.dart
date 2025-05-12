@@ -1,47 +1,86 @@
-import 'package:gunwave/data/constants/game/game_color.dart';
-
-enum GameMonster {
-  blueBarrel('barrel', GameColor.blue),
-  redBarrel('barrel', GameColor.red),
-  yellowBarrel('barrel', GameColor.yellow),
-  purpleBarrel('barrel', GameColor.purple),
-
-  blueTnt('tnt', GameColor.blue),
-  redTnt('tnt', GameColor.red),
-  yellowTnt('tnt', GameColor.yellow),
-  purpleTnt('tnt', GameColor.purple),
-
-  blueTorch('torch', GameColor.blue),
-  redTorch('torch', GameColor.red),
-  yellowTorch('torch', GameColor.yellow),
-  purpleTorch('torch', GameColor.purple);
-
-  final String name;
-  final GameColor color;
-
-  const GameMonster(this.name, this.color); 
-
-  String get path => 'factions/monsters/$name/${color.name}/${name}_${color.name}.png';
-}
+import 'package:gunwave/gen/assets.gen.dart';
 
 class GameMonsters {
-  const GameMonsters._();
-  static const GameMonsters instance = GameMonsters._();
+  const GameMonsters._(this.name, this.path);
 
-  final name = 'monster';
+  final String name;
+  final String path;
+  
+  static const className = 'monster';
+  static final basePath = Assets.images.factions.monsters;
 
-  final blueBarrel = GameMonster.blueBarrel;
-  final redBarrel = GameMonster.redBarrel;
-  final yellowBarrel = GameMonster.yellowBarrel;
-  final purpleBarrel = GameMonster.purpleBarrel;
+  static final values = [
+    blueBarrel,
+    redBarrel,
+    yellowBarrel,
+    purpleBarrel,
+    blueTnt,
+    redTnt,
+    yellowTnt,
+    purpleTnt,
+    blueTorch,
+    redTorch,
+    yellowTorch,
+    purpleTorch,
+  ];
 
-  final blueTnt = GameMonster.blueTnt;
-  final redTnt = GameMonster.redTnt;
-  final yellowTnt = GameMonster.yellowTnt;
-  final purpleTnt = GameMonster.purpleTnt;
+  static final blueBarrel = GameMonsters._(
+    'barrel_blue',
+    basePath.barrel.blue.barrelBluePng.path,
+  );
 
-  final blueTorch = GameMonster.blueTorch;
-  final redTorch = GameMonster.redTorch;
-  final yellowTorch = GameMonster.yellowTorch;
-  final purpleTorch = GameMonster.purpleTorch;
+  static final redBarrel = GameMonsters._(
+    'barrel_red',
+    basePath.barrel.red.barrelRedPng.path,
+  );
+  
+  static final yellowBarrel = GameMonsters._(
+    'barrel_yellow',
+    basePath.barrel.yellow.barrelYellowPng.path,
+  );
+  
+  static final purpleBarrel = GameMonsters._(
+    'barrel_purple',
+    basePath.barrel.purple.barrelPurplePng.path,
+  );
+
+  static final blueTnt = GameMonsters._(
+    'tnt_blue',
+    basePath.tnt.blue.tntBluePng.path,
+  );
+  
+  static final redTnt = GameMonsters._(
+    'tnt_red',
+    basePath.tnt.red.tntRedPng.path,
+  );
+  
+  static final yellowTnt = GameMonsters._(
+    'tnt_yellow',
+    basePath.tnt.yellow.tntYellowPng.path,
+  );
+  
+  static final purpleTnt = GameMonsters._(
+    'tnt_purple',
+    basePath.tnt.purple.tntPurplePng.path,
+  );
+
+  static final blueTorch = GameMonsters._(
+    'torch_blue',
+    basePath.torch.blue.torchBluePng.path,
+  );
+  
+  static final redTorch = GameMonsters._(
+    'torch_red',
+    basePath.torch.red.torchRedPng.path,
+  );
+  
+  static final yellowTorch = GameMonsters._(
+    'torch_yellow',
+    basePath.torch.yellow.torchYellowPng.path,
+  );
+  
+  static final purpleTorch = GameMonsters._(
+    'torch_purple',
+    basePath.torch.purple.torchPurplePng.path,
+  );
 }

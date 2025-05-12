@@ -1,17 +1,18 @@
-enum GameHub {
-  joystickKnob('hub/joystick/knob.png'),
-  joystickBackground('hub/joystick/background.png');
+import 'package:gunwave/gen/assets.gen.dart';
+
+class GameHubs {
+  const GameHubs._(this.path);
 
   final String path;
 
-  const GameHub(this.path);
-}
+  static const className = 'hubs';
+  static final basePath = Assets.images.hub;
 
-class GameHubs {
-  const GameHubs._();
-  static const GameHubs instance = GameHubs._();
+  static final values = [
+    joystickKnob,
+    joystickBackground,
+  ];
 
-
-  final joystickKnob = GameHub.joystickKnob;
-  final joystickBackground = GameHub.joystickBackground;
+  static final joystickKnob = GameHubs._(basePath.joystick.knob.path);
+  static final joystickBackground = GameHubs._(basePath.joystick.background.path);
 }

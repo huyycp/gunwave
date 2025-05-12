@@ -1,12 +1,15 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flame/components.dart';
+import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter_riverpod/src/consumer.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
+import 'package:gunwave/data/constants/game/game_ui.dart';
 import 'package:gunwave/views/game/game_view.dart';
+import 'package:gunwave/views/home/widgets/background.dart';
 import 'package:gunwave/views/map/map_view_model.dart';
 import 'package:gunwave/widgets/app_image.dart';
 import 'package:gunwave/widgets/base/base_view.dart';
@@ -19,10 +22,25 @@ class MapView extends BaseView {
   ConsumerState<ConsumerStatefulWidget> createState() {
     return MapViewState();
   }
-
 }
 
 class MapViewState extends BaseViewState<MapView, MapViewModel> {
+  late final Widget _background = GameWidget(game: FlameGame(
+    world: Background(
+      backgroundPath: GameMaps.loading,
+      screenSize: Vector2(MediaQuery.sizeOf(context).width, MediaQuery.sizeOf(context).height),
+    ),
+    camera: CameraComponent()
+      ..viewfinder.anchor = Anchor.topLeft
+      ..viewfinder.zoom = 1.0  // Use full size since we're scaling the component
+  ));
+
+  @override
+  void onReady() {
+    super.onReady();
+    model.getMaps();
+  }
+
   @override
   Widget getView() {
     ref.watch(mapViewModel);
@@ -31,17 +49,23 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
         color: const Color.fromARGB(255, 90, 190, 189),
         child: Stack(
           children: [
+            _background,
             Positioned(
               top: 8,
               left: 8,
               child: _buildBackBtn(),
             ),
-            Positioned(
+            if (model.maps.isNotEmpty) Positioned(
               top: 8,
               right: 8,
               child: _buildFightBtn(),
             ),
-            Positioned.fill(top: 40, child: _buildMapCarousel())
+            Positioned.fill(
+              top: 40,
+              child: model.isLoading 
+                ? const Center(child: CircularProgressIndicator(color: GameColors.primary))
+                : _buildMapCarousel()
+            ),
           ],
         ),
       ),
@@ -58,14 +82,14 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
   }
 
   Widget _buildMapCarousel() {
-    const maps = GameMap.values;
+    final maps = model.maps;
     return CarouselSlider(
       options: CarouselOptions(
         viewportFraction: 0.7,
         enableInfiniteScroll: false,
         scrollPhysics: const BouncingScrollPhysics(),
         onPageChanged: (index, reason) {
-          model.setMap(maps[index]);
+          model.setMap(index);
         },
       ),
       items: maps.map((map) => Column(
@@ -81,19 +105,19 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: GameColor.primary.withOpacity(0.5),
+                  color: GameColors.primary.withOpacity(0.5),
                   blurRadius: 10,
                   spreadRadius: 5,
                 ),
               ]
             ),
-            child: AppImage('assets/tiles/${map.name}.png', borderRadius: BorderRadius.circular(12)),
+            child: AppImage(map.map.imagePath, borderRadius: BorderRadius.circular(12)),
           ),
           Text(
             map.name,
             style: GoogleFonts.pressStart2p(
               fontSize: 20,
-              color: GameColor.primary,
+              color: GameColors.primary,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -131,8 +155,8 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             // color: const Color.fromARGB(255, 117, 209, 255),
-            image: const DecorationImage(
-              image: AssetImage('assets/images/ui/banners/carved_slide.png'),
+            image: DecorationImage(
+              image: AssetImage(GameBanners.carvedSlide.path),
               fit: BoxFit.fill,
               scale: 0.1,
             ),
@@ -145,7 +169,7 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
                 'Play Mode',
                 style: GoogleFonts.pressStart2p(
                   fontSize: 20,
-                  color: GameColor.primary,
+                  color: GameColors.primary,
                 ),
               ),
               Row(
@@ -157,7 +181,7 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
                       Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => GameView(
-                          map: model.currentMap,
+                          map: model.maps[model.currentMapIndex],
                           joystickEnabled: true,
                         ),
                       ),
@@ -176,7 +200,7 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => GameView(
-                            map: model.currentMap,
+                            map: model.maps[model.currentMapIndex],
                             joystickEnabled: false,
                           ),
                         ),
