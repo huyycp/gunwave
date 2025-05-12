@@ -7,6 +7,7 @@ class CharacterModel {
     required this.userId,
     required this.name,
     required this.filename,
+    required this.price,
     required this.hp,
     required this.str,
     required this.vit,
@@ -26,6 +27,8 @@ class CharacterModel {
   final String name;
   
   final String filename;
+
+  final int price;
   
   int hp;
 
@@ -54,6 +57,7 @@ class CharacterModel {
     userId: json['user_id']?.toString() ?? '',
     name: json['name']?.toString() ?? '',
     filename: json['filename']?.toString() ?? '',
+    price: intFromJson(json['price'], defaultValue: 0),
     hp: intFromJson(json['hp'], defaultValue: 0),
     str: intFromJson(json['str'], defaultValue: 0),
     vit: intFromJson(json['vit'], defaultValue: 0),
@@ -71,6 +75,7 @@ class CharacterModel {
     'user_id': userId,
     'name': name,
     'filename': filename,
+    'price': price,
     'hp': hp,
     'str': str,
     'vit': vit,

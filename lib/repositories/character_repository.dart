@@ -11,9 +11,12 @@ class CharacterRepository {
 
   final CharacterRemoteDataSource _characterRemote;
 
-  Future<List<CharacterModel>> getCharacters(String? userId) async {
-    if (userId == null) return [];
-    return await _characterRemote.getCharacters(userId);
+  Future<List<CharacterModel>> getCharacters() async {
+    return await _characterRemote.getCharacters();
+  }
+
+  Future<List<CharacterModel>> getUnownedCharacters(String userId) async {
+    return await _characterRemote.getUnownedCharacters(userId);
   }
 
   Future<bool> updateAttr(String id, CharacterAttr attr) async {
