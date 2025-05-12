@@ -33,7 +33,11 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
   
   final spawnPosition = Vector2.zero();
 
-  double moveSpeed = 150;
+  late int hp = character.hp;
+  late int str = character.str;
+  late int vit = character.vit;
+  late int agi = character.agi;
+  late int moveSpeed = agi;
   Vector2 velocity = Vector2.zero();
 
   /// Value : -1, 0, 1
@@ -50,11 +54,6 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
   bool isAttacking = false;
   bool isAttackAvailable = false;
   bool isDoubleAttack = false;
-
-  late int hp = character.hp;
-  late int str = character.str;
-  late int vit = character.vit;
-  late int agi = character.agi;
 
   final hitbox = RectangleHitbox(
     position: Vector2(72, 72),
@@ -289,10 +288,10 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
   }
 
   void _updateCharacterMovement(double dt) {
-    velocity.x = horizontalMovement * moveSpeed;
+    velocity.x = horizontalMovement * moveSpeed * 1.0;
     position.x += velocity.x * dt;
 
-    velocity.y = verticalMovement * moveSpeed;
+    velocity.y = verticalMovement * moveSpeed * 1.0;
     position.y += velocity.y * dt;
   }
   

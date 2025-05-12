@@ -208,7 +208,7 @@
 </data>
  </layer>
  <objectgroup id="13" name="buildings" locked="1"/>
- <objectgroup id="3" name="spawn_points">
+ <objectgroup id="3" name="spawn_points" locked="1">
   <object id="11" name="character" type="character" x="640" y="640" width="192" height="192"/>
   <object id="12" name="torch_red" type="monster" x="1664" y="704" width="192" height="192">
    <properties>
@@ -229,7 +229,7 @@
   </object>
   <object id="81" name="fire" type="effects" x="896" y="512" width="128" height="128"/>
  </objectgroup>
- <objectgroup id="2" name="collisions" locked="1">
+ <objectgroup id="2" name="collisions">
   <object id="1" type="boundary" x="577.131" y="511.666" width="193.463" height="14.657"/>
   <object id="4" type="boundary" x="576" y="960" width="385.259" height="64"/>
   <object id="5" type="boundary" x="1215.39" y="1152" width="128.612" height="64"/>
@@ -266,20 +266,20 @@
   <object id="44" type="boundary" x="2050.02" y="1019.33" width="64" height="64.8926"/>
   <object id="45" type="boundary" x="1728.64" y="957.311" width="249.919" height="63.9378"/>
   <object id="46" type="boundary" x="577" y="513.361" width="21.1008" height="505.449"/>
-  <object id="47" type="boundary" x="956.47" y="450.005" width="59.7959" height="16.1966"/>
-  <object id="48" type="boundary" x="769.781" y="446.346" width="70.987" height="9.995"/>
+  <object id="47" type="boundary" x="944.754" y="450.005" width="71.5115" height="15.4644"/>
+  <object id="48" type="boundary" x="769.781" y="446.346" width="70.987" height="14.3884"/>
   <object id="49" type="boundary" x="768" y="256" width="253.888" height="64"/>
   <object id="50" type="boundary" x="1984" y="896" width="64" height="63.3467"/>
   <object id="51" type="boundary" x="2112" y="957.189" width="64" height="63.7952"/>
-  <object id="52" type="boundary" x="832.079" y="386.779" width="11.354" height="61.2193"/>
-  <object id="53" type="boundary" x="832" y="386" width="125.514" height="14.0464"/>
-  <object id="54" type="boundary" x="944.42" y="387.94" width="14.355" height="61.3714"/>
-  <object id="55" type="boundary" x="769.084" y="447.797" width="7.65834" height="69.1134"/>
-  <object id="57" type="boundary" x="1007.12" y="455.331" width="15.543" height="71.2609"/>
-  <object id="58" type="boundary" x="1012.66" y="513.426" width="330.208" height="14.3071"/>
-  <object id="59" type="boundary" x="1326.35" y="514.57" width="16.1624" height="77.2725"/>
-  <object id="61" type="boundary" x="1330.37" y="573.414" width="389.232" height="16.8508"/>
-  <object id="62" type="boundary" x="1703.99" y="576.038" width="21.8702" height="67.5934"/>
+  <object id="52" type="boundary" x="832.079" y="386.779" width="17.2118" height="61.2193"/>
+  <object id="53" type="boundary" x="832" y="386" width="125.514" height="17.7075"/>
+  <object id="54" type="boundary" x="942.956" y="387.94" width="15.8195" height="76.0159"/>
+  <object id="55" type="boundary" x="769.084" y="447.797" width="13.5161" height="69.1134"/>
+  <object id="57" type="boundary" x="995.404" y="455.331" width="27.2586" height="71.2609"/>
+  <object id="58" type="boundary" x="1012.66" y="513.426" width="330.208" height="17.9682"/>
+  <object id="59" type="boundary" x="1322.69" y="514.57" width="19.8235" height="77.2725"/>
+  <object id="61" type="boundary" x="1330.37" y="573.414" width="396.554" height="22.7086"/>
+  <object id="62" type="boundary" x="1701.06" y="576.038" width="24.7991" height="75.6479"/>
   <object id="63" type="boundary" x="1705.2" y="641.378" width="272.669" height="11.9213"/>
   <object id="64" type="boundary" x="1964.94" y="645.728" width="17.3962" height="70.1838"/>
   <object id="65" type="boundary" x="1968.68" y="706.027" width="78.1304" height="9.12262"/>
