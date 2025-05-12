@@ -55,6 +55,7 @@ flutter:
     - assets/images/buildings/wood_tower/
     - assets/images/effects/explosion/
     - assets/images/effects/fire/
+    - assets/images/resources/
     - assets/images/resources/dynamite/
     - assets/images/resources/gold_bag/
     - assets/images/resources/gold_mine/

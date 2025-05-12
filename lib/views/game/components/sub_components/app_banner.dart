@@ -27,6 +27,7 @@ class AppBanner extends PositionComponent with HasGameRef<FlameGame> {
   @override
   Future<void> onLoad() async {
     try {
+      game.images.prefix = '';
       await(game.images.load(banner.path));
 
       final spriteSheet = game.images.fromCache(banner.path);

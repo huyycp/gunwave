@@ -21,7 +21,7 @@ class MapRemoteDataSource {
   Future<List<MapModel>> getMaps() async {
     final response = await client
       .from(mapsTable)
-      .select('*, monsters(*)') 
+      .select('*, monsters(*), rewards(*, maps_rewards(amount))') 
       .order('id', ascending: true);
     debugPrint("Maps response: $response");
     return response.map((json) {
