@@ -15,6 +15,10 @@ class CharacterRepository {
     return await _characterRemote.getCharacters();
   }
 
+  Future<List<CharacterModel>> getOwnedCharacters(String userId) async {
+    return await _characterRemote.getOwnedCharacters(userId);
+  }
+
   Future<List<CharacterModel>> getUnownedCharacters(String userId) async {
     return await _characterRemote.getUnownedCharacters(userId);
   }

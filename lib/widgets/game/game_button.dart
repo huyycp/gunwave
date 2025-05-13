@@ -74,6 +74,10 @@ class _GameButtonState extends State<GameButton> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.onPressed == null) {
+      state = GameButtonState.disabled;
+    }
+
     final buttonSize = _getButtonSize();
     final buttonPadding = _getButtonPadding();
     

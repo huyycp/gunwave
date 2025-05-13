@@ -16,7 +16,7 @@ class ShopViewModel extends BaseViewModel {
   late final CharacterRepository _characterRepo;
 
   List<CharacterModel> characters = [];
-  List<CharacterModel> unownedCharacters = [];
+  List<CharacterModel> ownedCharacters = [];
 
   bool isLoading = true;
 
@@ -26,7 +26,7 @@ class ShopViewModel extends BaseViewModel {
     try {
       if (userRepo.appUser == null) return;
       characters = await _characterRepo.getCharacters();
-      unownedCharacters = await _characterRepo.getUnownedCharacters(userRepo.appUser!.id);
+      ownedCharacters = await _characterRepo.getOwnedCharacters(userRepo.appUser!.id);
       notifyListeners();
     } catch (err, stack) {
       AppException.log(runtimeType, err, stack);
@@ -35,25 +35,27 @@ class ShopViewModel extends BaseViewModel {
     }
   }
 
-  Future<void> buyCharacter(String characterId) async {
+  Future<void> buyCharacter(CharacterModel character) async {
     try {
       if (userRepo.appUser == null) return;
       view?.showFullScreenLoading();
-      final result = await _characterRepo.buyCharacter(characterId);
+      final result = await _characterRepo.buyCharacter(character.id);
       if (result) {
-        unownedCharacters.removeWhere((element) => element.id == characterId);
-        notifyListeners();
+        ownedCharacters.add(character);
+        userRepo.appUser?.gold -= character.price;
       }
     } catch (err, stack) {
       AppException.log(runtimeType, err, stack);
     } finally {
+      userRepo.getAppUser();
+      notifyListeners();
       view?.hideFullScreenLoading();
     }
   }
 
-  bool isCharacterOwned(String characterId) {
-    return characters.any((element) => element.id == characterId);
-  }
+  // Property that returns a function to check character ownership
+  get isCharacterOwned => (String characterId) => 
+    ownedCharacters.any((element) => element.id == characterId);
 
   void setLoading(bool loading) {
     isLoading = loading;

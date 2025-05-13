@@ -21,10 +21,23 @@ class CharacterRemoteDataSource {
   Future<List<CharacterModel>> getCharacters() async {
     final response = await client
         .from(charactersTable)
-        .select();
+        .select()
+        .order('price', ascending: true);
     debugPrint("Characters: $response");
     return response.map((json) {
       return CharacterModel.fromJson(json);
+    }).toList();
+  }
+
+  Future<List<CharacterModel>> getOwnedCharacters(String userId) async {
+    final response = await client
+        .from(usersCharactersTable)
+        .select('characters(*)')
+        .eq('user_id', userId);
+    
+    debugPrint("Owned characters: $response");
+    return response.map((json) {
+      return CharacterModel.fromJson(json['characters']);
     }).toList();
   }
 
