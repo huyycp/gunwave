@@ -252,6 +252,10 @@ class $AssetsImagesHubGen {
 class $AssetsImagesResourcesGen {
   const $AssetsImagesResourcesGen();
 
+  /// File path: assets/images/resources/coin.png
+  AssetGenImage get coin =>
+      const AssetGenImage('assets/images/resources/coin.png');
+
   /// Directory path: assets/images/resources/dynamite
   $AssetsImagesResourcesDynamiteGen get dynamite =>
       const $AssetsImagesResourcesDynamiteGen();
@@ -279,6 +283,9 @@ class $AssetsImagesResourcesGen {
   /// Directory path: assets/images/resources/wood
   $AssetsImagesResourcesWoodGen get wood =>
       const $AssetsImagesResourcesWoodGen();
+
+  /// List of all assets
+  List<AssetGenImage> get values => [coin];
 }
 
 class $AssetsImagesTerrainGen {

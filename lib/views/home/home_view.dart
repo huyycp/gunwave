@@ -57,13 +57,19 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
                   onPressed: () {
                     context.push(Routes.map);
                   },
-                  child: const Text('Play')
+                  child: const Text('Maps')
                 ),
                 GameButton(
                   onPressed: () {
                     context.push(Routes.character);
                   },
-                  child: const Text('Status')
+                  child: const Text('Champs')
+                ),
+                GameButton(
+                  onPressed: () {
+                    context.push(Routes.shop);
+                  },
+                  child: const Text('Shop')
                 ),
               ],
             ),

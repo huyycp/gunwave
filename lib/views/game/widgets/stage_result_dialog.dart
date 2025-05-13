@@ -5,10 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_ui.dart';
 import 'package:gunwave/data/models/reward_model.dart';
-import 'package:gunwave/gen/assets.gen.dart';
 import 'package:gunwave/routes.dart';
 import 'package:gunwave/views/game/components/sub_components/app_banner.dart';
-import 'package:gunwave/widgets/app_image.dart';
 
 class StageResultDialog extends StatelessWidget {
   StageResultDialog({

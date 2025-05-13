@@ -16,12 +16,12 @@ class CharacterViewModel extends BaseViewModel {
   
   Future<void> getCharacters() async {
     try {
-      await Future.delayed(const Duration(milliseconds: 100), () {
-        characters = userRepo.appUser?.characters ?? [];
-        setLoading(false);
-      });
+      await userRepo.getAppUser();
+      characters = userRepo.appUser?.characters ?? [];
     } catch (err, stack) {
       AppException.log(runtimeType, err, stack);
+    } finally {
+      setLoading(false);
     }
   }
 

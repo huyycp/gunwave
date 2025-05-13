@@ -32,7 +32,7 @@ class MapViewModel extends BaseViewModel {
     if (maps.isEmpty) setLoading(true);
     try {
       maps = await _mapRepo.getMaps();
-      debugPrint("Maps loaded: ${maps.length}");
+      debugPrint("Maps loaded: ${maps.map((e) => e.toJson())}");
       notifyListeners();
     } catch (e) {
       debugPrint("Error loading maps: $e");

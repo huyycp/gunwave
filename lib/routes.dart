@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gunwave/views/character/character_view.dart';
 import 'package:gunwave/views/home/home_view.dart';
 import 'package:gunwave/views/map/map_view.dart';
+import 'package:gunwave/views/shop/shop_view.dart';
 import 'package:gunwave/views/splash/splash_view.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -13,6 +14,7 @@ class Routes {
   static const home = '/home';
   static const map = '/map';
   static const character = '/character';
+  static const shop = '/shop';
 
   static final GoRouter config = GoRouter(
     initialLocation: splash,
@@ -23,6 +25,7 @@ class Routes {
       _buildHomeRoute(),
       _buildMapRoute(),
       _buildCharacterRoute(),
+      _buildShopRoute(),
     ],
   );
   
@@ -55,6 +58,14 @@ class Routes {
       path: character,
       name: character,
       pageBuilder: (context, state) => const NoTransitionPage(child: CharacterView()),
+    );
+  }
+
+  static GoRoute _buildShopRoute() {
+    return GoRoute(
+      path: shop,
+      name: shop,
+      pageBuilder: (context, state) => const NoTransitionPage(child: ShopView()),
     );
   }
 }
