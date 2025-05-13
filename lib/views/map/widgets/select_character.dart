@@ -37,7 +37,7 @@ class SelectCharacterWidget extends BaseWidget {
 }
 
 class SelectCharacterWidgetState extends BaseWidgetState<SelectCharacterWidget, SelectCharacterWidgetModel> {
-  late final provider = ChangeNotifierProvider<SelectCharacterWidgetModel>((ref) => SelectCharacterWidgetModel(widget.onCharacterSelected));
+  late final provider = ChangeNotifierProvider<SelectCharacterWidgetModel>((ref) => SelectCharacterWidgetModel(ref, widget.onCharacterSelected));
   
   final _background = GameWidget(
     game: FlameGame(
@@ -174,7 +174,11 @@ class SelectCharacterWidgetState extends BaseWidgetState<SelectCharacterWidget, 
 }
 
 class SelectCharacterWidgetModel extends BaseWidgetModel {
-  SelectCharacterWidgetModel(this.onCharacterSelected);
+  SelectCharacterWidgetModel(ref, this.onCharacterSelected) {
+    _characterRepo = ref.read(characterRepoProvider);
+  }
+
+  late final CharacterRepository _characterRepo;
 
   final void Function(CharacterModel) onCharacterSelected;
   List<CharacterModel> characters = [];
@@ -184,11 +188,9 @@ class SelectCharacterWidgetModel extends BaseWidgetModel {
 
   Future<void> getCharacters() async {
     try {
-      await Future.delayed(Duration.zero, () {
-        characters = userRepo.appUser?.characters ?? [];
-        debugPrint("Characters loaded: $characters");
-        setLoading(false);
-      });
+      if (userRepo.appUser == null) return;
+      characters = await _characterRepo.getOwnedCharacters(userRepo.appUser!.id);
+      debugPrint("Characters loaded: $characters");
     } catch (e) {
       debugPrint("Error loading characters: $e");
     } finally {

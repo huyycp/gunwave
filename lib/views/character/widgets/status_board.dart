@@ -190,11 +190,7 @@ class StatusBoardWidgetModel extends BaseWidgetModel {
     try {
       final result = await _characterRepo.resetAttr(character.id);
       if (result) {
-        character.hp = character.baseHp;
-        character.str = character.baseStr;
-        character.vit = character.baseVit;
-        character.agi = character.baseAgi;
-        character.sp = character.totalSp;
+        await _characterRepo.getOwnedCharacter(userRepo.appUser!.id, character.id);
         notifyListeners();
       }
     } catch (err, stack) {
