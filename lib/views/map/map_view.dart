@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
 import 'package:gunwave/data/constants/game/game_ui.dart';
+import 'package:gunwave/utils/extensions/string_ex.dart';
 import 'package:gunwave/views/game/game_view.dart';
 import 'package:gunwave/views/home/widgets/background.dart';
 import 'package:gunwave/views/map/map_view_model.dart';
@@ -115,7 +116,7 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
             child: AppImage(map.map?.imagePath ?? '', borderRadius: BorderRadius.circular(12)),
           ),
           Text(
-            map.name,
+            map.name.capitalize,
             style: GoogleFonts.pressStart2p(
               fontSize: 20,
               color: GameColors.primary,
