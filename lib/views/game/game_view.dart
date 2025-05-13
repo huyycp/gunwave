@@ -3,12 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/data/models/map_model.dart';
-import 'package:gunwave/theme/app_colors.dart';
-import 'package:gunwave/views/character/character_view_model.dart';
 import 'package:gunwave/views/game/game_view_model.dart';
 import 'package:gunwave/views/game/gunwave.dart';
 import 'package:gunwave/views/game/widgets/stage_result_dialog.dart';
-import 'package:gunwave/widgets/app_button.dart';
 import 'package:gunwave/widgets/base/base_view.dart';
 
 class GameView extends BaseView {

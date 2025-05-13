@@ -1,6 +1,5 @@
 import 'package:gunwave/data/constants/game/game_monster.dart';
 import 'package:gunwave/utils/common_functions.dart';
-import 'package:gunwave/utils/enum_utils.dart';
 
 class MonsterModel {
   MonsterModel({

@@ -6,8 +6,6 @@ import 'package:gunwave/data/constants/game/game_collision.dart';
 import 'package:gunwave/data/constants/game/game_components.dart';
 import 'package:gunwave/data/constants/game/game_effect.dart';
 import 'package:gunwave/data/constants/game/game_layer.dart';
-import 'package:gunwave/data/constants/game/game_map.dart';
-import 'package:gunwave/data/constants/game/game_monster.dart';
 import 'package:gunwave/data/models/map_model.dart';
 import 'package:gunwave/views/game/components/character.dart';
 import 'package:gunwave/views/game/components/sub_components/building.dart';
