@@ -47,7 +47,7 @@ class SelectCharacterWidgetState extends BaseWidgetState<SelectCharacterWidget, 
     game: FlameGame(
       children: [
         AppBanner(
-          banner: GameBanners.bannerHozizontal,
+          banner: GameBanners.bannerHorizontal,
           xCount: 10,
           yCount: 5,
         )

@@ -82,7 +82,7 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
   double get characterX => scale.x > 0 ? position.x + hitbox.x : position.x - hitbox.x - hitbox.width;
   double get characterY => position.y + hitbox.y;
 
-  bool get isDead => character.hp <= 0;
+  bool get isDead => hp <= 0;
 
   int getHitRefreshTime = 500;
 
@@ -192,7 +192,7 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
       ) {
         other.hp -= str;
         other.healthBar.updateHealth(other.hp);
-        other.setInvicible();
+        other.setInvincible();
         debugPrint('Monster HP: ${other.hp}');
       }
 

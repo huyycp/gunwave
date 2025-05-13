@@ -157,7 +157,9 @@ class Monster extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, Co
     int? framePerRow,
     bool loop = true,
   }) {
-  
+    if (monster.monster == null) {
+      throw Exception("Monster path is null");
+    }
     return SpriteAnimation.fromFrameData(
       game.images.fromCache(monster.monster!.path),
       SpriteAnimationData.sequenced(
@@ -215,7 +217,7 @@ class Monster extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, Co
     }
   }
 
-  void setInvicible() {
+  void setInvincible() {
     if (hitbox.collisionType == CollisionType.inactive) {
       return;
     }
