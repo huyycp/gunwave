@@ -15,7 +15,9 @@ class RewardModel {
   factory RewardModel.fromJson(Map<String, dynamic> json) => RewardModel(
     id: json['id']?.toString() ?? '',
     type: enumFromString(RewardType.values, json['type'], RewardType.unknown),
-    amount: intFromJson(json['maps_rewards']?.first['amount']),
+    amount: json['maps_reward'] != null && json['maps_rewards'].isNotEmpty
+      ? intFromJson(json['maps_rewards'].first['amount'])
+      : 0,
   );
 
   Map<String, dynamic> toJson() => {

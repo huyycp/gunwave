@@ -54,7 +54,7 @@ class ShopViewModel extends BaseViewModel {
   }
 
   // Property that returns a function to check character ownership
-  get isCharacterOwned => (String characterId) => 
+  bool Function(String) get isCharacterOwned => (String characterId) => 
     ownedCharacters.any((element) => element.id == characterId);
 
   void setLoading(bool loading) {
