@@ -25,19 +25,20 @@ class CharacterRemoteDataSource {
         .order('price', ascending: true);
     debugPrint("Characters: $response");
     return response.map((json) {
-      return CharacterModel.fromJson(json);
+      return CharacterModel.fromCharactersJson(json);
     }).toList();
   }
 
   Future<List<CharacterModel>> getOwnedCharacters(String userId) async {
     final response = await client
         .from(usersCharactersTable)
-        .select('characters(*)')
-        .eq('user_id', userId);
+        .select('*, characters(*)')
+        .eq('user_id', userId)
+        .order('created_at', ascending: true);
     
     debugPrint("Owned characters: $response");
     return response.map((json) {
-      return CharacterModel.fromJson(json['characters']);
+      return CharacterModel.fromUsersCharactersJson(json);
     }).toList();
   }
 
@@ -61,13 +62,25 @@ class CharacterRemoteDataSource {
     
     debugPrint("Unowned characters: $response");
     return response.map((json) {
-      return CharacterModel.fromJson(json);
+      return CharacterModel.fromCharactersJson(json);
     }).toList();
+  }
+
+  Future<CharacterModel?> getOwnedCharacter(String userId, String characterId) async {
+    final response = await client
+        .from(usersCharactersTable)
+        .select('*, characters(*)')
+        .eq('user_id', userId)
+        .eq('character_id', characterId)
+        .single();
+    
+    debugPrint("Owned character: $response");
+    return CharacterModel.fromUsersCharactersJson(response);
   }
 
   Future<bool> updateAttr(String id, CharacterAttr attr) async {
     final result = await client.rpc('update_character_status', params: {
-      'character_id': id,
+      'char_id': id,
       'attr': attr.name,
     });
 
@@ -77,7 +90,7 @@ class CharacterRemoteDataSource {
 
   Future<bool> resetAttr(String id) async {
     final result = await client.rpc('reset_character_status', params: {
-      'character_id': id,
+      'char_id': id,
     });
 
     debugPrint("Reset character attr: $result");

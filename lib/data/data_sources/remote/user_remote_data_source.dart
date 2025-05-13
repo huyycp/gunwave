@@ -25,10 +25,10 @@ class UserRemoteDataSource {
   Future<UserModel?> getAppUser(String authId) async {
     final response = await client
       .from(usersTable)
-      .select('*, characters(*)')
+      .select('*')
       .eq('auth_id', authId)
       .single();
-    debugPrint("User with characters: $response");
+    debugPrint("User: $response");
     return UserModel.fromJson(response);
   }
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/repositories/character_repository.dart';
@@ -27,6 +28,8 @@ class ShopViewModel extends BaseViewModel {
       if (userRepo.appUser == null) return;
       characters = await _characterRepo.getCharacters();
       ownedCharacters = await _characterRepo.getOwnedCharacters(userRepo.appUser!.id);
+      debugPrint("Characters loaded: ${characters.map((e) => e.toJson())}");
+      debugPrint("Owned characters loaded: ${ownedCharacters.map((e) => e.toJson())}");
       notifyListeners();
     } catch (err, stack) {
       AppException.log(runtimeType, err, stack);

@@ -11,7 +11,6 @@ import 'package:gunwave/views/game/components/sub_components/app_banner.dart';
 import 'package:gunwave/views/shop/shop_view_model.dart';
 import 'package:gunwave/widgets/base/base_view.dart';
 import 'package:gunwave/widgets/game/game_button.dart';
-
 class ShopView extends BaseView {
   const ShopView({super.key});
 

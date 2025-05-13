@@ -38,7 +38,6 @@ class CharacterViewState extends BaseViewState<CharacterView, CharacterViewModel
   void onReady() {
     super.onReady();
     model.getCharacters();
-    
   }
 
   @override
