@@ -11,6 +11,7 @@ import 'package:gunwave/data/constants/game/game_ui.dart';
 import 'package:gunwave/views/game/game_view.dart';
 import 'package:gunwave/views/home/widgets/background.dart';
 import 'package:gunwave/views/map/map_view_model.dart';
+import 'package:gunwave/views/map/widgets/select_character.dart';
 import 'package:gunwave/widgets/app_image.dart';
 import 'package:gunwave/widgets/base/base_view.dart';
 import 'package:gunwave/widgets/game/game_button.dart';
@@ -111,7 +112,7 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
                 ),
               ]
             ),
-            child: AppImage(map.map.imagePath, borderRadius: BorderRadius.circular(12)),
+            child: AppImage(map.map?.imagePath ?? '', borderRadius: BorderRadius.circular(12)),
           ),
           Text(
             map.name,
@@ -129,7 +130,7 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
   Widget _buildFightBtn() {
     return GameButton(
       onPressed: () {
-        showPlayModeDialog();
+        showCharacterSelectDialog();
         
 
         // Navigator.of(context).push(
@@ -145,6 +146,13 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
     );
   }
 
+  void showCharacterSelectDialog() {
+    SelectCharacterWidget.show((character) {
+      model.selectCharacter(character);
+      showPlayModeDialog();
+    });
+  }
+
   void showPlayModeDialog() {
     showDialog(
       context: context,
@@ -154,7 +162,6 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            // color: const Color.fromARGB(255, 117, 209, 255),
             image: DecorationImage(
               image: AssetImage(GameBanners.carvedSlide.path),
               fit: BoxFit.fill,
@@ -178,29 +185,33 @@ class MapViewState extends BaseViewState<MapView, MapViewModel> {
                 children: [
                   GameButton(
                     onPressed: () {
+                      context.pop();
                       Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => GameView(
-                          map: model.maps[model.currentMapIndex],
-                          joystickEnabled: true,
+                        MaterialPageRoute(
+                          builder: (context) => GameView(
+                            map: model.maps[model.currentMapIndex],
+                            character: model.selectedCharacter!,
+                            joystickEnabled: true,
+                          ),
                         ),
-                      ),
-                    );
+                      );
                     },
                     child: const Text('Joystick'),
                   ),
                   GameButton(
                     onPressed: () {
-                      
+                      context.pop();
                     },
                     child: const Text('Gestures'),
                   ),
                   GameButton(
                     onPressed: () {
+                      context.pop();
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => GameView(
                             map: model.maps[model.currentMapIndex],
+                            character: model.selectedCharacter!,
                             joystickEnabled: false,
                           ),
                         ),

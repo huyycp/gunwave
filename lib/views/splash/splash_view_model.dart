@@ -7,6 +7,9 @@ final splashViewModel = ChangeNotifierProvider.autoDispose<SplashViewModel>(
 
 class SplashViewModel extends BaseViewModel {
   Future<void> init(void Function() onDone) async {
+    if (userRepo.user != null) {
+      await userRepo.getAppUser();
+    }
     onDone();
   }
 }

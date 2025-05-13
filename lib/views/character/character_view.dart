@@ -33,13 +33,13 @@ class CharacterViewState extends BaseViewState<CharacterView, CharacterViewModel
       ..viewfinder.anchor = Anchor.topLeft
       ..viewfinder.zoom = 1.0  // Use full size since we're scaling the component
   ));
-
+  
   @override
   void onReady() {
-    model.getCharacters();
     super.onReady();
+    model.getCharacters();
   }
-  
+
   @override
   Widget getView() {
     ref.watch(characterViewModel);
@@ -49,13 +49,12 @@ class CharacterViewState extends BaseViewState<CharacterView, CharacterViewModel
     return Scaffold(
       body: Stack(
         children: [
-          // _buildBackground(),
           Container(
             color: const Color.fromARGB(255, 90, 190, 189),
           ),
           _background,
           Center(
-            child: model.characters.isNotEmpty 
+            child: !model.isLoading 
               ? LayoutBuilder(
                 builder: (context, constaint) => SizedBox(
                   height: height,
@@ -122,8 +121,6 @@ class CharacterViewState extends BaseViewState<CharacterView, CharacterViewModel
   }
 
   Widget _buildStatusBoard() {
-    // ref.watch(characterViewModel);
-
     return StatusBoard(
       model.characters[model.selectedCharacterIndex],
     );

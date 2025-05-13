@@ -2,6 +2,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:gunwave/data/constants/game/game_constants.dart';
 import 'package:gunwave/data/constants/game/game_monster.dart';
+import 'package:gunwave/data/models/monster_model.dart';
 import 'package:gunwave/views/game/components/sub_components/health_bar.dart';
 import 'package:gunwave/views/game/gunwave.dart';
 
@@ -14,7 +15,7 @@ class Monster extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, Co
     required this.posXBound,
   });
 
-  final GameMonsters monster;
+  final MonsterModel monster;
   final double negXBound;
   final double posXBound;
 
@@ -32,8 +33,10 @@ class Monster extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, Co
   double moveSpeed = 120;
   int getHitRefreshTime = 500;
 
-  int hp = 100;
-  int str = 40;
+  late int hp = monster.hp;
+  late int str = monster.str;
+  late int vit = monster.vit;
+  late int agi = monster.agi;
 
   double accoumulatedTime = 0;
 
@@ -154,9 +157,11 @@ class Monster extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, Co
     int? framePerRow,
     bool loop = true,
   }) {
-  
+    if (monster.monster == null) {
+      throw Exception("Monster path is null");
+    }
     return SpriteAnimation.fromFrameData(
-      game.images.fromCache(monster.path),
+      game.images.fromCache(monster.monster!.path),
       SpriteAnimationData.sequenced(
         amount: frameAmount,
         amountPerRow: framePerRow,
@@ -212,7 +217,7 @@ class Monster extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, Co
     }
   }
 
-  void setInvicible() {
+  void setInvincible() {
     if (hitbox.collisionType == CollisionType.inactive) {
       return;
     }
