@@ -68,7 +68,7 @@ class StageResultDialog extends StatelessWidget {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                Row(
+                if (result) Row(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: 8,

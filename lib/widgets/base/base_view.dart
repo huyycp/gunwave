@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/routes.dart';
 import 'base_view_model.dart';
 import 'base_widget.dart';
