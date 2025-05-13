@@ -16,6 +16,7 @@ class CharacterRemoteDataSource {
   SupabaseClient get client => _supabaseApi.supabase;
 
   final charactersTable = 'characters';
+  final usersCharactersTable = 'users_characters';
 
   Future<List<CharacterModel>> getCharacters() async {
     final response = await client
@@ -30,7 +31,7 @@ class CharacterRemoteDataSource {
   Future<List<CharacterModel>> getUnownedCharacters(String userId) async {
     // First, get the list of character IDs that the user owns
     final ownedCharacters = await client
-        .from('users_characters')
+        .from(usersCharactersTable)
         .select('character_id')
         .eq('user_id', userId);
     
@@ -41,7 +42,7 @@ class CharacterRemoteDataSource {
     
     // Now, query for characters that are not in the list of owned character IDs
     final response = await client
-        .from('characters')
+        .from(charactersTable)
         .select()
         .not('id', 'in', ownedCharacterIds);
     
@@ -69,4 +70,14 @@ class CharacterRemoteDataSource {
     debugPrint("Reset character attr: $result");
     return result;
   }
+
+  Future<bool> buyCharacter(String characterId) async {
+    final result = await client.rpc('purchase_character', params: {
+      'character_id': characterId,
+    });
+
+    debugPrint("Buy character $characterId: $result");
+    return result;
+  }
+
 }

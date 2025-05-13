@@ -26,4 +26,8 @@ class CharacterRepository {
   Future<bool> resetAttr(String id) async {
     return await _characterRemote.resetAttr(id);
   }
+
+  Future<bool> buyCharacter(String characterId) async {
+    return await _characterRemote.buyCharacter(characterId);
+  }
 }

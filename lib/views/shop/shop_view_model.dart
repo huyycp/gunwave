@@ -16,19 +16,43 @@ class ShopViewModel extends BaseViewModel {
   late final CharacterRepository _characterRepo;
 
   List<CharacterModel> characters = [];
+  List<CharacterModel> unownedCharacters = [];
 
   bool isLoading = true;
+
+  int get userBalance => userRepo.appUser?.gold ?? 0;
 
   Future<void> getCharacters() async {
     try {
       if (userRepo.appUser == null) return;
-      characters = await _characterRepo.getUnownedCharacters(userRepo.appUser!.id);
+      characters = await _characterRepo.getCharacters();
+      unownedCharacters = await _characterRepo.getUnownedCharacters(userRepo.appUser!.id);
       notifyListeners();
     } catch (err, stack) {
       AppException.log(runtimeType, err, stack);
     } finally {
       setLoading(false);
     }
+  }
+
+  Future<void> buyCharacter(String characterId) async {
+    try {
+      if (userRepo.appUser == null) return;
+      view?.showFullScreenLoading();
+      final result = await _characterRepo.buyCharacter(characterId);
+      if (result) {
+        unownedCharacters.removeWhere((element) => element.id == characterId);
+        notifyListeners();
+      }
+    } catch (err, stack) {
+      AppException.log(runtimeType, err, stack);
+    } finally {
+      view?.hideFullScreenLoading();
+    }
+  }
+
+  bool isCharacterOwned(String characterId) {
+    return characters.any((element) => element.id == characterId);
   }
 
   void setLoading(bool loading) {
