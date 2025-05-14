@@ -216,9 +216,9 @@
     <property name="posXBound" type="float" value="2"/>
    </properties>
   </object>
-  <object id="79" name="tower" type="building" x="1280" y="512" width="128" height="256">
+  <object id="79" name="tower_blue" type="building" x="1280" y="512" width="128" height="256">
    <properties>
-    <property name="color" value="blue"/>
+    <property name="is_checkpoint" type="bool" value="true"/>
    </properties>
   </object>
   <object id="80" name="torch_blue" type="monster" x="960" y="768" width="192" height="192">
@@ -229,7 +229,7 @@
   </object>
   <object id="81" name="fire" type="effects" x="896" y="512" width="128" height="128"/>
  </objectgroup>
- <objectgroup id="2" name="collisions">
+ <objectgroup id="2" name="collisions" locked="1">
   <object id="1" type="boundary" x="577.131" y="511.666" width="193.463" height="14.657"/>
   <object id="4" type="boundary" x="576" y="960" width="385.259" height="64"/>
   <object id="5" type="boundary" x="1215.39" y="1152" width="128.612" height="64"/>

@@ -8,6 +8,7 @@ import 'package:gunwave/data/constants/game/game_constants.dart';
 import 'package:gunwave/data/constants/game/game_effect.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/utils/app_math.dart';
+import 'package:gunwave/views/game/components/sub_components/building.dart';
 import 'package:gunwave/views/game/components/sub_components/collision_component.dart';
 import 'package:gunwave/views/game/components/monster.dart';
 import 'package:gunwave/views/game/components/sub_components/health_bar.dart';
@@ -16,9 +17,13 @@ import 'package:gunwave/views/game/gunwave.dart';
 
 class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, KeyboardHandler, CollisionCallbacks {
   
-  Character(this.character);
+  Character(
+    this.character, {
+    this.onCharacterReachCheckpoint,
+  });
 
   final CharacterModel character;
+  final void Function(bool)? onCharacterReachCheckpoint;
   
   final double stepTime = 0.08;
   late final SpriteAnimation idleAni;
@@ -107,6 +112,9 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
     position: Vector2(hitbox.x + hitbox.width / 2 - 24, hitbox.y), // Position above head
   );
 
+  // Create a set to track which checkpoints we're currently in
+  final Set<Building> _activeCheckpoints = {};
+
   @override
   FutureOr<void> onLoad() {
     onLoadAnimation();
@@ -182,6 +190,33 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
   }
 
   @override
+  void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
+    if (other is Building && other.isCheckpoint && other.checkZone != null) {
+      if (movebox.collidingWith(other.checkZone)) {
+        _activeCheckpoints.add(other);
+        if (onCharacterReachCheckpoint != null) {
+          onCharacterReachCheckpoint!(true);
+        }
+      }
+    }
+    super.onCollisionStart(intersectionPoints, other);
+  }
+
+  @override
+  void onCollisionEnd(PositionComponent other) {
+    if (other is Building && other.isCheckpoint && _activeCheckpoints.contains(other)) {
+      // Remove from tracked checkpoints
+      _activeCheckpoints.remove(other);
+      
+      // Call the callback without checking collision status again
+      if (onCharacterReachCheckpoint != null) {
+        onCharacterReachCheckpoint!(false);
+      }
+    }
+    super.onCollisionEnd(other);
+  }
+
+  @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     if (other is Monster) {
       if (
@@ -193,7 +228,7 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
         other.hp -= str;
         other.healthBar.updateHealth(other.hp);
         other.setInvincible();
-        debugPrint('Monster HP: ${other.hp}');
+        // debugPrint('Monster HP: ${other.hp}');
       }
 
       if (
@@ -205,7 +240,7 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
         hp -= other.str;
         healthBar.updateHealth(hp);
         setInvicible();
-        debugPrint('Character HP: $hp');
+        // debugPrint('Character HP: $hp');
       }
     }
     if (other is Trap) {
@@ -219,7 +254,7 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
           healthBar.updateHealth(hp);
           setInvicible();
           setFireEffect();
-          debugPrint('Character HP: $hp');
+          // debugPrint('Character HP: $hp');
         }
       }
     }
@@ -312,19 +347,19 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
         if (angCA < 0) angCA += 2 * pi;
         if (angCD < 0) angCD += 2 * pi;
 
-        debugPrint('component: ${component.position}');
-        debugPrint('movebox: ${movebox.position}');
+        // debugPrint('component: ${component.position}');
+        // debugPrint('movebox: ${movebox.position}');
 
-        debugPrint('angCB: ${angCB * 180 / pi}');
-        debugPrint('angCA: ${angCA * 180 / pi}');
-        debugPrint('angCD: ${angCD * 180 / pi}');
+        // debugPrint('angCB: ${angCB * 180 / pi}');
+        // debugPrint('angCA: ${angCA * 180 / pi}');
+        // debugPrint('angCD: ${angCD * 180 / pi}');
 
         double angCChar = calculateAngle(cPoint, component.position, Vector2(characterX - hitbox.x + movebox.x, characterY - hitbox.y + movebox.y));
 
         
         if (angCChar < 0) angCChar += 2 * pi;
 
-        debugPrint('angChar: ${angCChar * 180 / pi}');
+        // debugPrint('angChar: ${angCChar * 180 / pi}');
 
         if (angCChar >= 0 && angCChar < angCB) {
           // right

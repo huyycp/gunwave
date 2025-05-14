@@ -151,6 +151,8 @@ class AppBanner extends PositionComponent with HasGameRef<FlameGame> {
   void _addTextComponent() {
     final textComponent = TextComponent(
       text: text,
+      position: Vector2(24, 0),
+      size: Vector2(size.x - 48, size.y - 32),
       textRenderer: TextPaint(
         style: GoogleFonts.pressStart2p(
           fontSize: 16,

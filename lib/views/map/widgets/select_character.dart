@@ -48,7 +48,7 @@ class SelectCharacterWidgetState extends BaseWidgetState<SelectCharacterWidget, 
           xCount: 10,
           yCount: 5,
         )
-      ]  
+      ]
     ),
   );
 
