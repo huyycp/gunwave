@@ -1,5 +1,5 @@
-class QuestionModel {
-  QuestionModel({
+class QuizModel {
+  QuizModel({
     required this.id,
     required this.question,
     required this.resultA,
@@ -10,15 +10,21 @@ class QuestionModel {
   });
 
   final String id;
+
   final String question;
+
   final String resultA;
+
   final String resultB;
+
   final String resultC;
+
   final String resultD;
+  
   final String answer;
 
-  factory QuestionModel.fromJson(Map<String, dynamic> json) {
-    return QuestionModel(
+  factory QuizModel.fromJson(Map<String, dynamic> json) {
+    return QuizModel(
       id: json['id']?.toString() ?? '',
       question: json['question']?.toString() ?? '',
       resultA: json['result_a']?.toString() ?? '',

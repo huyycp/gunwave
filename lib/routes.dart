@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gunwave/views/character/character_view.dart';
 import 'package:gunwave/views/home/home_view.dart';
-import 'package:gunwave/views/map/map_view.dart';
+import 'package:gunwave/views/map/room_view.dart';
 import 'package:gunwave/views/shop/shop_view.dart';
 import 'package:gunwave/views/splash/splash_view.dart';
 
@@ -49,7 +49,7 @@ class Routes {
     return GoRoute(
       path: map,
       name: map,
-      pageBuilder: (context, state) => const NoTransitionPage(child: MapView()),
+      pageBuilder: (context, state) => const NoTransitionPage(child: RoomView()),
     );
   }
 

@@ -18,7 +18,7 @@ class GameMaps {
     forest,
   ];
 
-  static final forest = GameMaps._('forest', basePath.forestTmx, basePath.forestPng.path);
+  static final forest = GameMaps._('forest', basePath.forestTmx, basePath.forestBrief.path);
   static final loading = GameMaps._('loading', basePath.loading, '');
   static final background = GameMaps._('background', basePath.background, '');
 }

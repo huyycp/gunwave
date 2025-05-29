@@ -9,7 +9,9 @@ class RewardModel {
   });
 
   final String id;
+
   final RewardType type;
+  
   final int amount;
 
   factory RewardModel.fromJson(Map<String, dynamic> json) => RewardModel(

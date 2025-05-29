@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/data/models/map_model.dart';
+import 'package:gunwave/data/models/room_model.dart';
 import 'package:gunwave/views/game/game_view_model.dart';
 import 'package:gunwave/views/game/gunwave.dart';
 import 'package:gunwave/views/game/widgets/question_widget.dart';
@@ -16,13 +17,13 @@ import 'package:google_fonts/google_fonts.dart';
 
 class GameView extends BaseView {
   const GameView({
-    required this.map,
+    required this.room,
     required this.character,
     this.joystickEnabled = false,
     super.key,
   });
 
-  final MapModel map;
+  final RoomModel room;
   final CharacterModel character;
   final bool joystickEnabled;
 
@@ -35,7 +36,7 @@ class GameView extends BaseView {
 class GameViewState extends BaseViewState<GameView, GameViewModel> {
   late final Gunwave _gunwave = Gunwave(
     ref,
-    map: widget.map,
+    map: widget.room.map!,
     gameCharacters: widget.character,
     isJoystickEnabled: widget.joystickEnabled,
     onStageCompleted: onStageCompleted,
@@ -48,7 +49,7 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
     super.onReady();
 
     // Initialize timer in view model
-    model.initializeTimer(widget.map.timeLimit);
+    model.initializeTimer(widget.room.map!.timeLimit);
 
     // Start the timer
     model.startTimer(() {
@@ -111,11 +112,11 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
   Widget _buildQuiz() {
     // Quiz doesn't depend on time now
     return QuestionWidget(
-      widget.map.questions[model.currentQuestionIndex],
+      widget.room.quizzes[model.currentQuestionIndex],
       onQuestionAnswered: (isCorrect) {
-        debugPrint('Question answered: $isCorrect');
+        debugPrint('Quiz answered: $isCorrect');
         if (isCorrect) {
-          if (model.currentQuestionIndex < widget.map.questions.length - 1) {
+          if (model.currentQuestionIndex < widget.room.quizzes.length - 1) {
             model.setNextQuestion();
           } else {
             onStageCompleted();
@@ -179,7 +180,7 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
     model.stopTimer();
     StageResultDialog.show(
       result: true,
-      rewards: widget.map.rewards,
+      rewards: widget.room.map!.rewards,
     );
   }
 
@@ -187,7 +188,7 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
     model.stopTimer();
     StageResultDialog.show(
       result: false,
-      rewards: widget.map.rewards,
+      rewards: widget.room.map!.rewards,
     );
   }
 

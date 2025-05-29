@@ -18,7 +18,7 @@ class QuestionWidget extends BaseWidget {
     super.key,
   });
 
-  final QuestionModel question;
+  final QuizModel question;
   final void Function(bool) onQuestionAnswered;
 
   @override

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="50" height="25" tilewidth="64" tileheight="64" infinite="0" nextlayerid="14" nextobjectid="82">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="50" height="25" tilewidth="64" tileheight="64" infinite="0" nextlayerid="15" nextobjectid="142">
  <tileset firstgid="1" source="elevation.tsx"/>
  <tileset firstgid="33" source="flat.tsx"/>
  <tileset firstgid="73" source="water.tsx"/>
@@ -290,5 +290,67 @@
   <object id="70" type="boundary" x="1216.97" y="643.68" width="16.8759" height="251.034"/>
   <object id="71" type="boundary" x="1455.12" y="643.513" width="15.3441" height="249.857"/>
   <object id="77" type="boundary" x="1295.85" y="672.273" width="96.0965" height="79.7509"/>
+ </objectgroup>
+ <objectgroup id="14" name="collisions" locked="1">
+  <object id="82" type="boundary" x="577.131" y="511.666" width="193.463" height="14.657"/>
+  <object id="83" type="boundary" x="576" y="960" width="385.259" height="64"/>
+  <object id="84" type="boundary" x="1215.39" y="1152" width="128.612" height="64"/>
+  <object id="85" type="boundary" x="1470.46" y="960" width="127.337" height="64"/>
+  <object id="86" type="boundary" x="446.72" y="447.829" width="64" height="191.435"/>
+  <object id="87" type="boundary" x="2176" y="704.633" width="64" height="60.3506"/>
+  <object id="88" type="boundary" x="705.9" y="320" width="59.9878" height="64"/>
+  <object id="89" type="boundary" x="512" y="384" width="192.094" height="64"/>
+  <object id="90" type="boundary" x="1024" y="320" width="191.274" height="64"/>
+  <object id="91" type="boundary" x="1216" y="384" width="190.063" height="64"/>
+  <object id="92" type="boundary" x="1408" y="448" width="383.515" height="64"/>
+  <object id="93" type="boundary" x="1792" y="512" width="319.644" height="64"/>
+  <object id="94" type="boundary" x="2112" y="576" width="64" height="128.485"/>
+  <object id="95" type="boundary" x="2240" y="766.614" width="64" height="65.9616"/>
+  <object id="96" type="boundary" x="2176" y="832" width="64" height="125.016"/>
+  <object id="97" type="boundary" x="2048" y="832" width="64" height="61.6104"/>
+  <object id="98" type="boundary" x="1408" y="1024" width="64.4276" height="60.499"/>
+  <object id="99" type="boundary" x="1344" y="1088" width="64.4276" height="60.499"/>
+  <object id="100" type="boundary" x="1022.65" y="1088" width="193.964" height="64"/>
+  <object id="101" type="boundary" x="960" y="1024" width="64.4276" height="60.499"/>
+  <object id="102" type="boundary" x="1215.98" y="832.491" width="64.6155" height="61.7537"/>
+  <object id="103" type="boundary" x="1408" y="832" width="64.4276" height="61.7537"/>
+  <object id="104" type="boundary" x="517.03" y="1086.42" width="381.108" height="60.8533"/>
+  <object id="105" type="boundary" x="449.689" y="830.429" width="64" height="254.257"/>
+  <object id="106" type="boundary" x="384" y="639.247" width="64" height="64.188"/>
+  <object id="107" type="boundary" x="320" y="706.653" width="64" height="62.1682"/>
+  <object id="108" type="boundary" x="384" y="768" width="64" height="62.1682"/>
+  <object id="109" type="boundary" x="897.147" y="1152" width="59.9604" height="64.8926"/>
+  <object id="110" type="boundary" x="959.88" y="1216" width="191.247" height="62.8728"/>
+  <object id="111" type="boundary" x="1152.63" y="1279.37" width="257.9" height="62.8728"/>
+  <object id="112" type="boundary" x="1408" y="1215.37" width="64" height="66.9123"/>
+  <object id="113" type="boundary" x="1472" y="1152" width="253.861" height="62.8728"/>
+  <object id="114" type="boundary" x="1728" y="1088" width="318.494" height="62.8728"/>
+  <object id="115" type="boundary" x="2050.02" y="1019.33" width="64" height="64.8926"/>
+  <object id="116" type="boundary" x="1728.64" y="957.311" width="249.919" height="63.9378"/>
+  <object id="117" type="boundary" x="577" y="513.361" width="21.1008" height="505.449"/>
+  <object id="118" type="boundary" x="944.754" y="450.005" width="71.5115" height="15.4644"/>
+  <object id="119" type="boundary" x="769.781" y="446.346" width="70.987" height="14.3884"/>
+  <object id="120" type="boundary" x="768" y="256" width="253.888" height="64"/>
+  <object id="121" type="boundary" x="1984" y="896" width="64" height="63.3467"/>
+  <object id="122" type="boundary" x="2112" y="957.189" width="64" height="63.7952"/>
+  <object id="123" type="boundary" x="832.079" y="386.779" width="17.2118" height="61.2193"/>
+  <object id="124" type="boundary" x="832" y="386" width="125.514" height="17.7075"/>
+  <object id="125" type="boundary" x="942.956" y="387.94" width="15.8195" height="76.0159"/>
+  <object id="126" type="boundary" x="769.084" y="447.797" width="13.5161" height="69.1134"/>
+  <object id="127" type="boundary" x="995.404" y="455.331" width="27.2586" height="71.2609"/>
+  <object id="128" type="boundary" x="1012.66" y="513.426" width="330.208" height="17.9682"/>
+  <object id="129" type="boundary" x="1322.69" y="514.57" width="19.8235" height="77.2725"/>
+  <object id="130" type="boundary" x="1330.37" y="573.414" width="396.554" height="22.7086"/>
+  <object id="131" type="boundary" x="1701.06" y="576.038" width="24.7991" height="75.6479"/>
+  <object id="132" type="boundary" x="1705.2" y="641.378" width="272.669" height="11.9213"/>
+  <object id="133" type="boundary" x="1964.94" y="645.728" width="17.3962" height="70.1838"/>
+  <object id="134" type="boundary" x="1968.68" y="706.027" width="78.1304" height="9.12262"/>
+  <object id="135" type="boundary" x="2031.66" y="704.709" width="15.5086" height="73.3194"/>
+  <object id="136" type="boundary" x="2032.15" y="768.105" width="78.1304" height="14.8374"/>
+  <object id="137" type="boundary" x="2094.32" y="769.653" width="16.3232" height="62.1962"/>
+  <object id="138" type="boundary" x="1214.71" y="641.047" width="256.814" height="15.0673"/>
+  <object id="139" type="boundary" x="1216.97" y="643.68" width="16.8759" height="251.034"/>
+  <object id="140" type="boundary" x="1455.12" y="643.513" width="15.3441" height="249.857"/>
+  <object id="141" type="boundary" x="1295.85" y="672.273" width="96.0965" height="79.7509"/>
  </objectgroup>
 </map>

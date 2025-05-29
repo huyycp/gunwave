@@ -22,7 +22,7 @@ class MapModel {
   final int timeLimit;
   final List<MonsterModel> monsters;
   final List<RewardModel> rewards;
-  final List<QuestionModel> questions;
+  final List<QuizModel> questions;
 
   GameMaps? get map => mapFromFile(filename);
 
@@ -33,7 +33,7 @@ class MapModel {
     timeLimit: intFromJson(json['time_limit']),
     monsters: listFromJson(json['monsters'], (js) => MonsterModel.fromJson(js)),
     rewards: listFromJson(json['rewards'], (js) => RewardModel.fromJson(js)),
-    questions: listFromJson(json['questions'], (js) => QuestionModel.fromJson(js)),
+    questions: listFromJson(json['questions'], (js) => QuizModel.fromJson(js)),
   );
 
   Map<String, dynamic> toJson() => {
