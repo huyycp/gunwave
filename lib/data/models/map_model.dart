@@ -1,6 +1,6 @@
 import 'package:gunwave/data/constants/game/game_map.dart';
 import 'package:gunwave/data/models/monster_model.dart';
-import 'package:gunwave/data/models/question_model.dart';
+import 'package:gunwave/data/models/quiz_model.dart';
 import 'package:gunwave/data/models/reward_model.dart';
 import 'package:gunwave/utils/common_functions.dart';
 import 'package:gunwave/utils/list_utils.dart';

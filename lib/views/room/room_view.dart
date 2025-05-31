@@ -50,23 +50,20 @@ class RoomViewState extends BaseViewState<RoomView, RoomViewModel> {
   Widget getView() {
     ref.watch(roomViewModel);
     return Scaffold(
-      body: Container(
-        color: const Color.fromARGB(255, 90, 190, 189),
-        child: Stack(
-          children: [
-            _background,
-            Positioned(
-              top: 16,
-              left: 16,
-              child: _buildBackBtn(),
-            ),
-            Center(
-              child: model.isLoading 
-                ? const Center(child: CircularProgressIndicator(color: GameColors.primary))
-                : _buildRoomCarousel()
-            ),
-          ],
-        ),
+      body: Stack(
+        children: [
+          _background,
+          Center(
+            child: model.isLoading 
+              ? const Center(child: CircularProgressIndicator(color: GameColors.primary))
+              : _buildRoomCarousel()
+          ),
+          Positioned(
+            top: 16,
+            left: 16,
+            child: _buildBackBtn(),
+          ),
+        ],
       ),
     );
   }
@@ -89,7 +86,10 @@ class RoomViewState extends BaseViewState<RoomView, RoomViewModel> {
         enableInfiniteScroll: false,
         scrollPhysics: const BouncingScrollPhysics(),
       ),
-      items: rooms.map((room) => RoomPreviewWidget(room, onPlay: showCharacterSelectDialog)).toList(),
+      items: rooms.map((room) => Container(
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+        child: RoomPreviewWidget(room, onPlay: showCharacterSelectDialog)
+      )).toList(),
     );
   }
 

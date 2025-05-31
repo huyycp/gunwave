@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gunwave/views/character/character_view.dart';
+import 'package:gunwave/views/create_room/create_room_view.dart';
 import 'package:gunwave/views/home/home_view.dart';
 import 'package:gunwave/views/my_room/my_room_view.dart';
 import 'package:gunwave/views/room/room_view.dart';
@@ -17,6 +18,7 @@ class Routes {
   static const character = '/character';
   static const shop = '/shop';
   static const myRoom = '/my-room';
+  static const createRoom = '/create-room';
 
   static final GoRouter config = GoRouter(
     initialLocation: splash,
@@ -29,6 +31,7 @@ class Routes {
       _buildCharacterRoute(),
       _buildShopRoute(),
       _buildMyRoomRoute(),
+      _buildCreateRoomRoute(),
     ],
   );
   
@@ -77,6 +80,17 @@ class Routes {
       path: myRoom,
       name: myRoom,
       pageBuilder: (context, state) => const NoTransitionPage(child: MyRoomView())
+    );
+  }
+
+  static GoRoute _buildCreateRoomRoute() {
+    return GoRoute(
+      path: createRoom,
+      name: createRoom,
+      pageBuilder: (context, state) {
+        final args = state.extra is Map<String, dynamic> ? state.extra as Map<String, dynamic> : {};
+        return NoTransitionPage(child: CreateRoomView(args.isNotEmpty ? args['onSuccess']: (_) {}));
+      },
     );
   }
 }

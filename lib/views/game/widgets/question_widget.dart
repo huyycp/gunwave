@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_ui.dart';
-import 'package:gunwave/data/models/question_model.dart';
+import 'package:gunwave/data/models/quiz_model.dart';
 import 'package:gunwave/utils/extensions/list_widget_ex.dart';
 import 'package:gunwave/views/game/components/sub_components/app_banner.dart';
 import 'package:gunwave/widgets/base/base_widget.dart';

@@ -54,6 +54,8 @@ class MyRoomWidget extends StatelessWidget {
                 children: [
                   Text(
                     room.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.pressStart2p(
                       color: GameColors.primary,
                       fontSize: 16,
@@ -61,6 +63,8 @@ class MyRoomWidget extends StatelessWidget {
                   ),
                   Text(
                     room.map?.name.capitalize ?? 'Unknown Map',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.pressStart2p(
                       color: GameColors.primary,
                       fontSize: 14,
@@ -77,7 +81,7 @@ class MyRoomWidget extends StatelessWidget {
                         )
                       ),
                       Text(
-                        '${room.map?.timeLimit} seconds',
+                        '20 played',
                         style: GoogleFonts.pressStart2p(
                           color: GameColors.primary,
                           fontSize: 12,
