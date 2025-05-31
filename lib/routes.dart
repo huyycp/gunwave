@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gunwave/views/character/character_view.dart';
 import 'package:gunwave/views/home/home_view.dart';
-import 'package:gunwave/views/map/room_view.dart';
+import 'package:gunwave/views/my_room/my_room_view.dart';
+import 'package:gunwave/views/room/room_view.dart';
 import 'package:gunwave/views/shop/shop_view.dart';
 import 'package:gunwave/views/splash/splash_view.dart';
 
@@ -15,6 +16,7 @@ class Routes {
   static const map = '/map';
   static const character = '/character';
   static const shop = '/shop';
+  static const myRoom = '/my-room';
 
   static final GoRouter config = GoRouter(
     initialLocation: splash,
@@ -26,6 +28,7 @@ class Routes {
       _buildMapRoute(),
       _buildCharacterRoute(),
       _buildShopRoute(),
+      _buildMyRoomRoute(),
     ],
   );
   
@@ -66,6 +69,14 @@ class Routes {
       path: shop,
       name: shop,
       pageBuilder: (context, state) => const NoTransitionPage(child: ShopView()),
+    );
+  }
+
+  static GoRoute _buildMyRoomRoute() {
+    return GoRoute(
+      path: myRoom,
+      name: myRoom,
+      pageBuilder: (context, state) => const NoTransitionPage(child: MyRoomView())
     );
   }
 }

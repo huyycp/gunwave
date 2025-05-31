@@ -77,6 +77,11 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
             ),
             Positioned(
               bottom: 16,
+              left: 184,
+              child: _buildMyRoomBtn(),
+            ),
+            Positioned(
+              bottom: 16,
               right: 32,
               child: _buildPlayBtn(),
             ),
@@ -147,6 +152,16 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
       },
       size: GameButtonSize.small,
       child: const Icon(Icons.store, color: GameColors.primary),
+    );
+  }
+
+  Widget _buildMyRoomBtn() {
+    return GameButton(
+      onPressed: () {
+        context.push(Routes.myRoom);
+      },
+      size: GameButtonSize.small,
+      child: const Icon(Icons.apps, color: GameColors.primary),
     );
   }
 
