@@ -100,13 +100,15 @@ class Stage extends World with HasGameRef<Gunwave> {
           add(effectComponent);
         }
       } else if (point.class_ == GameComponents.building) {
+        final isCheckpoint = point.properties.getValue('is_checkpoint') ?? false;
         if (point.name == GameBuildings.blueTower.name) {
           final buildingComponent = Building(
-          building: GameBuildings.blueTower,
-          position: point.position,
-          size: Vector2(point.width, point.height),
-        );
-        add(buildingComponent);
+            building: GameBuildings.blueTower,
+            position: point.position,
+            size: Vector2(point.width, point.height),
+            isCheckpoint: isCheckpoint,
+          );
+          add(buildingComponent);
         }
       } else {
         throw Exception('Unknown spawn point class: ${point.class_}');

@@ -14,7 +14,7 @@ class GameBuildings {
   ];
 
   static final GameBuildings blueTower = GameBuildings._(
-    'tower',
+    'tower_blue',
     basePath.tower.towerBlue.path,
   );
 }

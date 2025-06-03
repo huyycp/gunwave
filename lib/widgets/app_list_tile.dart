@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:gunwave/theme/app_colors.dart';
 import 'package:gunwave/theme/text_theme.dart';
@@ -23,8 +24,15 @@ class AppListTile extends StatelessWidget {
     this.tags = const [],
     this.titleAlign = TextAlign.start,
     this.subTitleAlign = TextAlign.start,
+    this.titleLeading,
+    this.subTitleLeading,
     this.titleTrailing,
     this.subTitleTrailing,
+    this.isTitleWrap = false,
+    this.isSubTitleWrap = false,
+    this.isExpand = false,
+    this.isBackgroundBlur = false,
+    this.blurRadius = 10,
   }) : assert (
     title.isNotEmpty || 
     subTitle.isNotEmpty ||
@@ -51,7 +59,7 @@ class AppListTile extends StatelessWidget {
 
   final EdgeInsets padding;
 
-  /// If [backgroundColors] only contains more than 1 color,
+  /// If [backgroundColors] contains more than 1 color,
   /// the background is gradient 
   final List<Color> backgroundColors;
 
@@ -69,42 +77,63 @@ class AppListTile extends StatelessWidget {
 
   final TextAlign subTitleAlign;
 
+  final Widget? titleLeading;
+
+  final Widget? subTitleLeading;
+
   final Widget? titleTrailing;
 
   final Widget? subTitleTrailing;
 
+  final bool isTitleWrap;
+
+  final bool isSubTitleWrap;
+
+  final bool isBackgroundBlur;
+  
+  final double blurRadius;
+  
+  final bool isExpand;
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: padding,
-      decoration: BoxDecoration(
-        gradient: backgroundColors.length >= 2 ? LinearGradient(colors: backgroundColors) : null,
-        color: backgroundColors.isNotEmpty ? backgroundColors.first : null,
-        borderRadius: borderRadius,
-        border: border,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          if (leading != null) ...[
-            leading!,
-            SizedBox(width: leadingTitleSpacing),
-          ],
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                if (title.isNotEmpty) _buildTitle(context),
-                if (subTitle.isNotEmpty) _buildSubtitle(context),
-              ].addSpace(titleSubtitleSpacing, Axis.vertical),
-            ),
+    Widget titleWidget = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        if (title.isNotEmpty) _buildTitle(context),
+        if (subTitle.isNotEmpty) _buildSubtitle(context),
+      ].addSpace(titleSubtitleSpacing, Axis.vertical),
+    );
+    return ClipRRect(
+      borderRadius: borderRadius,
+      child: Container(
+        padding: padding,
+        decoration: BoxDecoration(
+          gradient: backgroundColors.length >= 2 ? LinearGradient(colors: backgroundColors) : null,
+          color: backgroundColors.isNotEmpty ? backgroundColors.first : null,
+          borderRadius: borderRadius,
+          border: border,
+        ),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: isBackgroundBlur ? blurRadius : 0, sigmaY: isBackgroundBlur ? blurRadius : 0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              if (leading != null) ...[
+                leading!,
+                SizedBox(width: leadingTitleSpacing),
+              ],
+              isExpand
+                ? Expanded(child: titleWidget)
+                : Flexible(child: titleWidget),
+              if (trailing != null) ...[
+                SizedBox(width: trailingTitleSpacing),
+                trailing!,
+              ],
+            ],
           ),
-          if (trailing != null) ...[
-            SizedBox(width: trailingTitleSpacing),
-            trailing!,
-          ],
-        ],
+        ),
       ),
     );
   }
@@ -113,12 +142,14 @@ class AppListTile extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
+        if (titleLeading != null) titleLeading!,
         Flexible(
           child: Text(
             title,
             textAlign: titleAlign,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+            maxLines: isTitleWrap ? null : 1,
+            softWrap: isTitleWrap,
+            overflow: isTitleWrap ? null : TextOverflow.ellipsis,
             style: titleStyle ?? BaseTextTheme.textTheme.titleMedium?.copyWith(color: context.appColors.primaryText),
           ),
         ),
@@ -132,12 +163,14 @@ class AppListTile extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
+        if (subTitleLeading != null) subTitleLeading!,
         Flexible(
           child: Text(
             subTitle,
             textAlign: subTitleAlign,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+            maxLines: isSubTitleWrap ? null : 1,
+            softWrap: isSubTitleWrap,
+            overflow: isSubTitleWrap ? null : TextOverflow.ellipsis,
             style: subTitleStyle ?? BaseTextTheme.textTheme.bodySmall?.copyWith(color: context.appColors.secondaryText),
           ),
         ),

@@ -13,11 +13,17 @@ class MonsterModel {
   });
 
   final String id;
+
   final String name;
+
   final String filename;
+
   int hp;
+
   int str;
+
   int vit;
+  
   int agi;
 
   GameMonsters? get monster => monsterFromFile(filename);

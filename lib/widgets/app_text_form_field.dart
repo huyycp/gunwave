@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:gradient_borders/input_borders/gradient_outline_input_border.dart';
+import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/theme/app_colors.dart';
 import 'package:gunwave/utils/extensions/string_ex.dart';
 import 'package:gunwave/widgets/base_input.dart';
@@ -80,19 +82,19 @@ class _AppInputState extends BaseInputState<AppTextFormField, AppInputWidgetMode
     ref.watch(provider);
     return Container(
       decoration: BoxDecoration(
-        color: colors.primaryBackground,
-        boxShadow: 
-          (widget.statesController.value.contains(WidgetState.focused) ||
-          widget.statesController.value.contains(WidgetState.hovered)) &&
-          !(widget.statesController.value.contains(WidgetState.error) ||
-          widget.statesController.value.contains(WidgetState.disabled))
-          ? [
-            BoxShadow(
-              color: kColorPrimary.withOpacity(0.5),
-              blurRadius: 15,
-            ),
-          ]
-          : null,
+        color: const Color.fromARGB(255, 211, 196, 151),
+        // boxShadow: 
+        //   (widget.statesController.value.contains(WidgetState.focused) ||
+        //   widget.statesController.value.contains(WidgetState.hovered)) &&
+        //   !(widget.statesController.value.contains(WidgetState.error) ||
+        //   widget.statesController.value.contains(WidgetState.disabled))
+        //   ? [
+        //     BoxShadow(
+        //       color: kColorPrimary.withOpacity(0.5),
+        //       blurRadius: 15,
+        //     ),
+        //   ]
+        //   : null,
           borderRadius: BorderRadius.horizontal(
             left: widget.borderRadius.topLeft,
             right: widget.borderRadius.topLeft,
@@ -120,9 +122,9 @@ class _AppInputState extends BaseInputState<AppTextFormField, AppInputWidgetMode
       filled: !enabled,
       border: InputBorder.none,
       enabledBorder: enableBorder,
-      focusedBorder: focusedBorder,
-      disabledBorder: disabledBorder,
-      errorBorder: errorBorder,
+      focusedBorder: enableBorder,
+      // disabledBorder: disabledBorder,
+      // errorBorder: errorBorder,
       focusedErrorBorder: errorBorder,
     );
     final formatter = widget.inputFormatters ?? [
@@ -147,7 +149,10 @@ class _AppInputState extends BaseInputState<AppTextFormField, AppInputWidgetMode
       onTap: widget.onTap,
       inputFormatters: formatter,
       decoration: decoration,
-      style: textStyles.bodyMedium,
+      style: GoogleFonts.pressStart2p(
+        color:GameColors.primary,
+        fontSize: 12,
+      ),
     );
   }
 

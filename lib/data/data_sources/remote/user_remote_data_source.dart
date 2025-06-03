@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/data/data_sources/remote/api/supabase_api.dart';
+import 'package:gunwave/data/models/room_model.dart';
 import 'package:gunwave/data/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -30,5 +31,15 @@ class UserRemoteDataSource {
       .single();
     debugPrint("User: $response");
     return UserModel.fromJson(response);
+  }
+
+  Future<List<RoomModel>> getRoomsByUser(String userId) async {
+    final response = await client
+      .from('rooms')
+      .select('*, maps(*), users(*), quizzes(*)')
+      .eq('user_id', userId)
+      .order('created_at', ascending: false);
+    debugPrint("User Rooms: $response");
+    return List<RoomModel>.from(response.map((json) => RoomModel.fromJson(json)));
   }
 }

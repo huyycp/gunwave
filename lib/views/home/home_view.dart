@@ -3,8 +3,14 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:gunwave/data/constants/game/game_button.dart';
+import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
+import 'package:gunwave/data/constants/game/game_ui.dart';
+import 'package:gunwave/gen/assets.gen.dart';
 import 'package:gunwave/routes.dart';
+import 'package:gunwave/views/game/components/sub_components/app_banner.dart';
 import 'package:gunwave/views/home/widgets/background.dart';
 import 'package:gunwave/views/home/home_view_model.dart';
 import 'package:gunwave/views/home/widgets/login_widget.dart';
@@ -48,38 +54,123 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
       body: Stack(
         children: [
           _background,
-          Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                GameButton(
-                  onPressed: () {
-                    context.push(Routes.map);
-                  },
-                  child: const Text('Maps')
-                ),
-                GameButton(
-                  onPressed: () {
-                    context.push(Routes.character);
-                  },
-                  child: const Text('Champs')
-                ),
-                GameButton(
-                  onPressed: () {
-                    context.push(Routes.shop);
-                  },
-                  child: const Text('Shop')
-                ),
-              ],
+          if (model.userRepo.appUser != null) ...[
+            Positioned(
+              top: 16,
+              left: 48,
+              child: _buildUserInfo(),
             ),
-          ),
-          if (model.isLoginFormVisible)
-            Center(
+            Positioned(
+              top: 16,
+              right: 48,
+              child: _buildUserGold(),
+            ),
+            Positioned(
+              bottom: 16,
+              left: 48,
+              child: _buildShopBtn(),
+            ),
+            Positioned(
+              bottom: 16,
+              left: 116,
+              child: _buildCharacterBtn(),
+            ),
+            Positioned(
+              bottom: 16,
+              left: 184,
+              child: _buildMyRoomBtn(),
+            ),
+            Positioned(
+              bottom: 16,
+              right: 32,
+              child: _buildPlayBtn(),
+            ),
+          ] else Center(
               child: _buildLoginForm(),
             ),
         ],
       ),
+    );
+  }
+
+  Widget _buildUserInfo() {
+    return Text(
+      model.userRepo.appUser?.name ?? 'Guest',
+      style: GoogleFonts.pressStart2p(
+        color: GameColors.primary,
+        fontSize: 20,
+      ),
+    );
+  }
+
+  Widget _buildUserGold() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(GameBanners.carvedSlide.path),
+          fit: BoxFit.cover,
+        ),
+        // color: Colors.red,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.monetization_on,
+            color: Colors.amber,
+            size: 24,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '${model.userRepo.appUser?.gold ?? 0}',
+            style: GoogleFonts.pressStart2p(
+              color: GameColors.primary,
+              fontSize: 18,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCharacterBtn() {
+    return GameButton(
+      onPressed: () {
+        context.push(Routes.character);
+      },
+      size: GameButtonSize.small,
+      child: const Icon(Icons.people, color: GameColors.primary),
+    );
+  }
+
+  Widget _buildShopBtn() {
+    return GameButton(
+      onPressed: () {
+        context.push(Routes.shop);
+      },
+      size: GameButtonSize.small,
+      child: const Icon(Icons.store, color: GameColors.primary),
+    );
+  }
+
+  Widget _buildMyRoomBtn() {
+    return GameButton(
+      onPressed: () {
+        context.push(Routes.myRoom);
+      },
+      size: GameButtonSize.small,
+      child: const Icon(Icons.apps, color: GameColors.primary),
+    );
+  }
+
+  Widget _buildPlayBtn() {
+    return GameButton(
+      onPressed: () {
+        context.push(Routes.map);
+      },
+      child: const Text('Play'),
     );
   }
 

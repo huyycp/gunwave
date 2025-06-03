@@ -61,6 +61,10 @@ class $AssetsTilesGen {
   /// File path: assets/tiles/forest.tmx
   String get forestTmx => 'assets/tiles/forest.tmx';
 
+  /// File path: assets/tiles/forest_brief.png
+  AssetGenImage get forestBrief =>
+      const AssetGenImage('assets/tiles/forest_brief.png');
+
   /// File path: assets/tiles/loading.tmx
   String get loading => 'assets/tiles/loading.tmx';
 
@@ -88,6 +92,7 @@ class $AssetsTilesGen {
     foam,
     forestPng,
     forestTmx,
+    forestBrief,
     loading,
     rocksLg,
     rocksMd,

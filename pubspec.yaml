@@ -23,7 +23,9 @@ dependencies:
   string_validator: 1.1.0
   flame: 1.26.1
   flame_tiled: 2.0.3
-  carousel_slider: 5.0.0
+  carousel_slider:
+    git:
+      url: https://github.com/fennelmarkets/flutter_carousel_slider.git
   supabase_flutter: 2.9.0
   collection: 1.19.1
 

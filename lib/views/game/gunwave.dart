@@ -20,6 +20,7 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
     this.isJoystickEnabled = false,
     required this.onStageCompleted,
     required this.onStageFailed,
+    this.onCharacterReachCheckpoint,
   });
 
   @override
@@ -32,13 +33,17 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
   final bool isJoystickEnabled;
   final void Function() onStageCompleted;
   final void Function() onStageFailed;
+  final void Function(bool)? onCharacterReachCheckpoint;
   
   late final JoystickComponent joystick;
   Stage? stage;
 
   double accoumulatedTime = 0;
 
-  late final Character character = Character(gameCharacters);
+  late final Character character = Character(
+    gameCharacters,
+    onCharacterReachCheckpoint: onCharacterReachCheckpoint,
+  );
 
   @override
   Future<void> onLoad() async {
@@ -104,7 +109,7 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
       onAttack: (bool attack) {
         character.triggerAttack = attack;
       },
-      position: Vector2(size.x - 100, size.y - 100),
+      position: Vector2(size.x - 130, size.y - 130),
       size: Vector2.all(64),
     );
 
