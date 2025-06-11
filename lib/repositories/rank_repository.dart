@@ -15,4 +15,8 @@ class RankRepository {
   Future<RankModel> updateUserRank(UpdateRankReq req) async {
     return await _rankRemote.updateUserRank(req);
   }
+
+  Future<List<RankModel>> getRanksByRoom({String? roomId, String? userId}) async {
+    return await _rankRemote.getRanksByRoom(roomId: roomId, userId: userId);
+  }
 }

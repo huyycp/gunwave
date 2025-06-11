@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,7 +6,6 @@ import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/dtos/req/update_rank_req.dart';
 import 'package:gunwave/data/models/character_model.dart';
-import 'package:gunwave/data/models/map_model.dart';
 import 'package:gunwave/data/models/rank_model.dart';
 import 'package:gunwave/data/models/room_model.dart';
 import 'package:gunwave/views/game/game_view_model.dart';

@@ -1,8 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/data/data_sources/remote/user_remote_data_source.dart';
-import 'package:gunwave/data/dtos/req/update_rank_req.dart';
-import 'package:gunwave/data/models/rank_model.dart';
 import 'package:gunwave/data/models/room_model.dart';
 import 'package:gunwave/data/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

@@ -30,4 +30,22 @@ class RankRemoteDataSource {
     debugPrint("Update Rank Response: ${resp.data}");
     return RankModel.fromJson(resp.data);
   }
+
+  Future<List<RankModel>> getRanksByRoom({String? roomId, String? userId}) async {
+    var query = client.
+      from(ranksTable)
+      .select('*, users(*), characters(*), rooms(*)');
+    if (roomId != null) {
+      query = query.eq('room_id', roomId);
+    }
+    if (userId != null) {
+      query = query.eq('user_id', userId);
+    }
+    final response = await query
+      .order('score', ascending: false)
+      .order('duration')
+      .order('created_at');
+    debugPrint("Ranks: $response");
+    return List<RankModel>.from(response.map((json) => RankModel.fromJson(json)));
+  }
 }

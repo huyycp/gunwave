@@ -86,6 +86,8 @@ Deno.serve(async (req) => {
         totalScore += quizScore
       }
     })
+
+    let duration = timeLimit - timeLeft
             
     const { data: rankData, error: insertError } = await supabaseClient
       .from('ranks')
@@ -93,7 +95,7 @@ Deno.serve(async (req) => {
         user_id: appUserId,
         room_id: roomId,
         character_id: characterId,
-        duration: timeLeft,
+        duration: duration,
         score: totalScore,
       })
       .select()
@@ -117,7 +119,7 @@ Deno.serve(async (req) => {
       user_id: appUserId,
       room_id: roomId,
       character_id: characterId,
-      duration: timeLeft,
+      duration: duration,
       score: totalScore,
       created_at: rankData.created_at,
     }

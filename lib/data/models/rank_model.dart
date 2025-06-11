@@ -1,11 +1,14 @@
+import 'package:gunwave/data/models/character_model.dart';
+import 'package:gunwave/data/models/room_model.dart';
+import 'package:gunwave/data/models/user_model.dart';
 import 'package:gunwave/utils/common_functions.dart';
 
 class RankModel {
   const RankModel({
     required this.id,
-    required this.userId,
-    required this.roomId,
-    required this.characterId,
+    required this.user,
+    required this.room,
+    required this.character,
     required this.score,
     required this.duration,
     required this.createdAt,
@@ -13,11 +16,11 @@ class RankModel {
 
   final String id;
   
-  final String userId;
+  final UserModel user;
   
-  final String roomId;
+  final RoomModel room;
   
-  final String characterId;
+  final CharacterModel character;
   
   final int score;
   
@@ -28,9 +31,9 @@ class RankModel {
   factory RankModel.fromJson(Map<String, dynamic> json) {
     return RankModel(
       id: json['id'] ?? '',
-      userId: json['user_id'] ?? '',
-      roomId: json['room_id'] ?? '',
-      characterId: json['character_id'] ?? '',
+      user: UserModel.fromJson(json['users'] ?? {}),
+      room: RoomModel.fromJson(json['rooms'] ?? {}),
+      character: CharacterModel.fromCharactersJson(json['characters'] ?? {}),
       score: intFromJson(json['score']),
       duration: Duration(seconds: json['duration'] ?? 0),
       createdAt: json['created_at'] != null 
@@ -42,9 +45,9 @@ class RankModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'user_id': userId,
-      'room_id': roomId,
-      'character_id': characterId,
+      'user': user.toJson(),
+      'room': room.toJson(),
+      'character': character.toJson(),
       'score': score,
       'duration': duration.inMilliseconds,
       'created_at': createdAt.toIso8601String(),
