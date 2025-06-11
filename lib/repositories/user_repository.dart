@@ -37,8 +37,4 @@ class UserRepository {
     if (appUser == null) return [];
     return _userRemote.getRoomsByUser(appUser!.id);
   }
-
-  Future<RankModel> updateUserRank(UpdateRankReq req) async {
-    return await _userRemote.updateUserRank(req);
-  }
 }

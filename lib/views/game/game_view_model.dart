@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/repositories/gesture_recognizer_repo.dart';
+import 'package:gunwave/repositories/rank_repository.dart';
 import 'package:gunwave/widgets/base/base_view_model.dart';
 
 final gameViewModel = ChangeNotifierProvider.autoDispose<GameViewModel>((ref) {
@@ -12,6 +13,7 @@ final gameViewModel = ChangeNotifierProvider.autoDispose<GameViewModel>((ref) {
 class GameViewModel extends BaseViewModel {
 
   late final GestureRecognizerRepo _gestureRecognizerRepo = ref.read(gestureRecognizerRepoProvider);
+  late final RankRepository rankRepo = ref.read(rankRepoProvider);
 
   StreamSubscription<String>? _gestureSubscription;
   String? gesture;

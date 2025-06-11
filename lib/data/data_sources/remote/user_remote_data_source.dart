@@ -45,17 +45,4 @@ class UserRemoteDataSource {
     debugPrint("User Rooms: $response");
     return List<RoomModel>.from(response.map((json) => RoomModel.fromJson(json)));
   }
-
-  Future<RankModel> updateUserRank(UpdateRankReq req) async {
-    final resp = await client.functions.invoke(
-      'update-ranks',
-      headers: {
-        'Authorization': 'Bearer ${client.auth.currentSession?.accessToken}',
-        'Content-Type': 'application/json',
-      },
-      body: req.toJson()
-    );
-    debugPrint("Update Rank Response: ${resp.data}");
-    return RankModel.fromJson(resp.data);
-  }
 } 

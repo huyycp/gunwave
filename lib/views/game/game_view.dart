@@ -188,7 +188,7 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
     RankModel? result;
     if (isSuccess) {
       showOverlay();
-      result = await model.userRepo.updateUserRank(UpdateRankReq(
+      result = await model.rankRepo.updateUserRank(UpdateRankReq(
         characterId: widget.character.id,
         roomId: widget.room.id,
         timeLeft: model.timeRemaining.value,
