@@ -19,11 +19,13 @@ class GameViewModel extends BaseViewModel {
   bool isShowQuizBtnVisible = false;
   bool isQuizVisible = false;
 
-  int currentQuestionIndex = 0;
+  int currentQuizIndex = 0;
+  Map<int, ({int failAttempts, bool isCorrect})> quizResult = {};
 
   final ValueNotifier<int> timeRemaining = ValueNotifier<int>(0);
   Timer? _timer;
 
+  /// gesture recognition
   Future<void> startGestureRecognition() async {
     await _gestureRecognizerRepo.startGestureRecognition();
     _gestureSubscription = _gestureRecognizerRepo.gestureStream.listen((gesture) {
@@ -38,7 +40,9 @@ class GameViewModel extends BaseViewModel {
     await _gestureRecognizerRepo.stopGestureRecognition();
     await _gestureSubscription?.cancel();
   }
-
+  ///
+  
+  /// Quiz management
   void setShowQuizBtnVisible(bool visible) {
     isShowQuizBtnVisible = visible;
     notifyListeners();
@@ -49,11 +53,20 @@ class GameViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  void setNextQuestion() {
-    currentQuestionIndex++;
+  void setNextQuiz() {
+    currentQuizIndex++;
     notifyListeners();
   }
 
+  void onQuizAnswered(bool isCorrect) {
+    quizResult[currentQuizIndex] = (
+      failAttempts: (quizResult[currentQuizIndex]?.failAttempts ?? 0) + (isCorrect ? 0 : 1),
+      isCorrect: isCorrect,
+    );
+  }
+  ///
+
+  /// Timer management
   void initializeTimer(int initialTime) {
     timeRemaining.value = initialTime;
   }
@@ -78,6 +91,7 @@ class GameViewModel extends BaseViewModel {
   void stopTimer() {
     _timer?.cancel();
   }
+  ///
 
   @override
   void dispose() {

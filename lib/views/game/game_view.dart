@@ -3,13 +3,17 @@ import 'dart:async';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
+import 'package:gunwave/data/constants/game/game_color.dart';
+import 'package:gunwave/data/dtos/req/update_rank_req.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/data/models/map_model.dart';
+import 'package:gunwave/data/models/rank_model.dart';
 import 'package:gunwave/data/models/room_model.dart';
 import 'package:gunwave/views/game/game_view_model.dart';
 import 'package:gunwave/views/game/gunwave.dart';
-import 'package:gunwave/views/game/widgets/question_widget.dart';
+import 'package:gunwave/views/game/widgets/quiz_widget.dart';
 import 'package:gunwave/views/game/widgets/stage_result_dialog.dart';
 import 'package:gunwave/widgets/base/base_view.dart';
 import 'package:gunwave/widgets/game/game_button.dart';
@@ -40,7 +44,6 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
     gameCharacters: widget.character,
     isJoystickEnabled: widget.joystickEnabled,
     onStageCompleted: onStageCompleted,
-    onStageFailed: onStageFailed,
     onCharacterReachCheckpoint: onCharacterReachCheckpoint,
   );
 
@@ -48,12 +51,16 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
   void onReady() {
     super.onReady();
 
+    _gunwave.character.hp;
+    model.timeRemaining;
+    _gunwave.stage?.monsters;
+
     // Initialize timer in view model
     model.initializeTimer(widget.room.map!.timeLimit);
 
     // Start the timer
     model.startTimer(() {
-      onStageFailed();
+      onStageCompleted(false);
     });
   }
 
@@ -111,18 +118,18 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
 
   Widget _buildQuiz() {
     // Quiz doesn't depend on time now
-    return QuestionWidget(
-      widget.room.quizzes[model.currentQuestionIndex],
+    return QuizWidget(
+      widget.room.quizzes[model.currentQuizIndex],
       onQuestionAnswered: (isCorrect) {
         debugPrint('Quiz answered: $isCorrect');
+        model.onQuizAnswered(isCorrect);
         if (isCorrect) {
-          if (model.currentQuestionIndex < widget.room.quizzes.length - 1) {
-            model.setNextQuestion();
+          if (model.currentQuizIndex < widget.room.quizzes.length - 1) {
+            model.setNextQuiz();
           } else {
-            onStageCompleted();
+            onStageCompleted(true);
           }
         } else {
-          // Use view model to decrease time instead of setState
           model.decreaseTime(5);
         }
       },
@@ -176,19 +183,45 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
     return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 
-  void onStageCompleted() {
+  void onStageCompleted(bool isSuccess) async {
     model.stopTimer();
+    RankModel? result;
+    if (isSuccess) {
+      showOverlay();
+      result = await model.userRepo.updateUserRank(UpdateRankReq(
+        characterId: widget.character.id,
+        roomId: widget.room.id,
+        timeLeft: model.timeRemaining.value,
+        timeLimit: widget.room.map!.timeLimit,
+        monsters: _gunwave.stage?.monsters.map((monster) => (
+          percenHpLeft: monster.hp / monster.monster.hp,
+          score: monster.monster.score
+        )).toList() ?? [],
+        quizzes: model.quizResult.values.map((result) => (
+          failAttempts: result.failAttempts,
+          isCorrect: result.isCorrect
+        )).toList(),
+      ));
+      context.pop();
+    }
     StageResultDialog.show(
-      result: true,
+      result: isSuccess,
       rewards: widget.room.map!.rewards,
+      score: result?.score,
     );
   }
 
-  void onStageFailed() {
-    model.stopTimer();
-    StageResultDialog.show(
-      result: false,
-      rewards: widget.room.map!.rewards,
+  void showOverlay() {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return const Center(
+          child: CircularProgressIndicator(
+            color: GameColors.primary
+          )
+        );
+      },
     );
   }
 

@@ -19,13 +19,11 @@ class Stage extends World with HasGameRef<Gunwave> {
     required this.world,
     required this.character,
     required this.onStageCompleted,
-    required this.onStageFailed,
   });
 
   final MapModel world;
   final Character character;
-  final void Function() onStageCompleted;
-  final void Function() onStageFailed;
+  final void Function(bool) onStageCompleted;
 
   /// Load world map
   late final TiledComponent component;
@@ -170,14 +168,7 @@ class Stage extends World with HasGameRef<Gunwave> {
       hasShownDialog = true;
       Future.delayed(const Duration(seconds: 1), () {
         character.velocity = Vector2.zero();
-        onStageFailed();
-      });
-    }
-    if (monsters.every((monster) => monster.isDead)) {
-      hasShownDialog = true;
-      Future.delayed(const Duration(seconds: 1), () {
-        character.velocity = Vector2.zero();
-        onStageCompleted();
+        onStageCompleted(false);
       });
     }
   }

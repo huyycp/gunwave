@@ -19,7 +19,6 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
     required this.gameCharacters,
     this.isJoystickEnabled = false,
     required this.onStageCompleted,
-    required this.onStageFailed,
     this.onCharacterReachCheckpoint,
   });
 
@@ -31,8 +30,7 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
   MapModel map;
   final CharacterModel gameCharacters;
   final bool isJoystickEnabled;
-  final void Function() onStageCompleted;
-  final void Function() onStageFailed;
+  final void Function(bool) onStageCompleted;
   final void Function(bool)? onCharacterReachCheckpoint;
   
   late final JoystickComponent joystick;
@@ -54,7 +52,6 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
       world: map,
       character: character,
       onStageCompleted: onStageCompleted,
-      onStageFailed: onStageFailed,
     );
     if (stage != null) world = stage!;
     camera = CameraComponent.withFixedResolution(

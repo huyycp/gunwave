@@ -6,13 +6,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_ui.dart';
 import 'package:gunwave/data/models/quiz_model.dart';
-import 'package:gunwave/utils/extensions/list_widget_ex.dart';
 import 'package:gunwave/views/game/components/sub_components/app_banner.dart';
 import 'package:gunwave/widgets/base/base_widget.dart';
 import 'package:gunwave/widgets/base/base_widget_model.dart';
 
-class QuestionWidget extends BaseWidget {
-  const QuestionWidget(
+class QuizWidget extends BaseWidget {
+  const QuizWidget(
     this.question, {
     required this.onQuestionAnswered,
     super.key,
@@ -27,7 +26,7 @@ class QuestionWidget extends BaseWidget {
   }
 }
 
-class QuestionWidgetState extends BaseWidgetState<QuestionWidget, QuestionWidgetModel> {
+class QuestionWidgetState extends BaseWidgetState<QuizWidget, QuestionWidgetModel> {
   final provider = ChangeNotifierProvider((ref) => QuestionWidgetModel());
 
   @override
