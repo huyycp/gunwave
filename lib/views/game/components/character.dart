@@ -191,7 +191,7 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
 
   @override
   void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (other is Building && other.isCheckpoint && other.checkZone != null) {
+    if (other is Building && other.isCheckpoint) {
       if (movebox.collidingWith(other.checkZone)) {
         _activeCheckpoints.add(other);
         if (onCharacterReachCheckpoint != null) {

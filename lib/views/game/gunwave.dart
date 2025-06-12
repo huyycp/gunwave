@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/data/constants/game/game_constants.dart';
 import 'package:gunwave/data/constants/game/game_hub.dart';
+import 'package:gunwave/data/constants/game/game_play_mode.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/data/models/map_model.dart';
 import 'package:gunwave/views/game/components/character.dart';
@@ -17,7 +18,7 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
     this.ref, {
     required this.map,
     required this.gameCharacters,
-    this.isJoystickEnabled = false,
+    required this.playMode,
     required this.onStageCompleted,
     this.onCharacterReachCheckpoint,
   });
@@ -29,7 +30,7 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
   WidgetRef ref;
   MapModel map;
   final CharacterModel gameCharacters;
-  final bool isJoystickEnabled;
+  final GamePlayMode playMode;
   final void Function(bool) onStageCompleted;
   final void Function(bool)? onCharacterReachCheckpoint;
   
@@ -62,7 +63,7 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
 
     camera.viewfinder.anchor = Anchor.topLeft;
 
-    if (isJoystickEnabled) {
+    if (playMode.isJoystick) {
       addJoystick();
       addAttachBtn();
     }
@@ -78,7 +79,7 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
         (character.scale.x > 0 ? character.x : character.x - character.width) - size.x / 4,
         (character.y - (size.y - character.height) / 2),
       );
-      if (isJoystickEnabled) updateJoystick();
+      if (playMode.isJoystick) updateJoystick();
 
       accoumulatedTime -= GameConstants.refreshRate;
       super.update(GameConstants.refreshRate);

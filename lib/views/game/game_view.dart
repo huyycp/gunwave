@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
+import 'package:gunwave/data/constants/game/game_play_mode.dart';
 import 'package:gunwave/data/dtos/req/update_rank_req.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/data/models/rank_model.dart';
@@ -20,13 +21,13 @@ class GameView extends BaseView {
   const GameView({
     required this.room,
     required this.character,
-    this.joystickEnabled = false,
+    required this.playMode,
     super.key,
   });
 
   final RoomModel room;
   final CharacterModel character;
-  final bool joystickEnabled;
+  final GamePlayMode playMode;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -38,8 +39,8 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
   late final Gunwave _gunwave = Gunwave(
     ref,
     map: widget.room.map!,
+    playMode: widget.playMode,
     gameCharacters: widget.character,
-    isJoystickEnabled: widget.joystickEnabled,
     onStageCompleted: onStageCompleted,
     onCharacterReachCheckpoint: onCharacterReachCheckpoint,
   );
