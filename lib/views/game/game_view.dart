@@ -60,12 +60,19 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
     model.startTimer(() {
       onStageCompleted(false);
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (widget.playMode.isGesture) {
+        await model.startGestureRecognition();
+      }
+    });
   }
 
   @override
-  void dispose() {
+  void dispose() async {
     model.stopTimer();
     super.dispose();
+    await model.stopGestureRecognition();
   }
 
   @override
@@ -183,6 +190,8 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
 
   void onStageCompleted(bool isSuccess) async {
     model.stopTimer();
+    if (widget.playMode.isGesture) await model.stopGestureRecognition();
+
     RankModel? result;
     if (isSuccess) {
       showOverlay();

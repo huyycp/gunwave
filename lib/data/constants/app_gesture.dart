@@ -1,0 +1,10 @@
+enum AppGesture {
+  Closed_Fist,
+  Open_Palm,
+  Pointing_Up,
+  Thumb_Down,
+  Thumb_Up,
+  Victory,
+  ILoveYou,
+  Unknown;
+}

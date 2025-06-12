@@ -4,14 +4,17 @@ import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gunwave/data/constants/app_gesture.dart';
 import 'package:gunwave/data/constants/game/game_constants.dart';
 import 'package:gunwave/data/constants/game/game_hub.dart';
 import 'package:gunwave/data/constants/game/game_play_mode.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/data/models/map_model.dart';
+import 'package:gunwave/utils/enum_utils.dart';
 import 'package:gunwave/views/game/components/character.dart';
 import 'package:gunwave/views/game/components/stage.dart';
 import 'package:gunwave/views/game/components/sub_components/attack_button.dart';
+import 'package:gunwave/views/game/game_view_model.dart';
 
 class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection {
   Gunwave(
@@ -80,6 +83,7 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
         (character.y - (size.y - character.height) / 2),
       );
       if (playMode.isJoystick) updateJoystick();
+      if (playMode.isGesture) updateGesture();
 
       accoumulatedTime -= GameConstants.refreshRate;
       super.update(GameConstants.refreshRate);
@@ -151,6 +155,46 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
       default:
         character.verticalMovement = 0;
         character.horizontalMovement = 0;
+    }
+  }
+
+  void updateGesture() {
+    final gestureLabel = ref.read(gameViewModel).gesture;
+    if (gestureLabel == null) return;
+    final gesture = enumFromString(AppGesture.values, gestureLabel, AppGesture.Unknown); 
+    switch(gesture) {
+      case AppGesture.Closed_Fist:
+        character.triggerAttack = true;
+        break;
+      case AppGesture.Open_Palm:
+        character.verticalMovement = 0;
+        character.horizontalMovement = 0;
+        break;
+      case AppGesture.Pointing_Up:
+        character.verticalMovement = 0;
+        character.horizontalMovement = 1;
+        break;
+      case AppGesture.Thumb_Down:
+        character.verticalMovement = 1;
+        character.horizontalMovement = 0;
+        break;
+      case AppGesture.Thumb_Up:
+        character.verticalMovement = -1;
+        character.horizontalMovement = 0;
+        break;
+      case AppGesture.Victory:
+        character.verticalMovement = 0;
+        character.horizontalMovement = -1;
+        break;
+      case AppGesture.ILoveYou:
+        character.horizontalMovement = 0;
+        character.verticalMovement = 0;
+        break;
+      case AppGesture.Unknown:
+        character.horizontalMovement = 0;
+        character.verticalMovement = 0;
+        character.triggerAttack = false;
+        break;
     }
   }
 }

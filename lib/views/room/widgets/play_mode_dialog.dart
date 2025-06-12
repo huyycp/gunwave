@@ -64,9 +64,9 @@ class PlayModeDialogState extends BaseWidgetState<PlayModeDialog, PlayModeDialog
             mainAxisSize: MainAxisSize.min,
             spacing: 8,
             children: [
-              _buildJoystickMode(),
-              _buildGestureMode(),
-              _buildKeyboardMode(),
+              _buildPlayModeItem(GamePlayMode.joystick),
+              _buildPlayModeItem(GamePlayMode.gesture),
+              _buildPlayModeItem(GamePlayMode.keyboard), 
             ],
           )
         ],
@@ -74,54 +74,20 @@ class PlayModeDialogState extends BaseWidgetState<PlayModeDialog, PlayModeDialog
     );
   }
 
-  Widget _buildJoystickMode() {
-    return _buildPlayModeItem(
-      GamePlayMode.joystick, 
-      () {
-        context.pop();
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => GameView(
-              room: widget.room,
-              character: widget.selectedCharacter,
-              playMode: GamePlayMode.joystick,
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildGestureMode() {
-    return _buildPlayModeItem(
-      GamePlayMode.gesture, 
-      () {
-        context.pop();
-      },
-    );
-  }
-
-  Widget _buildKeyboardMode() {
-    return _buildPlayModeItem(
-      GamePlayMode.keyboard, 
-      () {
-        context.pop();
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => GameView(
-              room: widget.room,
-              character: widget.selectedCharacter,
-              playMode: GamePlayMode.keyboard,
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildPlayModeItem(GamePlayMode mode, VoidCallback onPressed) {
+  Widget _buildPlayModeItem(GamePlayMode mode) {
     return GameButton(
-      onPressed: onPressed,
+      onPressed: () {
+        context.pop();
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => GameView(
+              room: widget.room,
+              character: widget.selectedCharacter,
+              playMode: mode,
+            ),
+          ),
+        );
+      },
       child: Text(
         mode.name.capitalize,
         style: GoogleFonts.pressStart2p(
