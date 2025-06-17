@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gunwave/data/constants/app_gesture.dart';
 import 'package:gunwave/repositories/gesture_recognizer_repo.dart';
 import 'package:gunwave/repositories/rank_repository.dart';
 import 'package:gunwave/widgets/base/base_view_model.dart';
@@ -32,7 +33,11 @@ class GameViewModel extends BaseViewModel {
     await _gestureRecognizerRepo.startGestureRecognition();
     _gestureSubscription = _gestureRecognizerRepo.gestureStream.listen((gesture) {
       // Handle the recognized gesture
-      this.gesture = gesture;
+      if (isShowQuizBtnVisible) {
+        this.gesture = AppGesture.Unknown.name;
+      } else {
+        this.gesture = gesture;
+      }
       // notifyListeners();
       debugPrint("Gesture recognized: $gesture");
     });

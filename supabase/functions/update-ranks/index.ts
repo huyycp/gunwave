@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
     
     monsters.forEach((monster: any) => {
       const monsterScore = monster.score || 0
-      totalScore += monster.percent_hp_left * monsterScore
+      totalScore += Math.floor(monster.percent_hp_left * monsterScore)
     })
     
     quizzes.forEach((quiz: any) => {

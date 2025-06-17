@@ -201,7 +201,7 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
         timeLeft: model.timeRemaining.value,
         timeLimit: widget.room.map!.timeLimit,
         monsters: _gunwave.stage?.monsters.map((monster) => (
-          percenHpLeft: monster.hp / monster.monster.hp,
+          percenHpLeft: (monster.hp / monster.monster.hp),
           score: monster.monster.score
         )).toList() ?? [],
         quizzes: model.quizResult.values.map((result) => (
