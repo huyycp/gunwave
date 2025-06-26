@@ -33,7 +33,7 @@ class GameViewModel extends BaseViewModel {
     await _gestureRecognizerRepo.startGestureRecognition();
     _gestureSubscription = _gestureRecognizerRepo.gestureStream.listen((gesture) {
       // Handle the recognized gesture
-      if (isShowQuizBtnVisible) {
+      if (isQuizVisible) {
         this.gesture = AppGesture.Unknown.name;
       } else {
         this.gesture = gesture;

@@ -68,6 +68,17 @@ class $AssetsTilesGen {
   /// File path: assets/tiles/loading.tmx
   String get loading => 'assets/tiles/loading.tmx';
 
+  /// File path: assets/tiles/rockland.png
+  AssetGenImage get rocklandPng =>
+      const AssetGenImage('assets/tiles/rockland.png');
+
+  /// File path: assets/tiles/rockland.tmx
+  String get rocklandTmx => 'assets/tiles/rockland.tmx';
+
+  /// File path: assets/tiles/rockland_brief.png
+  AssetGenImage get rocklandBrief =>
+      const AssetGenImage('assets/tiles/rockland_brief.png');
+
   /// File path: assets/tiles/rocks_lg.tsx
   String get rocksLg => 'assets/tiles/rocks_lg.tsx';
 
@@ -94,6 +105,9 @@ class $AssetsTilesGen {
     forestTmx,
     forestBrief,
     loading,
+    rocklandPng,
+    rocklandTmx,
+    rocklandBrief,
     rocksLg,
     rocksMd,
     rocksSm,

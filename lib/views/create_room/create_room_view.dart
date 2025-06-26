@@ -135,6 +135,7 @@ class CreateRoomViewState extends BaseViewState<CreateRoomView, CreateRoomViewMo
               ),
               items: model.maps.map((map) {
                 return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     color: const Color.fromARGB(255, 71, 183, 181),
