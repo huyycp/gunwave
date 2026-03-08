@@ -12,15 +12,18 @@ class StageResultDialog extends StatelessWidget {
   StageResultDialog({
     required this.result,
     required this.rewards,
+    this.score,
     super.key,
   });
 
   final bool result;
   final List<RewardModel> rewards;
+  int? score;
 
   static void show({
     required bool result,
     required List<RewardModel> rewards,
+    int? score,
   }) {
     showDialog(
       context: navigatorKey.currentContext!,
@@ -29,6 +32,7 @@ class StageResultDialog extends StatelessWidget {
         child: StageResultDialog(
           result: result,
           rewards: rewards,
+          score: score,
         ),
       ),
     );
@@ -68,25 +72,49 @@ class StageResultDialog extends StatelessWidget {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                if (result) Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 8,
-                  children: [
-                    Text(
-                      'Rewards',
-                      style: GoogleFonts.pressStart2p(
-                        fontSize: 16,
-                        color: GameColors.primary,
+                if (result) ...[
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    spacing: 8,
+                    children: [
+                      Text(
+                        'Rewards',
+                        style: GoogleFonts.pressStart2p(
+                          fontSize: 16,
+                          color: GameColors.primary,
+                        ),
                       ),
-                    ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: rewards.map((reward) => _buildRewardItem(reward)).toList(),
-                    )
-                  ],
-                ),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: rewards.map((reward) => _buildRewardItem(reward)).toList(),
+                      )
+                    ],
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 8,
+                    children: [
+                      Text(
+                        'Score',
+                        style: GoogleFonts.pressStart2p(
+                          fontSize: 16,
+                          color: GameColors.primary,
+                        ),
+                      ),
+                      Text(
+                        score?.toString() ?? '0',
+                        style: GoogleFonts.pressStart2p(
+                          fontSize: 16,
+                          color: GameColors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 _buildCloseButton(context),
               ],
             ),

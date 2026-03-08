@@ -16,9 +16,11 @@ class GameMaps {
 
   static final values = [
     forest,
+    rockland,
   ];
 
   static final forest = GameMaps._('forest', basePath.forestTmx, basePath.forestBrief.path);
+  static final rockland = GameMaps._('rockland', basePath.rocklandTmx, basePath.rocklandBrief.path);
   static final loading = GameMaps._('loading', basePath.loading, '');
   static final background = GameMaps._('background', basePath.background, '');
 }

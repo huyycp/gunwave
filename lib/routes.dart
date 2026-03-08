@@ -4,6 +4,7 @@ import 'package:gunwave/views/character/character_view.dart';
 import 'package:gunwave/views/create_room/create_room_view.dart';
 import 'package:gunwave/views/home/home_view.dart';
 import 'package:gunwave/views/my_room/my_room_view.dart';
+import 'package:gunwave/views/rank/rank_view.dart';
 import 'package:gunwave/views/room/room_view.dart';
 import 'package:gunwave/views/shop/shop_view.dart';
 import 'package:gunwave/views/splash/splash_view.dart';
@@ -19,6 +20,7 @@ class Routes {
   static const shop = '/shop';
   static const myRoom = '/my-room';
   static const createRoom = '/create-room';
+  static const rank = '/rank';
 
   static final GoRouter config = GoRouter(
     initialLocation: splash,
@@ -32,6 +34,7 @@ class Routes {
       _buildShopRoute(),
       _buildMyRoomRoute(),
       _buildCreateRoomRoute(),
+      _buildRankRoute(),
     ],
   );
   
@@ -91,6 +94,19 @@ class Routes {
         final args = state.extra is Map<String, dynamic> ? state.extra as Map<String, dynamic> : {};
         return NoTransitionPage(child: CreateRoomView(args.isNotEmpty ? args['onSuccess']: (_) {}));
       },
+    );
+  }
+
+  static GoRoute _buildRankRoute() {
+    return GoRoute(
+      path: rank,
+      name: rank,
+      pageBuilder: (context, state) {
+        final args = state.extra is Map<String, dynamic> ? state.extra as Map<String, dynamic> : {};
+        return NoTransitionPage(child: RankView(
+          roomId: args['room_id'],
+          userId: args['user_id']));
+      } ,
     );
   }
 }

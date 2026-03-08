@@ -4,22 +4,25 @@ import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gunwave/data/constants/app_gesture.dart';
 import 'package:gunwave/data/constants/game/game_constants.dart';
 import 'package:gunwave/data/constants/game/game_hub.dart';
+import 'package:gunwave/data/constants/game/game_play_mode.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/data/models/map_model.dart';
+import 'package:gunwave/utils/enum_utils.dart';
 import 'package:gunwave/views/game/components/character.dart';
 import 'package:gunwave/views/game/components/stage.dart';
 import 'package:gunwave/views/game/components/sub_components/attack_button.dart';
+import 'package:gunwave/views/game/game_view_model.dart';
 
 class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection {
   Gunwave(
     this.ref, {
     required this.map,
     required this.gameCharacters,
-    this.isJoystickEnabled = false,
+    required this.playMode,
     required this.onStageCompleted,
-    required this.onStageFailed,
     this.onCharacterReachCheckpoint,
   });
 
@@ -30,9 +33,8 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
   WidgetRef ref;
   MapModel map;
   final CharacterModel gameCharacters;
-  final bool isJoystickEnabled;
-  final void Function() onStageCompleted;
-  final void Function() onStageFailed;
+  final GamePlayMode playMode;
+  final void Function(bool) onStageCompleted;
   final void Function(bool)? onCharacterReachCheckpoint;
   
   late final JoystickComponent joystick;
@@ -54,7 +56,6 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
       world: map,
       character: character,
       onStageCompleted: onStageCompleted,
-      onStageFailed: onStageFailed,
     );
     if (stage != null) world = stage!;
     camera = CameraComponent.withFixedResolution(
@@ -65,7 +66,7 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
 
     camera.viewfinder.anchor = Anchor.topLeft;
 
-    if (isJoystickEnabled) {
+    if (playMode.isJoystick) {
       addJoystick();
       addAttachBtn();
     }
@@ -81,7 +82,8 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
         (character.scale.x > 0 ? character.x : character.x - character.width) - size.x / 4,
         (character.y - (size.y - character.height) / 2),
       );
-      if (isJoystickEnabled) updateJoystick();
+      if (playMode.isJoystick) updateJoystick();
+      if (playMode.isGesture) updateGesture();
 
       accoumulatedTime -= GameConstants.refreshRate;
       super.update(GameConstants.refreshRate);
@@ -153,6 +155,46 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
       default:
         character.verticalMovement = 0;
         character.horizontalMovement = 0;
+    }
+  }
+
+  void updateGesture() {
+    final gestureLabel = ref.read(gameViewModel).gesture;
+    if (gestureLabel == null) return;
+    final gesture = enumFromString(AppGesture.values, gestureLabel, AppGesture.Unknown); 
+    switch(gesture) {
+      case AppGesture.Closed_Fist:
+        character.triggerAttack = true;
+        break;
+      case AppGesture.Open_Palm:
+        character.verticalMovement = 0;
+        character.horizontalMovement = 0;
+        break;
+      case AppGesture.Pointing_Up:
+        character.verticalMovement = 0;
+        character.horizontalMovement = 1;
+        break;
+      case AppGesture.Thumb_Down:
+        character.verticalMovement = 1;
+        character.horizontalMovement = 0;
+        break;
+      case AppGesture.Thumb_Up:
+        character.verticalMovement = -1;
+        character.horizontalMovement = 0;
+        break;
+      case AppGesture.Victory:
+        character.verticalMovement = 0;
+        character.horizontalMovement = -1;
+        break;
+      case AppGesture.ILoveYou:
+        character.horizontalMovement = 0;
+        character.verticalMovement = 0;
+        break;
+      case AppGesture.Unknown:
+        character.horizontalMovement = 0;
+        character.verticalMovement = 0;
+        character.triggerAttack = false;
+        break;
     }
   }
 }

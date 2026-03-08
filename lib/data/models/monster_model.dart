@@ -10,6 +10,7 @@ class MonsterModel {
     required this.str,
     required this.vit,
     required this.agi,
+    required this.score,
   });
 
   final String id;
@@ -26,6 +27,8 @@ class MonsterModel {
   
   int agi;
 
+  final int score;
+
   GameMonsters? get monster => monsterFromFile(filename);
 
   factory MonsterModel.fromJson(Map<String, dynamic> json) => MonsterModel(
@@ -36,6 +39,7 @@ class MonsterModel {
     str: intFromJson(json['str'], defaultValue: 0),
     vit: intFromJson(json['vit'], defaultValue: 0),
     agi: intFromJson(json['agi'], defaultValue: 0),
+    score: intFromJson(json['score'], defaultValue: 0), 
   );
 
   Map<String, dynamic> toJson() => {
@@ -46,5 +50,6 @@ class MonsterModel {
     'str': str,
     'vit': vit,
     'agi': agi,
+    'score': score,
   };
 }

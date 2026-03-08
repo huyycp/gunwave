@@ -31,7 +31,7 @@ class BuildConfig {
   }
 
   void prod() {
-    scheme = 'luckypool';
+    scheme = 'gunwave';
     iosAppId = 'com.huyvowkm.gunwave';
     androidBundleId = 'com.huyvowkm.gunwave';
     nativeUrl = '$scheme://';

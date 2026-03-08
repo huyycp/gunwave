@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/models/room_model.dart';
+import 'package:gunwave/routes.dart';
 import 'package:gunwave/utils/extensions/string_ex.dart';
 import 'package:gunwave/widgets/app_image.dart';
 import 'package:gunwave/widgets/app_list_tile.dart';
@@ -39,6 +42,11 @@ class RoomPreviewWidget extends StatelessWidget {
           ),
           Positioned.fill(
             child: _buildRoomInfo(),
+          ),
+          Positioned(
+            top: 16,
+            right: 16,
+            child: _buildRankInfoBtn(context),
           ),
         ],
       )
@@ -147,6 +155,24 @@ class RoomPreviewWidget extends StatelessWidget {
             ],
           )
         ],
+      ),
+    );
+  }
+
+  Widget _buildRankInfoBtn(BuildContext context) {
+    return GameButton(
+      onPressed: () {
+        context.push(
+          Routes.rank,
+          extra: {
+            'room_id': room.id, 
+          }
+        );
+      },
+      size: GameButtonSize.small,
+      child: const Icon(
+        Icons.bar_chart,
+        color: GameColors.primary,
       ),
     );
   }

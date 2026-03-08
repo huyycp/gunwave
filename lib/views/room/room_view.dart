@@ -4,19 +4,15 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
-import 'package:gunwave/data/constants/game/game_ui.dart';
 import 'package:gunwave/data/models/room_model.dart';
-import 'package:gunwave/utils/extensions/string_ex.dart';
-import 'package:gunwave/views/game/game_view.dart';
 import 'package:gunwave/views/home/widgets/background.dart';
 import 'package:gunwave/views/room/room_view_model.dart';
+import 'package:gunwave/views/room/widgets/play_mode_dialog.dart';
 import 'package:gunwave/views/room/widgets/room_preview_widget.dart';
 import 'package:gunwave/views/room/widgets/select_character.dart';
-import 'package:gunwave/widgets/app_image.dart';
 import 'package:gunwave/widgets/base/base_view.dart';
 import 'package:gunwave/widgets/game/game_button.dart';
 
@@ -101,78 +97,9 @@ class RoomViewState extends BaseViewState<RoomView, RoomViewModel> {
   }
 
   void showPlayModeDialog(RoomModel room) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) => Dialog(
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            image: DecorationImage(
-              image: AssetImage(GameBanners.carvedSlide.path),
-              fit: BoxFit.fill,
-              scale: 0.1,
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            spacing: 8,
-            children: [
-              Text(
-                'Play Mode',
-                style: GoogleFonts.pressStart2p(
-                  fontSize: 20,
-                  color: GameColors.primary,
-                ),
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                spacing: 8,
-                children: [
-                  GameButton(
-                    onPressed: () {
-                      context.pop();
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => GameView(
-                            room: room,
-                            character: model.selectedCharacter!,
-                            joystickEnabled: true,
-                          ),
-                        ),
-                      );
-                    },
-                    child: const Text('Joystick'),
-                  ),
-                  GameButton(
-                    onPressed: () {
-                      context.pop();
-                    },
-                    child: const Text('Gestures'),
-                  ),
-                  GameButton(
-                    onPressed: () {
-                      context.pop();
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => GameView(
-                            room: room,
-                            character: model.selectedCharacter!,
-                            joystickEnabled: false,
-                          ),
-                        ),
-                      );
-                    },
-                    child: const Text('Keyboard'),
-                  ),
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
-    );
+    if (model.selectedCharacter != null) {
+      PlayModeDialog.show(room, model.selectedCharacter!);
+    }
   }
 
   @override
