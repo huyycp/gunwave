@@ -25,16 +25,16 @@ class RankRemoteDataSource {
         'Authorization': 'Bearer ${client.auth.currentSession?.accessToken}',
         'Content-Type': 'application/json',
       },
-      body: req.toJson()
+      body: req.toJson(),
     );
     debugPrint("Update Rank Response: ${resp.data}");
     return RankModel.fromJson(resp.data);
   }
 
-  Future<List<RankModel>> getRanksByRoom({String? roomId, String? userId}) async {
-    var query = client.
-      from(ranksTable)
-      .select('*, users(*), characters(*), rooms(*)');
+  Future<List<RankModel>> getRanksByRoom(
+      {String? roomId, String? userId}) async {
+    var query =
+        client.from(ranksTable).select('*, users(*), characters(*), rooms(*)');
     if (roomId != null) {
       query = query.eq('room_id', roomId);
     }
@@ -42,10 +42,11 @@ class RankRemoteDataSource {
       query = query.eq('user_id', userId);
     }
     final response = await query
-      .order('score', ascending: false)
-      .order('duration')
-      .order('created_at');
+        .order('score', ascending: false)
+        .order('duration')
+        .order('created_at');
     debugPrint("Ranks: $response");
-    return List<RankModel>.from(response.map((json) => RankModel.fromJson(json)));
+    return List<RankModel>.from(
+        response.map((json) => RankModel.fromJson(json)));
   }
 }

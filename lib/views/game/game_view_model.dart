@@ -12,8 +12,7 @@ final gameViewModel = ChangeNotifierProvider.autoDispose<GameViewModel>((ref) {
 });
 
 class GameViewModel extends BaseViewModel {
-
-  late final GestureRecognizerRepo _gestureRecognizerRepo = ref.read(gestureRecognizerRepoProvider);
+  GestureRecognizerRepo? _gestureRecognizerRepo;
   late final RankRepository rankRepo = ref.read(rankRepoProvider);
 
   StreamSubscription<String>? _gestureSubscription;
@@ -30,8 +29,10 @@ class GameViewModel extends BaseViewModel {
 
   /// gesture recognition
   Future<void> startGestureRecognition() async {
-    await _gestureRecognizerRepo.startGestureRecognition();
-    _gestureSubscription = _gestureRecognizerRepo.gestureStream.listen((gesture) {
+    _gestureRecognizerRepo ??= ref.read(gestureRecognizerRepoProvider);
+    await _gestureRecognizerRepo?.startGestureRecognition();
+    _gestureSubscription =
+        _gestureRecognizerRepo?.gestureStream.listen((gesture) {
       // Handle the recognized gesture
       if (isQuizVisible) {
         this.gesture = AppGesture.Unknown.name;
@@ -44,11 +45,12 @@ class GameViewModel extends BaseViewModel {
   }
 
   Future<void> stopGestureRecognition() async {
-    await _gestureRecognizerRepo.stopGestureRecognition();
+    await _gestureRecognizerRepo?.stopGestureRecognition();
     await _gestureSubscription?.cancel();
   }
+
   ///
-  
+
   /// Quiz management
   void setShowQuizBtnVisible(bool visible) {
     isShowQuizBtnVisible = visible;
@@ -67,10 +69,12 @@ class GameViewModel extends BaseViewModel {
 
   void onQuizAnswered(bool isCorrect) {
     quizResult[currentQuizIndex] = (
-      failAttempts: (quizResult[currentQuizIndex]?.failAttempts ?? 0) + (isCorrect ? 0 : 1),
+      failAttempts: (quizResult[currentQuizIndex]?.failAttempts ?? 0) +
+          (isCorrect ? 0 : 1),
       isCorrect: isCorrect,
     );
   }
+
   ///
 
   /// Timer management
@@ -98,6 +102,7 @@ class GameViewModel extends BaseViewModel {
   void stopTimer() {
     _timer?.cancel();
   }
+
   ///
 
   @override

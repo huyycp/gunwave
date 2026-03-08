@@ -69,10 +69,13 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
   }
 
   @override
-  void dispose() async {
+  void dispose() {
     model.stopTimer();
+    // Stop gesture recognition before detaching the view (BaseWidgetState.dispose
+    // will call model.detachView()). This ensures `ref` remains available
+    // during shutdown logic inside the model.
+    model.stopGestureRecognition();
     super.dispose();
-    await model.stopGestureRecognition();
   }
 
   @override
@@ -82,7 +85,6 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
       body: Stack(
         children: [
           GameWidget(game: _gunwave),
-
           if (model.isQuizVisible)
             Positioned.fill(
               child: GestureDetector(
@@ -91,8 +93,7 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
                 child: Container(),
               ),
             ),
-          if (model.isQuizVisible)
-            Positioned.fill(child: _buildQuiz()),
+          if (model.isQuizVisible) Positioned.fill(child: _buildQuiz()),
           if (model.isShowQuizBtnVisible)
             Align(
               alignment: Alignment.centerRight,
@@ -200,14 +201,19 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
         roomId: widget.room.id,
         timeLeft: model.timeRemaining.value,
         timeLimit: widget.room.map!.timeLimit,
-        monsters: _gunwave.stage?.monsters.map((monster) => (
-          percenHpLeft: (monster.hp / monster.monster.hp),
-          score: monster.monster.score
-        )).toList() ?? [],
-        quizzes: model.quizResult.values.map((result) => (
-          failAttempts: result.failAttempts,
-          isCorrect: result.isCorrect
-        )).toList(),
+        monsters: _gunwave.stage?.monsters
+                .map((monster) => (
+                      percenHpLeft: (monster.hp / monster.monster.hp),
+                      score: monster.monster.score
+                    ))
+                .toList() ??
+            [],
+        quizzes: model.quizResult.values
+            .map((result) => (
+                  failAttempts: result.failAttempts,
+                  isCorrect: result.isCorrect
+                ))
+            .toList(),
       ));
       context.pop();
     }
@@ -224,10 +230,7 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
       context: context,
       builder: (context) {
         return const Center(
-          child: CircularProgressIndicator(
-            color: GameColors.primary
-          )
-        );
+            child: CircularProgressIndicator(color: GameColors.primary));
       },
     );
   }

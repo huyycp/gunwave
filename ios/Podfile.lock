@@ -52,7 +52,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   app_links: 76b66b60cc809390ca1ad69bfd66b998d2387ac7
-  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   MediaPipeTasksCommon: 6cfa29170d4900f04d250ad95ec058f14a741f38
   MediaPipeTasksVision: 7b1c0f5a5820e87e9d96926f5e65d8cd3744fac2
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
