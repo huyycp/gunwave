@@ -9,6 +9,8 @@ import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
 import 'package:gunwave/data/constants/game/game_ui.dart';
 import 'package:gunwave/routes.dart';
+import 'package:gunwave/localization/build_context_l10n.dart';
+import 'package:gunwave/gen/assets.gen.dart';
 import 'package:gunwave/views/home/widgets/background.dart';
 import 'package:gunwave/views/home/home_view_model.dart';
 import 'package:gunwave/views/home/widgets/login_widget.dart';
@@ -55,16 +57,19 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
       body: Stack(
         children: [
           _background,
+          Positioned(
+            top: 8,
+            right: 32,
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              _buildSettingsBtn(),
+              if (model.userRepo.appUser != null) _buildUserGold(),
+            ]),
+          ),
           if (model.userRepo.appUser != null) ...[
             Positioned(
               top: 16,
               left: 48,
               child: _buildUserInfo(),
-            ),
-            Positioned(
-              top: 16,
-              right: 48,
-              child: _buildUserGold(),
             ),
             Positioned(
               bottom: 16,
@@ -94,6 +99,21 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
       ),
     );
   }
+
+  Widget _buildSettingsBtn() => Tooltip(
+    message: context.l10n.settings,
+    child: Semantics(
+      button: true,
+      label: context.l10n.settings,
+      child: GameButton(
+        size: GameButtonSize.small,
+        onPressed: () => context.push(Routes.settings),
+        child: Assets.images.ui.icons.setting.image(
+          filterQuality: FilterQuality.none,
+        ),
+      ),
+    ),
+  );
 
   Widget _buildUserInfo() {
     return Text(
