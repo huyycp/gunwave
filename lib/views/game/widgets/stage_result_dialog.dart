@@ -13,17 +13,20 @@ class StageResultDialog extends StatelessWidget {
     required this.result,
     required this.rewards,
     this.score,
+    this.errorMessage,
     super.key,
   });
 
   final bool result;
   final List<RewardModel> rewards;
-  int? score;
+  final int? score;
+  final String? errorMessage;
 
   static void show({
     required bool result,
     required List<RewardModel> rewards,
     int? score,
+    String? errorMessage,
   }) {
     showDialog(
       context: navigatorKey.currentContext!,
@@ -33,28 +36,27 @@ class StageResultDialog extends StatelessWidget {
           result: result,
           rewards: rewards,
           score: score,
+          errorMessage: errorMessage,
         ),
       ),
     );
   }
 
   final _background = GameWidget(
-    game: FlameGame(
-      children: [
-        AppBanner(
-          banner: GameBanners.bannerHorizontal,
-          xCount: 6,
-          yCount: 3,
-        )
-      ]  
-    ),
+    game: FlameGame(children: [
+      AppBanner(
+        banner: GameBanners.bannerHorizontal,
+        xCount: 6,
+        yCount: 3,
+      )
+    ]),
   );
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: 400,
-      height: 200,
+      height: errorMessage == null ? 200 : 240,
       child: Stack(
         children: [
           _background,
@@ -89,31 +91,43 @@ class StageResultDialog extends StatelessWidget {
                       Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: rewards.map((reward) => _buildRewardItem(reward)).toList(),
+                        children: rewards
+                            .map((reward) => _buildRewardItem(reward))
+                            .toList(),
                       )
                     ],
                   ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: 8,
-                    children: [
-                      Text(
-                        'Score',
-                        style: GoogleFonts.pressStart2p(
-                          fontSize: 16,
-                          color: GameColors.primary,
-                        ),
+                  if (errorMessage != null)
+                    Text(
+                      errorMessage!,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.pressStart2p(
+                        fontSize: 12,
+                        color: GameColors.primary,
                       ),
-                      Text(
-                        score?.toString() ?? '0',
-                        style: GoogleFonts.pressStart2p(
-                          fontSize: 16,
-                          color: GameColors.primary,
+                    ),
+                  if (score != null)
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 8,
+                      children: [
+                        Text(
+                          'Score',
+                          style: GoogleFonts.pressStart2p(
+                            fontSize: 16,
+                            color: GameColors.primary,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                        Text(
+                          score?.toString() ?? '0',
+                          style: GoogleFonts.pressStart2p(
+                            fontSize: 16,
+                            color: GameColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
                 ],
                 _buildCloseButton(context),
               ],
@@ -136,33 +150,34 @@ class StageResultDialog extends StatelessWidget {
             color: GameColors.primary,
           ),
         ),
-        Text(reward.type.name.toUpperCase(), style: GoogleFonts.pressStart2p(fontSize: 16, color: GameColors.primary)),
+        Text(reward.type.name.toUpperCase(),
+            style: GoogleFonts.pressStart2p(
+                fontSize: 16, color: GameColors.primary)),
       ],
     );
   }
 
   Widget _buildCloseButton(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        context.pop();
-        context.pop();
-      },
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(GameBanners.carvedSlide.path),
-            fit: BoxFit.fill,
+        onTap: () {
+          context.pop();
+          context.pop();
+        },
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(GameBanners.carvedSlide.path),
+              fit: BoxFit.fill,
+            ),
           ),
-        ),
-        child: Text(
-          'Back',
-          style: GoogleFonts.pressStart2p(
-            fontSize: 16,
-            color: Colors.white,
+          child: Text(
+            'Back',
+            style: GoogleFonts.pressStart2p(
+              fontSize: 16,
+              color: Colors.white,
+            ),
           ),
-        ),
-      )
-    );
+        ));
   }
 }

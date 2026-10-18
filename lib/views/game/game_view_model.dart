@@ -22,7 +22,7 @@ class GameViewModel extends BaseViewModel {
   bool isQuizVisible = false;
 
   int currentQuizIndex = 0;
-  Map<int, ({int failAttempts, bool isCorrect})> quizResult = {};
+  Map<int, ({int failAttempts, String answer})> quizResult = {};
 
   final ValueNotifier<int> timeRemaining = ValueNotifier<int>(0);
   Timer? _timer;
@@ -30,23 +30,27 @@ class GameViewModel extends BaseViewModel {
   /// gesture recognition
   Future<void> startGestureRecognition() async {
     _gestureRecognizerRepo ??= ref.read(gestureRecognizerRepoProvider);
-    await _gestureRecognizerRepo?.startGestureRecognition();
+    await _gestureSubscription?.cancel();
     _gestureSubscription =
         _gestureRecognizerRepo?.gestureStream.listen((gesture) {
-      // Handle the recognized gesture
-      if (isQuizVisible) {
-        this.gesture = AppGesture.Unknown.name;
-      } else {
-        this.gesture = gesture;
-      }
-      // notifyListeners();
-      debugPrint("Gesture recognized: $gesture");
+      this.gesture = isQuizVisible ? AppGesture.Unknown.name : gesture;
     });
+
+    try {
+      await _gestureRecognizerRepo?.startGestureRecognition();
+    } catch (_) {
+      gesture = AppGesture.Unknown.name;
+      await _gestureSubscription?.cancel();
+      _gestureSubscription = null;
+      rethrow;
+    }
   }
 
   Future<void> stopGestureRecognition() async {
-    await _gestureRecognizerRepo?.stopGestureRecognition();
+    gesture = AppGesture.Unknown.name;
     await _gestureSubscription?.cancel();
+    _gestureSubscription = null;
+    await _gestureRecognizerRepo?.stopGestureRecognition();
   }
 
   ///
@@ -59,6 +63,7 @@ class GameViewModel extends BaseViewModel {
 
   void toggleQuizVisible() {
     isQuizVisible = !isQuizVisible;
+    if (isQuizVisible) gesture = AppGesture.Unknown.name;
     notifyListeners();
   }
 
@@ -67,11 +72,11 @@ class GameViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  void onQuizAnswered(bool isCorrect) {
+  void onQuizAnswered(String answer, bool isCorrect) {
     quizResult[currentQuizIndex] = (
       failAttempts: (quizResult[currentQuizIndex]?.failAttempts ?? 0) +
           (isCorrect ? 0 : 1),
-      isCorrect: isCorrect,
+      answer: answer,
     );
   }
 

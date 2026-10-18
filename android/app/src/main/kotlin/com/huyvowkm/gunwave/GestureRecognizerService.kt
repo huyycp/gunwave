@@ -24,6 +24,7 @@ class GestureRecognizerService(
     private val TAG = "GestureRecognizerService"
     private var gestureRecognizer: GestureRecognizer? = null
     private var isProcessing = false
+    private var lastEmittedGesture: String? = null
     private val executor = Executors.newSingleThreadExecutor()
 
     init {
@@ -89,12 +90,12 @@ class GestureRecognizerService(
                         val gestureName = category.categoryName()
                         val score = category.score()
                         Log.d(TAG, "Detected gesture: $gestureName with score: $score")
-                        onGestureRecognized(gestureName)
+                        emitGestureIfChanged(gestureName)
                     } else {
-                        Log.d(TAG, "No gesture detected in hand")
+                        emitGestureIfChanged("Unknown")
                     }
                 } else {
-                    Log.d(TAG, "No hand detected")
+                    emitGestureIfChanged("Unknown")
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error processing image: ${e.message}")
@@ -104,6 +105,12 @@ class GestureRecognizerService(
                 imageProxy.close()
             }
         }
+    }
+
+    private fun emitGestureIfChanged(gesture: String) {
+        if (gesture == lastEmittedGesture) return
+        lastEmittedGesture = gesture
+        onGestureRecognized(gesture)
     }
 
     private fun ImageProxy.toBitmap(): Bitmap {
@@ -132,6 +139,7 @@ class GestureRecognizerService(
     fun release() {
         try {
             Log.d(TAG, "Releasing gesture recognizer...")
+            emitGestureIfChanged("Unknown")
             gestureRecognizer?.close()
             gestureRecognizer = null
             executor.shutdown()

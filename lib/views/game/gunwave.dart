@@ -15,8 +15,10 @@ import 'package:gunwave/views/game/components/character.dart';
 import 'package:gunwave/views/game/components/stage.dart';
 import 'package:gunwave/views/game/components/sub_components/attack_button.dart';
 import 'package:gunwave/views/game/game_view_model.dart';
+import 'package:gunwave/views/game/gesture_controls.dart';
 
-class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection {
+class Gunwave extends FlameGame
+    with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection {
   Gunwave(
     this.ref, {
     required this.map,
@@ -29,14 +31,13 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
   @override
   bool get pauseWhenBackgrounded => false;
 
-
   WidgetRef ref;
   MapModel map;
   final CharacterModel gameCharacters;
   final GamePlayMode playMode;
   final void Function(bool) onStageCompleted;
   final void Function(bool)? onCharacterReachCheckpoint;
-  
+
   late final JoystickComponent joystick;
   Stage? stage;
 
@@ -79,7 +80,8 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
     accoumulatedTime += dt;
     while (accoumulatedTime > GameConstants.refreshRate) {
       camera.viewfinder.position = Vector2(
-        (character.scale.x > 0 ? character.x : character.x - character.width) - size.x / 4,
+        (character.scale.x > 0 ? character.x : character.x - character.width) -
+            size.x / 4,
         (character.y - (size.y - character.height) / 2),
       );
       if (playMode.isJoystick) updateJoystick();
@@ -119,7 +121,7 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
   }
 
   void updateJoystick() {
-    switch(joystick.direction) {
+    switch (joystick.direction) {
       case JoystickDirection.upLeft:
         character.verticalMovement = -1;
         character.horizontalMovement = -1;
@@ -161,40 +163,11 @@ class Gunwave extends FlameGame with HasKeyboardHandlerComponents, DragCallbacks
   void updateGesture() {
     final gestureLabel = ref.read(gameViewModel).gesture;
     if (gestureLabel == null) return;
-    final gesture = enumFromString(AppGesture.values, gestureLabel, AppGesture.Unknown); 
-    switch(gesture) {
-      case AppGesture.Closed_Fist:
-        character.triggerAttack = true;
-        break;
-      case AppGesture.Open_Palm:
-        character.verticalMovement = 0;
-        character.horizontalMovement = 0;
-        break;
-      case AppGesture.Pointing_Up:
-        character.verticalMovement = 0;
-        character.horizontalMovement = 1;
-        break;
-      case AppGesture.Thumb_Down:
-        character.verticalMovement = 1;
-        character.horizontalMovement = 0;
-        break;
-      case AppGesture.Thumb_Up:
-        character.verticalMovement = -1;
-        character.horizontalMovement = 0;
-        break;
-      case AppGesture.Victory:
-        character.verticalMovement = 0;
-        character.horizontalMovement = -1;
-        break;
-      case AppGesture.ILoveYou:
-        character.horizontalMovement = 0;
-        character.verticalMovement = 0;
-        break;
-      case AppGesture.Unknown:
-        character.horizontalMovement = 0;
-        character.verticalMovement = 0;
-        character.triggerAttack = false;
-        break;
-    }
+    final gesture =
+        enumFromString(AppGesture.values, gestureLabel, AppGesture.Unknown);
+    final controls = GestureControls.fromGesture(gesture);
+    character.horizontalMovement = controls.horizontalMovement;
+    character.verticalMovement = controls.verticalMovement;
+    character.triggerAttack = controls.attack;
   }
 }

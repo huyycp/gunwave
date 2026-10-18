@@ -22,6 +22,8 @@ A pixel adventure and shooting game with hand gesture recognition
     ```bash
     flutter pub get
     ```
+4. Configure `dev.env` and `prod.env` with `SUPABASE_URL` and `SUPABASE_ANON_KEY`.
+   These files are ignored by Git and must be supplied locally or by the release pipeline.
 
 ## Usage
 ### Development

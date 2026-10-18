@@ -8,6 +8,7 @@ import MediaPipeTasksVision
   var flutterMethodChannel: FlutterMethodChannel?
   private var cameraFeedService: CameraFeedService?
   private var gestureRecognizerService: GestureRecognizerService?
+  private var lastEmittedGesture: String?
   private let backgroundQueue = DispatchQueue(label: "com.google.mediapipe.appdelegate.backgroundQueue")
 
   override func application(
@@ -32,8 +33,17 @@ import MediaPipeTasksVision
 
       switch call.method {
       case "startGestureRecognition":
-        self.startGestureRecognition()
-        result(nil)
+        self.startGestureRecognition { started in
+          if started {
+            result(nil)
+          } else {
+            result(FlutterError(
+              code: "PERMISSION_OR_CAMERA_ERROR",
+              message: "Camera access is required for gesture recognition",
+              details: nil
+            ))
+          }
+        }
       case "stopGestureRecognition":
         self.stopGestureRecognition()
         result(nil)
@@ -47,27 +57,52 @@ import MediaPipeTasksVision
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
-  private func startGestureRecognition() {
+  private func startGestureRecognition(completion: @escaping (Bool) -> Void) {
+    lastEmittedGesture = nil
     // Request camera permissions
     AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
       guard let self = self else { return }
-      if granted {
+      guard granted else {
         DispatchQueue.main.async {
-          self.initializeCameraFeedService()
-          self.initializeGestureRecognizerService()
+          self.presentCameraPermissionsDeniedAlert()
+          completion(false)
         }
-      } else {
-        self.presentCameraPermissionsDeniedAlert()
+        return
+      }
+
+      DispatchQueue.main.async {
+        self.initializeCameraFeedService { status in
+          guard status == .success else {
+            if status == .permissionDenied {
+              self.presentCameraPermissionsDeniedAlert()
+            } else {
+              self.presentVideoConfigurationErrorAlert()
+            }
+            completion(false)
+            return
+          }
+          self.initializeGestureRecognizerService()
+          completion(true)
+        }
       }
     }
   }
 
   private func stopGestureRecognition() {
+    emitGestureIfChanged("Unknown")
     cameraFeedService?.stopSession()
     gestureRecognizerService = nil
   }
 
-  private func initializeCameraFeedService() {
+  private func emitGestureIfChanged(_ gesture: String) {
+    guard gesture != lastEmittedGesture else { return }
+    lastEmittedGesture = gesture
+    flutterMethodChannel?.invokeMethod("onGestureRecognized", arguments: gesture)
+  }
+
+  private func initializeCameraFeedService(
+    completion: @escaping (CameraFeedService.CameraConfigurationStatus) -> Void
+  ) {
     // Create a preview view for the camera feed
     let previewView = UIView(frame: UIScreen.main.bounds)
     previewView.backgroundColor = .black
@@ -77,16 +112,9 @@ import MediaPipeTasksVision
     // Initialize the CameraFeedService
     cameraFeedService = CameraFeedService(previewView: previewView)
     cameraFeedService?.delegate = self
-    cameraFeedService?.startLiveCameraSession { [weak self] cameraConfiguration in
+    cameraFeedService?.startLiveCameraSession { cameraConfiguration in
       DispatchQueue.main.async {
-        switch cameraConfiguration {
-        case .failed:
-          self?.presentVideoConfigurationErrorAlert()
-        case .permissionDenied:
-          self?.presentCameraPermissionsDeniedAlert()
-        default:
-          break
-        }
+        completion(cameraConfiguration)
       }
     }
   }
@@ -181,11 +209,8 @@ extension AppDelegate: GestureRecognizerServiceLiveStreamDelegate {
       }
       
       guard let gestureRecognizerResult = result?.gestureRecognizerResults.first as? GestureRecognizerResult else { return }
-      if let firstGesture = gestureRecognizerResult.gestures.first {
-        let recognizedGesture = firstGesture.first?.categoryName
-        // Send the recognized gesture back to Flutter
-        self.flutterMethodChannel?.invokeMethod("onGestureRecognized", arguments: recognizedGesture)
-      }
+      let recognizedGesture = gestureRecognizerResult.gestures.first?.first?.categoryName ?? "Unknown"
+      self.emitGestureIfChanged(recognizedGesture)
     }
   }
 }

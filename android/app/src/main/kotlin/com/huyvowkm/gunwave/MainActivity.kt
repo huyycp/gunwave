@@ -19,6 +19,7 @@ class MainActivity : FlutterActivity() {
     private var cameraService: CameraService? = null
     private val CAMERA_PERMISSION_REQUEST_CODE = 100
     private var methodChannel: MethodChannel? = null
+    private var pendingGestureStartResult: MethodChannel.Result? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,12 +39,19 @@ class MainActivity : FlutterActivity() {
                     if (checkCameraPermission()) {
                         Log.d(TAG, "Camera permission granted, starting gesture recognition")
                         // Use a asset path that's definitely accessible
-                        startGestureRecognizer("gesture_recognizer.task")
-                        result.success(true)
+                        if (startGestureRecognizer("gesture_recognizer.task")) {
+                            result.success(true)
+                        } else {
+                            result.error("GESTURE_START_FAILED", "Could not start gesture recognition", null)
+                        }
                     } else {
                         Log.d(TAG, "Requesting camera permission")
+                        if (pendingGestureStartResult != null) {
+                            result.error("PERMISSION_REQUEST_IN_PROGRESS", "Camera permission request is already open", null)
+                            return@setMethodCallHandler
+                        }
+                        pendingGestureStartResult = result
                         requestCameraPermission()
-                        result.error("PERMISSION_DENIED", "Camera permission not granted", null)
                     }
                 }
                 "stopGestureRecognition" -> {
@@ -59,7 +67,7 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-    private fun startGestureRecognizer(modelPath: String) {
+    private fun startGestureRecognizer(modelPath: String): Boolean {
         try {
             Log.d(TAG, "Starting gesture recognizer with model: $modelPath")
             
@@ -87,9 +95,12 @@ class MainActivity : FlutterActivity() {
             // Start the camera
             cameraService?.startCamera()
             Log.d(TAG, "Gesture recognition started successfully")
+            return true
         } catch (e: Exception) {
             Log.e(TAG, "Error starting gesture recognizer: ${e.message}")
             e.printStackTrace()
+            stopGestureRecognizer()
+            return false
         }
     }
 
@@ -136,16 +147,24 @@ class MainActivity : FlutterActivity() {
         if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Log.d(TAG, "Camera permission granted in onRequestPermissionsResult")
-                startGestureRecognizer("gesture_recognizer.task")
+                if (startGestureRecognizer("gesture_recognizer.task")) {
+                    pendingGestureStartResult?.success(true)
+                } else {
+                    pendingGestureStartResult?.error("GESTURE_START_FAILED", "Could not start gesture recognition", null)
+                }
             } else {
                 Log.d(TAG, "Camera permission denied in onRequestPermissionsResult")
                 Toast.makeText(this, "Camera permission is required to use this feature", Toast.LENGTH_SHORT).show()
+                pendingGestureStartResult?.error("PERMISSION_DENIED", "Camera permission not granted", null)
             }
+            pendingGestureStartResult = null
         }
     }
 
     override fun onDestroy() {
         Log.d(TAG, "onDestroy called")
+        pendingGestureStartResult?.error("ACTIVITY_DESTROYED", "Activity closed before camera permission completed", null)
+        pendingGestureStartResult = null
         stopGestureRecognizer()
         super.onDestroy()
     }

@@ -1,7 +1,6 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_play_mode.dart';
@@ -36,6 +35,8 @@ class GameView extends BaseView {
 }
 
 class GameViewState extends BaseViewState<GameView, GameViewModel> {
+  bool _isCompletingStage = false;
+
   late final Gunwave _gunwave = Gunwave(
     ref,
     map: widget.room.map!,
@@ -63,7 +64,14 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (widget.playMode.isGesture) {
-        await model.startGestureRecognition();
+        try {
+          await model.startGestureRecognition();
+        } catch (error) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Gesture recognition failed: $error')),
+          );
+        }
       }
     });
   }
@@ -126,9 +134,11 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
     // Quiz doesn't depend on time now
     return QuizWidget(
       widget.room.quizzes[model.currentQuizIndex],
-      onQuestionAnswered: (isCorrect) {
+      onQuestionAnswered: (answer) {
+        final isCorrect =
+            answer == widget.room.quizzes[model.currentQuizIndex].answer;
         debugPrint('Quiz answered: $isCorrect');
-        model.onQuizAnswered(isCorrect);
+        model.onQuizAnswered(answer, isCorrect);
         if (isCorrect) {
           if (model.currentQuizIndex < widget.room.quizzes.length - 1) {
             model.setNextQuiz();
@@ -190,37 +200,54 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
   }
 
   void onStageCompleted(bool isSuccess) async {
+    if (_isCompletingStage) return;
+    _isCompletingStage = true;
     model.stopTimer();
-    if (widget.playMode.isGesture) await model.stopGestureRecognition();
+    if (widget.playMode.isGesture) {
+      try {
+        await model.stopGestureRecognition();
+      } catch (error) {
+        debugPrint('Failed to stop gesture recognition: $error');
+      }
+    }
 
     RankModel? result;
+    Object? rankError;
     if (isSuccess) {
       showOverlay();
-      result = await model.rankRepo.updateUserRank(UpdateRankReq(
-        characterId: widget.character.id,
-        roomId: widget.room.id,
-        timeLeft: model.timeRemaining.value,
-        timeLimit: widget.room.map!.timeLimit,
-        monsters: _gunwave.stage?.monsters
-                .map((monster) => (
-                      percenHpLeft: (monster.hp / monster.monster.hp),
-                      score: monster.monster.score
-                    ))
-                .toList() ??
-            [],
-        quizzes: model.quizResult.values
-            .map((result) => (
-                  failAttempts: result.failAttempts,
-                  isCorrect: result.isCorrect
-                ))
-            .toList(),
-      ));
-      context.pop();
+      try {
+        result = await model.rankRepo.updateUserRank(UpdateRankReq(
+          characterId: widget.character.id,
+          roomId: widget.room.id,
+          timeLeft: model.timeRemaining.value,
+          monsters: _gunwave.stage?.monsters
+                  .map((monster) => (
+                        monsterId: monster.monster.id,
+                        percentHpLeft:
+                            (monster.hp / monster.monster.hp).clamp(0.0, 1.0),
+                      ))
+                  .toList() ??
+              [],
+          quizzes: model.quizResult.entries
+              .map((entry) => (
+                    quizId: widget.room.quizzes[entry.key].id,
+                    answer: entry.value.answer,
+                    failAttempts: entry.value.failAttempts,
+                  ))
+              .toList(),
+        ));
+      } catch (error) {
+        rankError = error;
+      } finally {
+        if (mounted) Navigator.of(context, rootNavigator: true).pop();
+      }
     }
+    if (!mounted) return;
     StageResultDialog.show(
       result: isSuccess,
       rewards: widget.room.map!.rewards,
       score: result?.score,
+      errorMessage: rankError == null ? null : 'Score was not saved.',
     );
   }
 
