@@ -2,11 +2,11 @@
 
 | Area | Technology | Use in Gunwave |
 |---|---|---|
-| App language and UI | Dart, Flutter | Cross-platform app screens, widgets, and platform integration. The SDK constraint is Dart `>=3.0.0 <4.0.0`. |
+| App language and UI | Dart, Flutter | Cross-platform app screens, widgets, and platform integration. FVM pins Flutter 3.47.4; the SDK constraint is Dart `>=3.13.0 <4.0.0`. |
 | Game engine | Flame | Real-time game loop, camera, components, input, and rendering. |
 | Map loading | `flame_tiled`, Tiled maps | Loads `.tmx` maps and their object layers for spawns and collision geometry. |
 | State management | Riverpod, `ChangeNotifier` | Provides dependencies and screen-level view model state. |
-| Navigation | GoRouter | Defines app routes for splash, home, rooms, characters, shop, and rankings. |
+| Navigation | GoRouter | Defines app routes for splash, home, rooms, characters, shop, rankings, and settings. |
 | Backend client | `supabase_flutter` | Supabase Auth, database access, and Edge Function calls. |
 | Environment values | `flutter_dotenv` | Loads `dev.env` or `prod.env` at startup. |
 | Android gesture capture | CameraX | Captures camera frames on Android. The app's Android minimum SDK is 24. |

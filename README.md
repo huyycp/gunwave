@@ -11,7 +11,7 @@ Gunwave is a landscape pixel action game built with Flutter and Flame. Players c
 
 ## Requirements
 
-- Flutter SDK with Dart 3 or later (`pubspec.yaml` requires Dart `>=3.0.0 <4.0.0`).
+- FVM. The project pins Flutter 3.47.4 (Dart 3.13.3) in `.fvmrc`.
 - Android Studio and an Android device/emulator, or Xcode and an iOS device/simulator.
 - A configured Supabase project for sign-in and remote game data.
 
@@ -24,10 +24,11 @@ Gunwave is a landscape pixel action game built with Flutter and Flame. Players c
    cd gunwave
    ```
 
-2. Install Flutter dependencies:
+2. Install the pinned Flutter SDK and project dependencies:
 
    ```sh
-   flutter pub get
+   fvm install
+   fvm flutter pub get
    ```
 
 3. Create the environment files required by Flutter assets:
@@ -45,36 +46,45 @@ Gunwave is a landscape pixel action game built with Flutter and Flame. Players c
 
 ## Run
 
+Generated Dart sources are intentionally not committed. After dependency installation, generate them before running or testing:
+
+```sh
+fvm flutter gen-l10n
+fvm dart run build_runner build
+```
+
+Language is configured from the settings icon on Home: **Device language**, **English**, or **Tiếng Việt**. Unsupported device languages fall back to English. Settings is available before signing in and for guests.
+
 Development and production are selected by Dart entrypoint files rather than Flutter `--flavor` configurations:
 
 ```sh
 # Development (loads dev.env)
-flutter run -t lib/main_dev.dart
+fvm flutter run -t lib/main_dev.dart
 
 # Production (loads prod.env)
-flutter run -t lib/main_prod.dart
+fvm flutter run -t lib/main_prod.dart
 ```
 
-To target a particular connected device, add `-d <device-id>`. List available devices with `flutter devices`.
+To target a particular connected device, add `-d <device-id>`. List available devices with `fvm flutter devices`.
 
 The app locks to landscape. Gesture control requires camera permission; allow it when prompted by the operating system.
 
 ## Verify and build
 
 ```sh
-flutter test
-dart analyze lib test
+fvm flutter test
+fvm dart analyze lib test
 
 # Android debug APK
-flutter build apk --debug -t lib/main_dev.dart
+fvm flutter build apk --debug -t lib/main_dev.dart
 
 # iOS simulator app
-flutter build ios --simulator -t lib/main_dev.dart
+fvm flutter build ios --simulator -t lib/main_dev.dart
 ```
 
 ## Backend tools
 
-The Supabase CLI is only needed when changing or deploying backend resources. From the repository root, link the intended Supabase project before applying migrations or deploying the Edge Function:
+The Supabase CLI is only needed when changing or deploying backend resources. See the [Edge Function deployment guide](docs/supabase-edge-functions.md) for the step-by-step process. From the repository root, link the intended Supabase project before applying migrations or deploying the Edge Function:
 
 ```sh
 supabase link --project-ref <project-ref>
