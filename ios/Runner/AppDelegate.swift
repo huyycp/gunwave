@@ -4,7 +4,7 @@ import AVFoundation
 import MediaPipeTasksVision
 
 @main
-@objc class AppDelegate: FlutterAppDelegate {
+@objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
   var flutterMethodChannel: FlutterMethodChannel?
   private var cameraFeedService: CameraFeedService?
   private var gestureRecognizerService: GestureRecognizerService?
@@ -15,16 +15,16 @@ import MediaPipeTasksVision
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    // Force landscape orientation at startup
-    UIDevice.current.setValue(UIInterfaceOrientation.landscapeRight.rawValue, forKey: "orientation")
-    
-    // Initialize FlutterViewController
-    let controller = window?.rootViewController as! FlutterViewController
-    
-    // Create a MethodChannel for communication between Flutter and native iOS
+    super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
+
+  /// Registers plugins and the gesture channel after Flutter creates its implicit engine.
+  func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
+    GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+
     flutterMethodChannel = FlutterMethodChannel(
       name: "gesture_recognizer",
-      binaryMessenger: controller.binaryMessenger
+      binaryMessenger: engineBridge.applicationRegistrar.messenger()
     )
 
     // Handle MethodChannel calls
@@ -51,10 +51,6 @@ import MediaPipeTasksVision
         result(FlutterMethodNotImplemented)
       }
     }
-
-    // Register Flutter plugins
-    GeneratedPluginRegistrant.register(with: self)
-    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
   private func startGestureRecognition(completion: @escaping (Bool) -> Void) {
@@ -151,7 +147,7 @@ import MediaPipeTasksVision
     let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
     alertController.addAction(settingsAction)
     alertController.addAction(cancelAction)
-    window?.rootViewController?.present(alertController, animated: true, completion: nil)
+    presentAlertFromActiveScene(alertController)
   }
 
   private func presentVideoConfigurationErrorAlert() {
@@ -161,7 +157,24 @@ import MediaPipeTasksVision
       preferredStyle: .alert
     )
     alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-    window?.rootViewController?.present(alert, animated: true, completion: nil)
+    presentAlertFromActiveScene(alert)
+  }
+
+  /// Presents native permission and camera errors from the active scene's key window.
+  private func presentAlertFromActiveScene(_ alert: UIAlertController) {
+    guard let windowScene = UIApplication.shared.connectedScenes
+      .compactMap({ $0 as? UIWindowScene })
+      .first(where: { $0.activationState == .foregroundActive }),
+      let rootViewController = windowScene.windows.first(where: \.isKeyWindow)?.rootViewController
+    else {
+      return
+    }
+
+    var presenter = rootViewController
+    while let presentedViewController = presenter.presentedViewController {
+      presenter = presentedViewController
+    }
+    presenter.present(alert, animated: true)
   }
 }
 
