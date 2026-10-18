@@ -17,13 +17,8 @@ class RoomRemoteDataSource {
   SupabaseClient get client => _supabaseApi.supabase;
 
   final roomsTable = 'rooms';
-  final quizzesTable = 'quizzes';
-  final roomsQuizzesTable = 'rooms_quizzes';
-
   Future<List<RoomModel>> getRooms() async {
-    final response = await client
-        .from(roomsTable)
-        .select('''
+    final response = await client.from(roomsTable).select('''
           *, 
           maps(
             *, 
@@ -35,9 +30,7 @@ class RoomRemoteDataSource {
           ),
           users(*),
           quizzes(*)
-        ''')
-        .eq('private', false)
-        .order('created_at', ascending: false);
+        ''').eq('private', false).order('created_at', ascending: false);
     debugPrint("Rooms: $response");
     return List<RoomModel>.from(response.map((json) {
       return RoomModel.fromJson(json);
@@ -45,21 +38,9 @@ class RoomRemoteDataSource {
   }
 
   Future<void> createRoom(CreateRoomReq req) async {
-    final room = await client
-      .from(roomsTable)
-      .insert(req.toJson()).select().single();
-
-    final quizzesJson = await client
-      .from(quizzesTable)
-      .insert(req.quizzes.map((quiz) => quiz.toJson()).toList()).select();
-    
-    await client.from(roomsQuizzesTable).insert(
-      quizzesJson.map((quiz) {
-        return {
-          'room_id': room['id'],
-          'quiz_id': quiz['id'],
-        };
-      }).toList(),
-    );
- }
+    await client.rpc('create_room_with_quizzes', params: {
+      'room_data': req.toJson(),
+      'quiz_data': req.quizzes.map((quiz) => quiz.toJson()).toList(),
+    });
+  }
 }
