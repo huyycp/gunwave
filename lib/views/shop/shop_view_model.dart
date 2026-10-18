@@ -5,9 +5,8 @@ import 'package:gunwave/repositories/character_repository.dart';
 import 'package:gunwave/utils/exception/app_exception.dart';
 import 'package:gunwave/widgets/base/base_view_model.dart';
 
-final shopViewModel = ChangeNotifierProvider<ShopViewModel>(
-  (ref) => ShopViewModel(ref)
-);
+final shopViewModel =
+    ChangeNotifierProvider<ShopViewModel>((ref) => ShopViewModel(ref));
 
 class ShopViewModel extends BaseViewModel {
   ShopViewModel(ChangeNotifierProviderRef ref) {
@@ -27,9 +26,11 @@ class ShopViewModel extends BaseViewModel {
     try {
       if (userRepo.appUser == null) return;
       characters = await _characterRepo.getCharacters();
-      ownedCharacters = await _characterRepo.getOwnedCharacters(userRepo.appUser!.id);
+      ownedCharacters =
+          await _characterRepo.getOwnedCharacters(userRepo.appUser!.id);
       debugPrint("Characters loaded: ${characters.map((e) => e.toJson())}");
-      debugPrint("Owned characters loaded: ${ownedCharacters.map((e) => e.toJson())}");
+      debugPrint(
+          "Owned characters loaded: ${ownedCharacters.map((e) => e.toJson())}");
       notifyListeners();
     } catch (err, stack) {
       AppException.log(runtimeType, err, stack, function: 'getCharacters');
@@ -38,6 +39,7 @@ class ShopViewModel extends BaseViewModel {
     }
   }
 
+  /// Purchases [character] and immediately updates the local gold snapshot.
   Future<void> buyCharacter(CharacterModel character) async {
     try {
       if (userRepo.appUser == null) return;
@@ -45,7 +47,10 @@ class ShopViewModel extends BaseViewModel {
       final result = await _characterRepo.buyCharacter(character.id);
       if (result) {
         ownedCharacters.add(character);
-        userRepo.appUser?.gold -= character.price;
+        final user = userRepo.appUser;
+        if (user != null) {
+          userRepo.appUser = user.copyWith(gold: user.gold - character.price);
+        }
       }
     } catch (err, stack) {
       AppException.log(runtimeType, err, stack, function: 'buyCharacter');
@@ -57,8 +62,8 @@ class ShopViewModel extends BaseViewModel {
   }
 
   // Property that returns a function to check character ownership
-  bool Function(String) get isCharacterOwned => (String characterId) => 
-    ownedCharacters.any((element) => element.id == characterId);
+  bool Function(String) get isCharacterOwned => (String characterId) =>
+      ownedCharacters.any((element) => element.id == characterId);
 
   void setLoading(bool loading) {
     isLoading = loading;

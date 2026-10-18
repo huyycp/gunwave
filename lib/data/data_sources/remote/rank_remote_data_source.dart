@@ -40,8 +40,9 @@ class RankRemoteDataSource {
 
   Future<List<RankModel>> getRanksByRoom(
       {String? roomId, String? userId}) async {
-    var query =
-        client.from(ranksTable).select('*, users(*), characters(*), rooms(*)');
+    var query = client.from(ranksTable).select(
+          '*, users(*), characters(*, abilities(*)), rooms(*)',
+        );
     if (roomId != null) {
       query = query.eq('room_id', roomId);
     }

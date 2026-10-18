@@ -1,61 +1,76 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/data/models/room_model.dart';
 import 'package:gunwave/data/models/user_model.dart';
-import 'package:gunwave/utils/common_functions.dart';
 
-class RankModel {
-  const RankModel({
-    required this.id,
-    required this.user,
-    required this.room,
-    required this.character,
-    required this.score,
-    required this.duration,
-    required this.createdAt,
-  });
+part 'rank_model.freezed.dart';
+part 'rank_model.g.dart';
 
-  final String id;
+// JsonKey applies to Freezed constructor parameters and is read by generation.
+// ignore_for_file: invalid_annotation_target
 
-  final UserModel user;
+/// Represents a player's result for a room, with linked user and game records.
+@freezed
+abstract class RankModel with _$RankModel {
+  /// Creates an immutable rank entry.
+  @JsonSerializable(explicitToJson: true)
+  const factory RankModel({
+    @Default('') String id,
+    @JsonKey(
+      name: 'user_id',
+      readValue: _readUser,
+      toJson: _userIdToJson,
+    )
+    required UserModel user,
+    @JsonKey(
+      name: 'room_id',
+      readValue: _readRoom,
+      toJson: _roomIdToJson,
+    )
+    required RoomModel room,
+    @JsonKey(
+      name: 'character_id',
+      readValue: _readCharacter,
+      toJson: _characterIdToJson,
+    )
+    required CharacterModel character,
+    @Default(0) int score,
+    @JsonKey(fromJson: _durationFromJson, toJson: _durationToJson)
+    @Default(Duration.zero)
+    Duration duration,
+    @JsonKey(name: 'created_at', fromJson: _dateTimeFromJson)
+    required DateTime createdAt,
+  }) = _RankModel;
 
-  final RoomModel room;
-
-  final CharacterModel character;
-
-  final int score;
-
-  final Duration duration;
-
-  final DateTime createdAt;
-
-  factory RankModel.fromJson(Map<String, dynamic> json) {
-    return RankModel(
-      id: json['id'] ?? '',
-      user: UserModel.fromJson(
-        json['users'] ?? {'id': json['user_id']},
-      ),
-      room: RoomModel.fromJson(
-        json['rooms'] ?? {'id': json['room_id']},
-      ),
-      character: CharacterModel.fromCharactersJson(
-        json['characters'] ?? {'id': json['character_id']},
-      ),
-      score: intFromJson(json['score']),
-      duration: Duration(seconds: intFromJson(json['duration'])),
-      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ??
-          DateTime.fromMillisecondsSinceEpoch(0),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'user_id': user.id,
-      'room_id': room.id,
-      'character_id': character.id,
-      'score': score,
-      'duration': duration.inSeconds,
-      'created_at': createdAt.toIso8601String(),
-    };
-  }
+  /// Parses a rank row, accepting either linked records or foreign-key values.
+  factory RankModel.fromJson(Map<String, dynamic> json) => _$RankModelFromJson({
+        ...json,
+        'users': json['users'] ?? {'id': json['user_id']},
+        'rooms': json['rooms'] ?? {'id': json['room_id']},
+        'characters': json['characters'] ?? {'id': json['character_id']},
+      });
 }
+
+Duration _durationFromJson(Object? value) =>
+    Duration(seconds: int.tryParse(value?.toString() ?? '') ?? 0);
+
+int _durationToJson(Duration value) => value.inSeconds;
+
+DateTime _dateTimeFromJson(Object? value) =>
+    DateTime.tryParse(value?.toString() ?? '') ??
+    DateTime.fromMillisecondsSinceEpoch(0);
+
+Object? _readUser(Map json, String key) =>
+    json['users'] ?? {'id': json['user_id']};
+
+Object? _readRoom(Map json, String key) =>
+    json['rooms'] ?? {'id': json['room_id']};
+
+Object? _readCharacter(Map json, String key) =>
+    json['characters'] ?? {'id': json['character_id']};
+
+String _userIdToJson(UserModel value) => value.id;
+
+String _roomIdToJson(RoomModel value) => value.id;
+
+String _characterIdToJson(CharacterModel value) => value.id;

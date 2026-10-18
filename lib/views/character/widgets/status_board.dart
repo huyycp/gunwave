@@ -27,19 +27,20 @@ class StatusBoard extends BaseWidget {
   }
 }
 
-class StatusBoardState extends BaseWidgetState<StatusBoard, StatusBoardWidgetModel> {
-  late final provider = ChangeNotifierProvider<StatusBoardWidgetModel>((ref) => StatusBoardWidgetModel(ref));
+class StatusBoardState
+    extends BaseWidgetState<StatusBoard, StatusBoardWidgetModel> {
+  late final provider = ChangeNotifierProvider<StatusBoardWidgetModel>(
+    (ref) => StatusBoardWidgetModel(ref, widget.character),
+  );
 
   final _background = GameWidget(
-    game: FlameGame(
-      children: [
-        AppBanner(
-          banner: GameBanners.bannerVertical,
-          xCount: 5,
-          yCount: 5,
-        )
-      ]  
-    ),
+    game: FlameGame(children: [
+      AppBanner(
+        banner: GameBanners.bannerVertical,
+        xCount: 5,
+        yCount: 5,
+      )
+    ]),
   );
 
   @override
@@ -56,10 +57,10 @@ class StatusBoardState extends BaseWidgetState<StatusBoard, StatusBoardWidgetMod
               const SizedBox(height: 4),
               _buildStatusPoint(),
               const SizedBox(height: 4),
-              _buildCharacterAttr(CharacterAttr.hp, widget.character.hp),
-              _buildCharacterAttr(CharacterAttr.str, widget.character.str),
-              _buildCharacterAttr(CharacterAttr.vit, widget.character.vit),
-              _buildCharacterAttr(CharacterAttr.agi, widget.character.agi),
+              _buildCharacterAttr(CharacterAttr.hp, model.character.hp),
+              _buildCharacterAttr(CharacterAttr.str, model.character.str),
+              _buildCharacterAttr(CharacterAttr.vit, model.character.vit),
+              _buildCharacterAttr(CharacterAttr.agi, model.character.agi),
               const SizedBox(height: 4),
               _buildResetButton(),
             ],
@@ -81,7 +82,7 @@ class StatusBoardState extends BaseWidgetState<StatusBoard, StatusBoardWidgetMod
           ),
         ),
         Text(
-          widget.character.sp.toString(),
+          model.character.sp.toString(),
           style: GoogleFonts.pressStart2p(
             fontSize: 10,
             color: GameColors.primary,
@@ -90,13 +91,19 @@ class StatusBoardState extends BaseWidgetState<StatusBoard, StatusBoardWidgetMod
       ],
     );
   }
- 
+
   Widget _buildCharacterAttr(CharacterAttr attr, int value) {
+    final label = switch (attr) {
+      CharacterAttr.hp => 'HP',
+      CharacterAttr.str => 'Strength',
+      CharacterAttr.vit => 'Vitality',
+      CharacterAttr.agi => 'Agility',
+    };
     return Row(
       children: [
         Expanded(
           child: Text(
-            attr.name.toUpperCase(),
+            label,
             style: GoogleFonts.pressStart2p(
               fontSize: 16,
               color: GameColors.primary,
@@ -116,12 +123,11 @@ class StatusBoardState extends BaseWidgetState<StatusBoard, StatusBoardWidgetMod
           height: 40,
           width: 40,
           child: GameButton(
-            onPressed: () {
-              model.updateAttr(widget.character, attr);
-            },
-            size: GameButtonSize.small,
-            child: const Text('+')
-          ),
+              onPressed: () {
+                model.updateAttr(model.character, attr);
+              },
+              size: GameButtonSize.small,
+              child: const Text('+')),
         )
       ],
     );
@@ -129,7 +135,7 @@ class StatusBoardState extends BaseWidgetState<StatusBoard, StatusBoardWidgetMod
 
   Widget _buildHeader() {
     return Text(
-      "Status Board",
+      'Status Board',
       style: GoogleFonts.pressStart2p(
         fontSize: 20,
         color: GameColors.primary,
@@ -140,9 +146,9 @@ class StatusBoardState extends BaseWidgetState<StatusBoard, StatusBoardWidgetMod
   Widget _buildResetButton() {
     return GameButton(
       onPressed: () {
-        model.resetAttr(widget.character);
+        model.resetAttr(model.character);
       },
-      child: const Text('Reset'),
+      child: Text('Reset'),
     );
   }
 
@@ -153,32 +159,36 @@ class StatusBoardState extends BaseWidgetState<StatusBoard, StatusBoardWidgetMod
 }
 
 class StatusBoardWidgetModel extends BaseWidgetModel {
-  StatusBoardWidgetModel(ChangeNotifierProviderRef ref) {
+  StatusBoardWidgetModel(
+    ChangeNotifierProviderRef ref,
+    CharacterModel character,
+  ) : _character = character {
     _characterRepo = ref.read(characterRepoProvider);
   }
 
   late final CharacterRepository _characterRepo;
-  
+  CharacterModel _character;
+
+  CharacterModel get character => _character;
+
+  /// Spends one status point to upgrade [attr] and refreshes the displayed copy.
   Future<void> updateAttr(CharacterModel character, CharacterAttr attr) async {
     try {
-      if (character.sp <= 0) return;
+      if (_character.sp <= 0) return;
       final result = await _characterRepo.updateAttr(character.id, attr);
       if (result) {
-         switch (attr) {
-          case CharacterAttr.hp:
-            character.hp++;
-            break;
-          case CharacterAttr.str:
-            character.str++;
-            break;
-          case CharacterAttr.vit:
-            character.vit++;
-            break;
-          case CharacterAttr.agi:
-            character.agi++;
-            break;
-        } 
-        character.sp--;
+        final currentCharacter = _character;
+        final updatedCharacter = switch (attr) {
+          CharacterAttr.hp =>
+            currentCharacter.copyWith(hp: currentCharacter.hp + 1),
+          CharacterAttr.str =>
+            currentCharacter.copyWith(str: currentCharacter.str + 1),
+          CharacterAttr.vit =>
+            currentCharacter.copyWith(vit: currentCharacter.vit + 1),
+          CharacterAttr.agi =>
+            currentCharacter.copyWith(agi: currentCharacter.agi + 1),
+        };
+        _character = updatedCharacter.copyWith(sp: currentCharacter.sp - 1);
         notifyListeners();
       }
     } catch (err, stack) {
@@ -186,11 +196,16 @@ class StatusBoardWidgetModel extends BaseWidgetModel {
     }
   }
 
+  /// Resets the character's upgrades and reloads its saved stats.
   Future<void> resetAttr(CharacterModel character) async {
     try {
       final result = await _characterRepo.resetAttr(character.id);
       if (result) {
-        await _characterRepo.getOwnedCharacter(userRepo.appUser!.id, character.id);
+        _character = await _characterRepo.getOwnedCharacter(
+              userRepo.appUser!.id,
+              character.id,
+            ) ??
+            character;
         notifyListeners();
       }
     } catch (err, stack) {

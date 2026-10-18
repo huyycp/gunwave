@@ -1,53 +1,44 @@
-class CreateRoomReq {
-  CreateRoomReq({
-    required this.mapId,
-    required this.userId,
-    required this.name,
-    required this.private,
-    required this.quizzes,
-  });
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  final String mapId;
-  final String userId;
-  final String name;
-  final bool private;
-  final List<CreateQuizReq> quizzes;
+part 'create_room_req.freezed.dart';
+part 'create_room_req.g.dart';
 
-  Map<String, dynamic> toJson() {
-    return {
-      'map_id': mapId,
-      'user_id': userId,
-      'name': name,
-      'private': private,
-    };
-  }
+// JsonKey applies to Freezed constructor parameters and is read by generation.
+// ignore_for_file: invalid_annotation_target
+
+/// Holds the room fields sent to the room-creation endpoint.
+@freezed
+abstract class CreateRoomReq with _$CreateRoomReq {
+  /// Creates a room request and its locally associated quiz requests.
+  const factory CreateRoomReq({
+    @JsonKey(name: 'map_id') required String mapId,
+    @JsonKey(name: 'user_id') required String userId,
+    required String name,
+    required bool private,
+    @JsonKey(includeToJson: false)
+    @Default(<CreateQuizReq>[])
+    List<CreateQuizReq> quizzes,
+  }) = _CreateRoomReq;
+
+  /// Parses a room-creation request from its snake-case JSON fields.
+  factory CreateRoomReq.fromJson(Map<String, dynamic> json) =>
+      _$CreateRoomReqFromJson(json);
 }
 
-class CreateQuizReq {
-  CreateQuizReq({
-    required this.question,
-    required this.resultA,
-    required this.resultB,
-    required this.resultC,
-    required this.resultD,
-    required this.answer,
-  });
+/// Holds the question fields sent alongside a room-creation request.
+@freezed
+abstract class CreateQuizReq with _$CreateQuizReq {
+  /// Creates a quiz request with four answer choices.
+  const factory CreateQuizReq({
+    required String question,
+    @JsonKey(name: 'result_a') required String resultA,
+    @JsonKey(name: 'result_b') required String resultB,
+    @JsonKey(name: 'result_c') required String resultC,
+    @JsonKey(name: 'result_d') required String resultD,
+    required String answer,
+  }) = _CreateQuizReq;
 
-  final String question;
-  final String resultA;
-  final String resultB;
-  final String resultC;
-  final String resultD;
-  final String answer;
-
-  Map<String, dynamic> toJson() {
-    return {
-      'question': question,
-      'result_a': resultA,
-      'result_b': resultB,
-      'result_c': resultC,
-      'result_d': resultD,
-      'answer': answer,
-    };
-  }
+  /// Parses a quiz request from its snake-case JSON fields.
+  factory CreateQuizReq.fromJson(Map<String, dynamic> json) =>
+      _$CreateQuizReqFromJson(json);
 }

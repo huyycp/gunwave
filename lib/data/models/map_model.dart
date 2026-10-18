@@ -1,48 +1,37 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
 import 'package:gunwave/data/models/monster_model.dart';
 import 'package:gunwave/data/models/quiz_model.dart';
 import 'package:gunwave/data/models/reward_model.dart';
 import 'package:gunwave/utils/common_functions.dart';
-import 'package:gunwave/utils/list_utils.dart';
 
-class MapModel {
-  MapModel({
-    required this.id,
-    required this.name,
-    required this.filename,
-    required this.timeLimit,
-    required this.monsters,
-    required this.rewards,
-    required this.questions,
-  });
+// JsonKey applies to Freezed constructor parameters and is read by generation.
+// ignore_for_file: invalid_annotation_target
 
-  final String id;
-  final String name;
-  final String filename;
-  final int timeLimit;
-  final List<MonsterModel> monsters;
-  final List<RewardModel> rewards;
-  final List<QuizModel> questions;
+part 'map_model.freezed.dart';
+part 'map_model.g.dart';
 
+/// Holds a map's metadata and the monsters, rewards, and questions it contains.
+@freezed
+abstract class MapModel with _$MapModel {
+  const MapModel._();
+
+  /// Creates an immutable map definition.
+  @JsonSerializable(explicitToJson: true)
+  const factory MapModel({
+    @Default('') String id,
+    @Default('') String name,
+    @Default('') String filename,
+    @JsonKey(name: 'time_limit') @Default(0) int timeLimit,
+    @Default(<MonsterModel>[]) List<MonsterModel> monsters,
+    @Default(<RewardModel>[]) List<RewardModel> rewards,
+    @Default(<QuizModel>[]) List<QuizModel> questions,
+  }) = _MapModel;
+
+  /// Parses a map row and its nested game content.
+  factory MapModel.fromJson(Map<String, dynamic> json) =>
+      _$MapModelFromJson(json);
+
+  /// Resolves [filename] to the matching in-game map asset.
   GameMaps? get map => mapFromFile(filename);
-
-  factory MapModel.fromJson(Map<String, dynamic> json) => MapModel(
-    id: json['id']?.toString() ?? '',
-    name: json['name']?.toString() ?? '',
-    filename: json['filename']?.toString() ?? '',
-    timeLimit: intFromJson(json['time_limit']),
-    monsters: listFromJson(json['monsters'], (js) => MonsterModel.fromJson(js)),
-    rewards: listFromJson(json['rewards'], (js) => RewardModel.fromJson(js)),
-    questions: listFromJson(json['questions'], (js) => QuizModel.fromJson(js)),
-  );
-
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'filename': filename,
-    'time_limit': timeLimit,
-    'monsters': monsters.map((e) => e.toJson()).toList(),
-    'rewards': rewards.map((e) => e.toJson()).toList(),
-    'questions': questions.map((e) => e.toJson()).toList(),
-  };
 }

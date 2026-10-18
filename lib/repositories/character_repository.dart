@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/data/data_sources/remote/character_remote_data_source.dart';
 import 'package:gunwave/data/models/character_model.dart';
@@ -21,7 +20,7 @@ class CharacterRepository {
   }
 
   Future<List<CharacterModel>> getOwnedCharacters(String userId) async {
-    ownedCharacters =  await _characterRemote.getOwnedCharacters(userId);
+    ownedCharacters = await _characterRemote.getOwnedCharacters(userId);
     return ownedCharacters;
   }
 
@@ -29,21 +28,44 @@ class CharacterRepository {
     return await _characterRemote.getUnownedCharacters(userId);
   }
 
-  Future<CharacterModel?> getOwnedCharacter(String userId, String characterId) async {
-    final character = await _characterRemote.getOwnedCharacter(userId, characterId);
+  /// Fetches one owned character and replaces its cached immutable snapshot.
+  Future<CharacterModel?> getOwnedCharacter(
+    String userId,
+    String characterId,
+  ) async {
+    final character = await _characterRemote.getOwnedCharacter(
+      userId,
+      characterId,
+    );
     if (character != null) {
-      ownedCharacters.firstWhereOrNull((char) => char.id == character.id)
-       ?..hp = character.hp
-       ..str = character.str
-       ..vit = character.vit
-       ..agi = character.agi
-       ..sp = character.sp;
+      final index = ownedCharacters.indexWhere(
+        (char) => char.id == character.id,
+      );
+      if (index >= 0) {
+        ownedCharacters[index] = character;
+      }
     }
     return character;
   }
 
   Future<bool> updateAttr(String id, CharacterAttr attr) async {
-    return await _characterRemote.updateAttr(id, attr);
+    final updated = await _characterRemote.updateAttr(id, attr);
+    if (updated) {
+      final index = ownedCharacters.indexWhere(
+        (character) => character.id == id,
+      );
+      if (index >= 0) {
+        final current = ownedCharacters[index];
+        final next = switch (attr) {
+          CharacterAttr.hp => current.copyWith(hp: current.hp + 1),
+          CharacterAttr.str => current.copyWith(str: current.str + 1),
+          CharacterAttr.vit => current.copyWith(vit: current.vit + 1),
+          CharacterAttr.agi => current.copyWith(agi: current.agi + 1),
+        };
+        ownedCharacters[index] = next.copyWith(sp: current.sp - 1);
+      }
+    }
+    return updated;
   }
 
   Future<bool> resetAttr(String id) async {

@@ -21,7 +21,7 @@ class CharacterRemoteDataSource {
   Future<List<CharacterModel>> getCharacters() async {
     final response = await client
         .from(charactersTable)
-        .select()
+        .select('*, abilities(*)')
         .order('price', ascending: true);
     debugPrint("Characters: $response");
     return response.map((json) {
@@ -32,10 +32,10 @@ class CharacterRemoteDataSource {
   Future<List<CharacterModel>> getOwnedCharacters(String userId) async {
     final response = await client
         .from(usersCharactersTable)
-        .select('*, characters(*)')
+        .select('*, characters(*, abilities(*))')
         .eq('user_id', userId)
         .order('created_at', ascending: true);
-    
+
     debugPrint("Owned characters: $response");
     return response.map((json) {
       return CharacterModel.fromUsersCharactersJson(json);
@@ -48,32 +48,32 @@ class CharacterRemoteDataSource {
         .from(usersCharactersTable)
         .select('character_id')
         .eq('user_id', userId);
-    
+
     // Extract the character IDs from the result
-    final ownedCharacterIds = ownedCharacters
-        .map((item) => item['character_id'])
-        .toList();
-    
+    final ownedCharacterIds =
+        ownedCharacters.map((item) => item['character_id']).toList();
+
     // Now, query for characters that are not in the list of owned character IDs
     final response = await client
         .from(charactersTable)
-        .select()
+        .select('*, abilities(*)')
         .not('id', 'in', ownedCharacterIds);
-    
+
     debugPrint("Unowned characters: $response");
     return response.map((json) {
       return CharacterModel.fromCharactersJson(json);
     }).toList();
   }
 
-  Future<CharacterModel?> getOwnedCharacter(String userId, String characterId) async {
+  Future<CharacterModel?> getOwnedCharacter(
+      String userId, String characterId) async {
     final response = await client
         .from(usersCharactersTable)
-        .select('*, characters(*)')
+        .select('*, characters(*, abilities(*))')
         .eq('user_id', userId)
         .eq('character_id', characterId)
         .single();
-    
+
     debugPrint("Owned character: $response");
     return CharacterModel.fromUsersCharactersJson(response);
   }
@@ -105,5 +105,4 @@ class CharacterRemoteDataSource {
     debugPrint("Buy character $characterId: $result");
     return result;
   }
-
 }
