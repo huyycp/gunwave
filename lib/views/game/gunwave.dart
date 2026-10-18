@@ -11,6 +11,9 @@ import 'package:gunwave/data/constants/game/game_play_mode.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/data/models/map_model.dart';
 import 'package:gunwave/utils/enum_utils.dart';
+import 'package:gunwave/views/game/abilities/ability_controller.dart';
+import 'package:gunwave/views/game/abilities/ability_registry.dart';
+import 'package:gunwave/views/game/abilities/game_ability_context.dart';
 import 'package:gunwave/views/game/components/character.dart';
 import 'package:gunwave/views/game/components/stage.dart';
 import 'package:gunwave/views/game/components/sub_components/attack_button.dart';
@@ -26,6 +29,7 @@ class Gunwave extends FlameGame
     required this.playMode,
     required this.onStageCompleted,
     this.onCharacterReachCheckpoint,
+    this.onExitRequested,
   });
 
   @override
@@ -37,9 +41,30 @@ class Gunwave extends FlameGame
   final GamePlayMode playMode;
   final void Function(bool) onStageCompleted;
   final void Function(bool)? onCharacterReachCheckpoint;
+  final VoidCallback? onExitRequested;
 
   late final JoystickComponent joystick;
   Stage? stage;
+  bool _controlsBlocked = false;
+  bool _touchAttackPressed = false;
+  bool get controlsBlocked => _controlsBlocked;
+  set controlsBlocked(bool value) {
+    _controlsBlocked = value;
+    if (value) {
+      _touchAttackPressed = false;
+      character.horizontalMovement = 0;
+      character.verticalMovement = 0;
+      character.triggerAttack = false;
+    }
+  }
+
+  late final abilities = AbilityController(
+    ability: AbilityRegistry.create(gameCharacters.ability),
+    context: GameAbilityContext(this),
+  );
+
+  /// Shares the same activation path across keyboard, joystick and gesture UI.
+  bool activateAbility() => abilities.activate();
 
   double accoumulatedTime = 0;
 
@@ -69,14 +94,15 @@ class Gunwave extends FlameGame
 
     if (playMode.isJoystick) {
       addJoystick();
-      addAttachBtn();
     }
+    if (!playMode.isKeyboard) addAttachBtn();
 
     return super.onLoad();
   }
 
   @override
   void update(double dt) {
+    if (controlsBlocked) return;
     accoumulatedTime += dt;
     while (accoumulatedTime > GameConstants.refreshRate) {
       camera.viewfinder.position = Vector2(
@@ -89,7 +115,14 @@ class Gunwave extends FlameGame
 
       accoumulatedTime -= GameConstants.refreshRate;
       super.update(GameConstants.refreshRate);
+      abilities.update(GameConstants.refreshRate);
     }
+  }
+
+  @override
+  void onRemove() {
+    abilities.dispose();
+    super.onRemove();
   }
 
   void addJoystick() {
@@ -111,7 +144,8 @@ class Gunwave extends FlameGame
   void addAttachBtn() {
     final attachBtn = AttachButton(
       onAttack: (bool attack) {
-        character.triggerAttack = attack;
+        _touchAttackPressed = attack && !controlsBlocked;
+        character.triggerAttack = _touchAttackPressed;
       },
       position: Vector2(size.x - 130, size.y - 130),
       size: Vector2.all(64),
@@ -163,11 +197,14 @@ class Gunwave extends FlameGame
   void updateGesture() {
     final gestureLabel = ref.read(gameViewModel).gesture;
     if (gestureLabel == null) return;
-    final gesture =
-        enumFromString(AppGesture.values, gestureLabel, AppGesture.Unknown);
+    final gesture = enumFromString(
+      AppGesture.values,
+      gestureLabel,
+      AppGesture.Unknown,
+    );
     final controls = GestureControls.fromGesture(gesture);
     character.horizontalMovement = controls.horizontalMovement;
     character.verticalMovement = controls.verticalMovement;
-    character.triggerAttack = controls.attack;
+    character.triggerAttack = controls.attack || _touchAttackPressed;
   }
 }
