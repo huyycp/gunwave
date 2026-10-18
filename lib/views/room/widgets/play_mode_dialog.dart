@@ -24,7 +24,8 @@ class PlayModeDialog extends BaseWidget {
     showDialog(
       context: navigatorKey.currentContext!,
       barrierDismissible: true,
-      builder: (context) => Dialog(child: PlayModeDialog(room, selectedCharacter)),
+      builder: (context) =>
+          Dialog(child: PlayModeDialog(room, selectedCharacter)),
     );
   }
 
@@ -34,7 +35,8 @@ class PlayModeDialog extends BaseWidget {
   }
 }
 
-class PlayModeDialogState extends BaseWidgetState<PlayModeDialog, PlayModeDialogModel> {
+class PlayModeDialogState
+    extends BaseWidgetState<PlayModeDialog, PlayModeDialogModel> {
   final provider = ChangeNotifierProvider((ref) => PlayModeDialogModel());
 
   @override
@@ -66,7 +68,7 @@ class PlayModeDialogState extends BaseWidgetState<PlayModeDialog, PlayModeDialog
             children: [
               _buildPlayModeItem(GamePlayMode.joystick),
               _buildPlayModeItem(GamePlayMode.gesture),
-              _buildPlayModeItem(GamePlayMode.keyboard), 
+              _buildPlayModeItem(GamePlayMode.keyboard),
             ],
           )
         ],
@@ -96,7 +98,6 @@ class PlayModeDialogState extends BaseWidgetState<PlayModeDialog, PlayModeDialog
         ),
       ),
     );
-
   }
 
   @override
@@ -105,6 +106,4 @@ class PlayModeDialogState extends BaseWidgetState<PlayModeDialog, PlayModeDialog
   }
 }
 
-class PlayModeDialogModel extends BaseWidgetModel {
-
-}
+class PlayModeDialogModel extends BaseWidgetModel {}

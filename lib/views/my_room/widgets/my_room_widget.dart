@@ -34,21 +34,23 @@ class MyRoomWidget extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) => Stack(
           children: [
-            Positioned.fill(child: Column(
+            Positioned.fill(
+                child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               spacing: 8,
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(_borderRadius)),
+                    borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(_borderRadius)),
                     color: const Color.fromARGB(255, 28, 168, 166),
-                    
                   ),
                   child: AppImage(
                     room.map?.map?.imagePath ?? '',
                     height: constraints.maxHeight * 0.5,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(_borderRadius)),
+                    borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(_borderRadius)),
                   ),
                 ),
                 Container(
@@ -58,41 +60,33 @@ class MyRoomWidget extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     spacing: 12,
                     children: [
-                      Text(
-                        room.name,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.pressStart2p(
-                          color: GameColors.primary,
-                          fontSize: 16,
-                        )
-                      ),
-                      Text(
-                        room.map?.name.capitalize ?? 'Unknown Map',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.pressStart2p(
-                          color: GameColors.primary,
-                          fontSize: 14,
-                        )
-                      ),
+                      Text(room.name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.pressStart2p(
+                            color: GameColors.primary,
+                            fontSize: 16,
+                          )),
+                      Text(room.map?.name.capitalize ?? 'Unknown Map',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.pressStart2p(
+                            color: GameColors.primary,
+                            fontSize: 14,
+                          )),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            '${room.quizzes.length} Quizzes',
-                            style: GoogleFonts.pressStart2p(
-                              color: GameColors.primary,
-                              fontSize: 12,
-                            )
-                          ),
-                          Text(
-                            '20 played',
-                            style: GoogleFonts.pressStart2p(
-                              color: GameColors.primary,
-                              fontSize: 12,
-                            )
-                          ),
+                          Text('${room.quizzes.length} Quizzes',
+                              style: GoogleFonts.pressStart2p(
+                                color: GameColors.primary,
+                                fontSize: 12,
+                              )),
+                          Text('20 played',
+                              style: GoogleFonts.pressStart2p(
+                                color: GameColors.primary,
+                                fontSize: 12,
+                              )),
                         ],
                       ),
                     ],
@@ -114,12 +108,9 @@ class MyRoomWidget extends StatelessWidget {
   Widget _buildRankInfoBtn(BuildContext context) {
     return GameButton(
       onPressed: () {
-        context.push(
-          Routes.rank,
-          extra: {
-            'room_id': room.id, 
-          }
-        );
+        context.push(Routes.rank, extra: {
+          'room_id': room.id,
+        });
       },
       size: GameButtonSize.small,
       child: const Icon(

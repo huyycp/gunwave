@@ -26,15 +26,16 @@ class RoomView extends BaseView {
 }
 
 class RoomViewState extends BaseViewState<RoomView, RoomViewModel> {
-  late final Widget _background = GameWidget(game: FlameGame(
-    world: Background(
-      backgroundPath: GameMaps.loading,
-      screenSize: Vector2(MediaQuery.sizeOf(context).width, MediaQuery.sizeOf(context).height),
-    ),
-    camera: CameraComponent()
-      ..viewfinder.anchor = Anchor.topLeft
-      ..viewfinder.zoom = 1.0
-  ));
+  late final Widget _background = GameWidget(
+      game: FlameGame(
+          world: Background(
+            backgroundPath: GameMaps.loading,
+            screenSize: Vector2(MediaQuery.sizeOf(context).width,
+                MediaQuery.sizeOf(context).height),
+          ),
+          camera: CameraComponent()
+            ..viewfinder.anchor = Anchor.topLeft
+            ..viewfinder.zoom = 1.0));
 
   @override
   void onReady() {
@@ -50,10 +51,11 @@ class RoomViewState extends BaseViewState<RoomView, RoomViewModel> {
         children: [
           _background,
           Center(
-            child: model.isLoading 
-              ? const Center(child: CircularProgressIndicator(color: GameColors.primary))
-              : _buildRoomCarousel()
-          ),
+              child: model.isLoading
+                  ? const Center(
+                      child:
+                          CircularProgressIndicator(color: GameColors.primary))
+                  : _buildRoomCarousel()),
           Positioned(
             top: 16,
             left: 16,
@@ -82,10 +84,12 @@ class RoomViewState extends BaseViewState<RoomView, RoomViewModel> {
         enableInfiniteScroll: false,
         scrollPhysics: const BouncingScrollPhysics(),
       ),
-      items: rooms.map((room) => Container(
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-        child: RoomPreviewWidget(room, onPlay: showCharacterSelectDialog)
-      )).toList(),
+      items: rooms
+          .map((room) => Container(
+              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              child:
+                  RoomPreviewWidget(room, onPlay: showCharacterSelectDialog)))
+          .toList(),
     );
   }
 

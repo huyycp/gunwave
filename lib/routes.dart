@@ -12,7 +12,6 @@ import 'package:gunwave/views/splash/splash_view.dart';
 final navigatorKey = GlobalKey<NavigatorState>();
 
 class Routes {
-
   static const splash = '/splash';
   static const home = '/home';
   static const map = '/map';
@@ -37,12 +36,13 @@ class Routes {
       _buildRankRoute(),
     ],
   );
-  
+
   static GoRoute _buildSplashRoute() {
     return GoRoute(
       path: splash,
       name: splash,
-      pageBuilder: (context, state) => const NoTransitionPage(child: SplashView()),
+      pageBuilder: (context, state) =>
+          const NoTransitionPage(child: SplashView()),
     );
   }
 
@@ -50,7 +50,8 @@ class Routes {
     return GoRoute(
       path: home,
       name: home,
-      pageBuilder: (context, state) => const NoTransitionPage(child: HomeView()),
+      pageBuilder: (context, state) =>
+          const NoTransitionPage(child: HomeView()),
     );
   }
 
@@ -58,7 +59,8 @@ class Routes {
     return GoRoute(
       path: map,
       name: map,
-      pageBuilder: (context, state) => const NoTransitionPage(child: RoomView()),
+      pageBuilder: (context, state) =>
+          const NoTransitionPage(child: RoomView()),
     );
   }
 
@@ -66,7 +68,8 @@ class Routes {
     return GoRoute(
       path: character,
       name: character,
-      pageBuilder: (context, state) => const NoTransitionPage(child: CharacterView()),
+      pageBuilder: (context, state) =>
+          const NoTransitionPage(child: CharacterView()),
     );
   }
 
@@ -74,16 +77,17 @@ class Routes {
     return GoRoute(
       path: shop,
       name: shop,
-      pageBuilder: (context, state) => const NoTransitionPage(child: ShopView()),
+      pageBuilder: (context, state) =>
+          const NoTransitionPage(child: ShopView()),
     );
   }
 
   static GoRoute _buildMyRoomRoute() {
     return GoRoute(
-      path: myRoom,
-      name: myRoom,
-      pageBuilder: (context, state) => const NoTransitionPage(child: MyRoomView())
-    );
+        path: myRoom,
+        name: myRoom,
+        pageBuilder: (context, state) =>
+            const NoTransitionPage(child: MyRoomView()));
   }
 
   static GoRoute _buildCreateRoomRoute() {
@@ -91,8 +95,12 @@ class Routes {
       path: createRoom,
       name: createRoom,
       pageBuilder: (context, state) {
-        final args = state.extra is Map<String, dynamic> ? state.extra as Map<String, dynamic> : {};
-        return NoTransitionPage(child: CreateRoomView(args.isNotEmpty ? args['onSuccess']: (_) {}));
+        final args = state.extra is Map<String, dynamic>
+            ? state.extra as Map<String, dynamic>
+            : {};
+        return NoTransitionPage(
+            child:
+                CreateRoomView(args.isNotEmpty ? args['onSuccess'] : (_) {}));
       },
     );
   }
@@ -102,11 +110,12 @@ class Routes {
       path: rank,
       name: rank,
       pageBuilder: (context, state) {
-        final args = state.extra is Map<String, dynamic> ? state.extra as Map<String, dynamic> : {};
-        return NoTransitionPage(child: RankView(
-          roomId: args['room_id'],
-          userId: args['user_id']));
-      } ,
+        final args = state.extra is Map<String, dynamic>
+            ? state.extra as Map<String, dynamic>
+            : {};
+        return NoTransitionPage(
+            child: RankView(roomId: args['room_id'], userId: args['user_id']));
+      },
     );
   }
 }

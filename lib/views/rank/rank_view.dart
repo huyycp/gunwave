@@ -25,23 +25,24 @@ class RankView extends BaseView {
   }
 }
 
-class RankViewState extends BaseViewState<RankView, RankViewModel> { 
-  late final Widget _background = GameWidget(game: FlameGame(
-    world: Background(
-      backgroundPath: GameMaps.loading,
-      screenSize: Vector2(MediaQuery.sizeOf(context).width, MediaQuery.sizeOf(context).height),
-    ),
-    camera: CameraComponent()
-      ..viewfinder.anchor = Anchor.topLeft
-      ..viewfinder.zoom = 1.0
-  ));
+class RankViewState extends BaseViewState<RankView, RankViewModel> {
+  late final Widget _background = GameWidget(
+      game: FlameGame(
+          world: Background(
+            backgroundPath: GameMaps.loading,
+            screenSize: Vector2(MediaQuery.sizeOf(context).width,
+                MediaQuery.sizeOf(context).height),
+          ),
+          camera: CameraComponent()
+            ..viewfinder.anchor = Anchor.topLeft
+            ..viewfinder.zoom = 1.0));
 
   @override
   void onReady() {
     super.onReady();
-    model.getRanks(roomId: widget.roomId);
+    model.getRanks(roomId: widget.roomId, userId: widget.userId);
   }
-  
+
   @override
   Widget getView() {
     ref.watch(rankViewModel);
@@ -123,13 +124,37 @@ class RankViewState extends BaseViewState<RankView, RankViewModel> {
   }
 
   Widget _buildListRank() {
+    if (model.isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(color: GameColors.primary),
+      );
+    }
+    if (model.errorMessage != null) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(model.errorMessage!),
+            TextButton(
+              onPressed: () => model.getRanks(
+                roomId: widget.roomId,
+                userId: widget.userId,
+              ),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+    if (model.ranks.isEmpty) {
+      return const Center(child: Text('No rankings yet.'));
+    }
     return ListView.separated(
-      itemCount: model.ranks.length,
-      itemBuilder: (context, index) {
-        return _buildRankItem(model.ranks[index]);
-      },
-      separatorBuilder: (context, index) => const SizedBox(height: 16)
-    );
+        itemCount: model.ranks.length,
+        itemBuilder: (context, index) {
+          return _buildRankItem(model.ranks[index]);
+        },
+        separatorBuilder: (context, index) => const SizedBox(height: 16));
   }
 
   Widget _buildRankItem(RankModel rank) {
@@ -142,38 +167,32 @@ class RankViewState extends BaseViewState<RankView, RankViewModel> {
       child: Row(
         children: [
           Expanded(
-            child: Text(
-              rank.user.name,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: GameColors.primary, fontSize: 20)
-            )
-          ),
+              child: Text(rank.user.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                      color: GameColors.primary, fontSize: 20))),
           Expanded(
-            child: Text(
-              '${rank.score}', 
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: GameColors.primary, fontSize: 18)
-            )
-          ),
+              child: Text('${rank.score}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                      color: GameColors.primary, fontSize: 18))),
           Expanded(
-            child: Text(
-              '${rank.duration.inSeconds}s', 
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: GameColors.primary, fontSize: 18)
-            )
-          ),
+              child: Text('${rank.duration.inSeconds}s',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                      color: GameColors.primary, fontSize: 18))),
           Expanded(
-            child: Text(
-                DateFormat('HH:mm:ss dd/MM/yyyy').format(rank.createdAt.toLocal()), 
-              style: const TextStyle(color: GameColors.primary, fontSize: 18)
-            )
-          ),
+              child: Text(
+                  DateFormat('HH:mm:ss dd/MM/yyyy')
+                      .format(rank.createdAt.toLocal()),
+                  style: const TextStyle(
+                      color: GameColors.primary, fontSize: 18))),
         ],
       ),
     );
   }
-  
+
   @override
   RankViewModel getViewModel() {
     return ref.read(rankViewModel);

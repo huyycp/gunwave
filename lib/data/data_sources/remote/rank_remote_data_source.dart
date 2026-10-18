@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/data/data_sources/remote/api/supabase_api.dart';
 import 'package:gunwave/data/dtos/req/update_rank_req.dart';
@@ -19,16 +18,24 @@ class RankRemoteDataSource {
   final ranksTable = 'ranks';
 
   Future<RankModel> updateUserRank(UpdateRankReq req) async {
+    final session = client.auth.currentSession;
+    if (session == null) {
+      throw StateError(
+          'Cannot submit a rank without an authenticated session.');
+    }
+
     final resp = await client.functions.invoke(
       'update-ranks',
       headers: {
-        'Authorization': 'Bearer ${client.auth.currentSession?.accessToken}',
+        'Authorization': 'Bearer ${session.accessToken}',
         'Content-Type': 'application/json',
       },
       body: req.toJson(),
     );
-    debugPrint("Update Rank Response: ${resp.data}");
-    return RankModel.fromJson(resp.data);
+    if (resp.data is! Map) {
+      throw const FormatException('Rank service returned an invalid response.');
+    }
+    return RankModel.fromJson(Map<String, dynamic>.from(resp.data as Map));
   }
 
   Future<List<RankModel>> getRanksByRoom(
@@ -45,7 +52,6 @@ class RankRemoteDataSource {
         .order('score', ascending: false)
         .order('duration')
         .order('created_at');
-    debugPrint("Ranks: $response");
     return List<RankModel>.from(
         response.map((json) => RankModel.fromJson(json)));
   }

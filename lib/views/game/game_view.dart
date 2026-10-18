@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -50,10 +52,6 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
   void onReady() {
     super.onReady();
 
-    _gunwave.character.hp;
-    model.timeRemaining;
-    _gunwave.stage?.monsters;
-
     // Initialize timer in view model
     model.initializeTimer(widget.room.map!.timeLimit);
 
@@ -63,6 +61,7 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
       if (widget.playMode.isGesture) {
         try {
           await model.startGestureRecognition();
@@ -82,8 +81,16 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
     // Stop gesture recognition before detaching the view (BaseWidgetState.dispose
     // will call model.detachView()). This ensures `ref` remains available
     // during shutdown logic inside the model.
-    model.stopGestureRecognition();
+    unawaited(_stopGestureRecognitionOnDispose());
     super.dispose();
+  }
+
+  Future<void> _stopGestureRecognitionOnDispose() async {
+    try {
+      await model.stopGestureRecognition();
+    } catch (error) {
+      debugPrint('Failed to stop gesture recognition: $error');
+    }
   }
 
   @override
@@ -199,7 +206,11 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
     return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 
-  void onStageCompleted(bool isSuccess) async {
+  void onStageCompleted(bool isSuccess) {
+    unawaited(_completeStage(isSuccess));
+  }
+
+  Future<void> _completeStage(bool isSuccess) async {
     if (_isCompletingStage) return;
     _isCompletingStage = true;
     model.stopTimer();

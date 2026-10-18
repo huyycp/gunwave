@@ -23,16 +23,19 @@ class HomeView extends BaseView {
 }
 
 class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
- late final _background = GameWidget(game: FlameGame(
-    world: Background(
-      backgroundPath: GameMaps.background,
-      screenSize: Vector2(MediaQuery.sizeOf(context).width, MediaQuery.sizeOf(context).height),
-    ),
-    camera: CameraComponent()
-      ..viewfinder.anchor = Anchor.topLeft
-      ..viewfinder.zoom = 1.0  // Use full size since we're scaling the component
-  ));
- 
+  late final _background = GameWidget(
+      game: FlameGame(
+          world: Background(
+            backgroundPath: GameMaps.background,
+            screenSize: Vector2(MediaQuery.sizeOf(context).width,
+                MediaQuery.sizeOf(context).height),
+          ),
+          camera: CameraComponent()
+            ..viewfinder.anchor = Anchor.topLeft
+            ..viewfinder.zoom =
+                1.0 // Use full size since we're scaling the component
+          ));
+
   @override
   void onReady() {
     super.onReady();
@@ -40,7 +43,7 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
       if (model.userRepo.appUser == null) {
         // debugPrint("User: ${model.userRepo.user}");
         model.toggleLoginForm();
-      // model.userRepo.getAppUser();
+        // model.userRepo.getAppUser();
       }
     });
   }
@@ -83,7 +86,8 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
               right: 32,
               child: _buildPlayBtn(),
             ),
-          ] else Center(
+          ] else
+            Center(
               child: _buildLoginForm(),
             ),
         ],

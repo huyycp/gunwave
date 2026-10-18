@@ -25,21 +25,22 @@ class UserRemoteDataSource {
 
   Future<UserModel?> getAppUser(String authId) async {
     final response = await client
-      .from(usersTable)
-      .select('*')
-      .eq('auth_id', authId)
-      .single();
+        .from(usersTable)
+        .select('*')
+        .eq('auth_id', authId)
+        .single();
     debugPrint("User: $response");
     return UserModel.fromJson(response);
   }
 
   Future<List<RoomModel>> getRoomsByUser(String userId) async {
     final response = await client
-      .from('rooms')
-      .select('*, maps(*), users(*), quizzes(*)')
-      .eq('user_id', userId)
-      .order('created_at', ascending: false);
+        .from('rooms')
+        .select('*, maps(*), users(*), quizzes(*)')
+        .eq('user_id', userId)
+        .order('created_at', ascending: false);
     debugPrint("User Rooms: $response");
-    return List<RoomModel>.from(response.map((json) => RoomModel.fromJson(json)));
+    return List<RoomModel>.from(
+        response.map((json) => RoomModel.fromJson(json)));
   }
-} 
+}

@@ -24,7 +24,7 @@ class MonsterModel {
   int str;
 
   int vit;
-  
+
   int agi;
 
   final int score;
@@ -32,24 +32,24 @@ class MonsterModel {
   GameMonsters? get monster => monsterFromFile(filename);
 
   factory MonsterModel.fromJson(Map<String, dynamic> json) => MonsterModel(
-    id: json['id']?.toString() ?? '',
-    name: json['name']?.toString() ?? '',
-    filename: json['filename']?.toString() ?? '',
-    hp: intFromJson(json['hp'], defaultValue: 0),
-    str: intFromJson(json['str'], defaultValue: 0),
-    vit: intFromJson(json['vit'], defaultValue: 0),
-    agi: intFromJson(json['agi'], defaultValue: 0),
-    score: intFromJson(json['score'], defaultValue: 0), 
-  );
+        id: json['id']?.toString() ?? '',
+        name: json['name']?.toString() ?? '',
+        filename: json['filename']?.toString() ?? '',
+        hp: intFromJson(json['hp'], defaultValue: 0),
+        str: intFromJson(json['str'], defaultValue: 0),
+        vit: intFromJson(json['vit'], defaultValue: 0),
+        agi: intFromJson(json['agi'], defaultValue: 0),
+        score: intFromJson(json['score'], defaultValue: 0),
+      );
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'filename': filename,
-    'hp': hp,
-    'str': str,
-    'vit': vit,
-    'agi': agi,
-    'score': score,
-  };
+        'id': id,
+        'name': name,
+        'filename': filename,
+        'hp': hp,
+        'str': str,
+        'vit': vit,
+        'agi': agi,
+        'score': score,
+      };
 }

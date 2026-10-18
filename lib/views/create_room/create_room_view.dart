@@ -30,19 +30,22 @@ class CreateRoomView extends BaseView {
   }
 }
 
-class CreateRoomViewState extends BaseViewState<CreateRoomView, CreateRoomViewModel> {
-  late final provider = ChangeNotifierProvider<CreateRoomViewModel>((ref) => CreateRoomViewModel(ref, widget.onSuccess));
+class CreateRoomViewState
+    extends BaseViewState<CreateRoomView, CreateRoomViewModel> {
+  late final provider = ChangeNotifierProvider<CreateRoomViewModel>(
+      (ref) => CreateRoomViewModel(ref, widget.onSuccess));
 
-  late final Widget _background = GameWidget(game: FlameGame(
-    world: Background(
-      backgroundPath: GameMaps.loading,
-      screenSize: Vector2(MediaQuery.sizeOf(context).width, MediaQuery.sizeOf(context).height),
-    ),
-    camera: CameraComponent()
-      ..viewfinder.anchor = Anchor.topLeft
-      ..viewfinder.zoom = 1.0
-  ));
-  
+  late final Widget _background = GameWidget(
+      game: FlameGame(
+          world: Background(
+            backgroundPath: GameMaps.loading,
+            screenSize: Vector2(MediaQuery.sizeOf(context).width,
+                MediaQuery.sizeOf(context).height),
+          ),
+          camera: CameraComponent()
+            ..viewfinder.anchor = Anchor.topLeft
+            ..viewfinder.zoom = 1.0));
+
   @override
   void onReady() {
     super.onReady();
@@ -59,16 +62,15 @@ class CreateRoomViewState extends BaseViewState<CreateRoomView, CreateRoomViewMo
           children: [
             _background,
             Positioned.fill(
-              child: ListView(
-                padding: const EdgeInsets.only(top: 48),
-                children: <Widget>[
-                  _buildNameInput(),
-                  _buildMapSelector(),
-                  _buildPrivateToggle(),
-                  _buildQuizzes(),
-                ].addSpace(16, Axis.vertical),
-              )
-            ),
+                child: ListView(
+              padding: const EdgeInsets.only(top: 48),
+              children: <Widget>[
+                _buildNameInput(),
+                _buildMapSelector(),
+                _buildPrivateToggle(),
+                _buildQuizzes(),
+              ].addSpace(16, Axis.vertical),
+            )),
             Positioned(
               top: 16,
               left: 32,
@@ -79,12 +81,14 @@ class CreateRoomViewState extends BaseViewState<CreateRoomView, CreateRoomViewMo
               right: 32,
               child: _buildCreateRoomBtn(),
             ),
-            if (model.isCreating) Positioned.fill(
-              child: Container(
+            if (model.isCreating)
+              Positioned.fill(
+                  child: Container(
                 color: GameColors.primary.withOpacity(0.5),
-                child: const Center(child: CircularProgressIndicator(color: GameColors.primary)),
-              )
-            )
+                child: const Center(
+                    child:
+                        CircularProgressIndicator(color: GameColors.primary)),
+              ))
           ],
         ),
       ),
@@ -123,40 +127,41 @@ class CreateRoomViewState extends BaseViewState<CreateRoomView, CreateRoomViewMo
           ),
         ),
         model.isLoading
-          ? const Center(child: CircularProgressIndicator(color: GameColors.primary))
-          : CarouselSlider(
-              options: CarouselOptions(
-                viewportFraction: 0.7,
-                initialPage: 0,
-                enableInfiniteScroll: false,
-                onPageChanged: (index, reason) {
-                  model.selectMap(index);
-                },
-              ),
-              items: model.maps.map((map) {
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 8),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    color: const Color.fromARGB(255, 71, 183, 181),
-                    boxShadow: [
-                      BoxShadow(
-                        color: GameColors.primary.withOpacity(0.5),
-                        blurRadius: 10,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: AppImage(
-                    map.map?.imagePath ?? '',
-                    // width: 200,
-                    height: 280,
-                    borderRadius: BorderRadius.circular(16),
-                    fit: BoxFit.cover,
-                  ),
-                );
-              }).toList(),
-            )
+            ? const Center(
+                child: CircularProgressIndicator(color: GameColors.primary))
+            : CarouselSlider(
+                options: CarouselOptions(
+                  viewportFraction: 0.7,
+                  initialPage: 0,
+                  enableInfiniteScroll: false,
+                  onPageChanged: (index, reason) {
+                    model.selectMap(index);
+                  },
+                ),
+                items: model.maps.map((map) {
+                  return Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      color: const Color.fromARGB(255, 71, 183, 181),
+                      boxShadow: [
+                        BoxShadow(
+                          color: GameColors.primary.withOpacity(0.5),
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: AppImage(
+                      map.map?.imagePath ?? '',
+                      // width: 200,
+                      height: 280,
+                      borderRadius: BorderRadius.circular(16),
+                      fit: BoxFit.cover,
+                    ),
+                  );
+                }).toList(),
+              )
       ],
     );
   }
@@ -164,7 +169,8 @@ class CreateRoomViewState extends BaseViewState<CreateRoomView, CreateRoomViewMo
   Widget _buildPrivateToggle() {
     return AppListTile(
       title: 'Private',
-      subTitle: 'This rooom will not be visible to others. Only invited players can join.',
+      subTitle:
+          'This rooom will not be visible to others. Only invited players can join.',
       isSubTitleWrap: true,
       titleStyle: GoogleFonts.pressStart2p(
         color: GameColors.primary,
@@ -249,7 +255,7 @@ class CreateRoomViewState extends BaseViewState<CreateRoomView, CreateRoomViewMo
       child: const Text('Create'),
     );
   }
-  
+
   @override
   CreateRoomViewModel getViewModel() {
     return ref.read(provider);

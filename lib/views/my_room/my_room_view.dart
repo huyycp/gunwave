@@ -24,22 +24,23 @@ class MyRoomView extends BaseView {
 }
 
 class MyRoomViewState extends BaseViewState<MyRoomView, MyRoomViewModel> {
-  late final Widget _background = GameWidget(game: FlameGame(
-    world: Background(
-      backgroundPath: GameMaps.loading,
-      screenSize: Vector2(MediaQuery.sizeOf(context).width, MediaQuery.sizeOf(context).height),
-    ),
-    camera: CameraComponent()
-      ..viewfinder.anchor = Anchor.topLeft
-      ..viewfinder.zoom = 1.0
-  ));
+  late final Widget _background = GameWidget(
+      game: FlameGame(
+          world: Background(
+            backgroundPath: GameMaps.loading,
+            screenSize: Vector2(MediaQuery.sizeOf(context).width,
+                MediaQuery.sizeOf(context).height),
+          ),
+          camera: CameraComponent()
+            ..viewfinder.anchor = Anchor.topLeft
+            ..viewfinder.zoom = 1.0));
 
   @override
   void onReady() {
     super.onReady();
     model.getMyRooms();
   }
-  
+
   @override
   Widget getView() {
     ref.watch(myRoomViewModel);
@@ -59,13 +60,11 @@ class MyRoomViewState extends BaseViewState<MyRoomView, MyRoomViewModel> {
               right: 32,
               child: _buildCreateRoomBtn(),
             ),
-            model.isLoading 
-              ? const Center(child: CircularProgressIndicator(color: GameColors.primary))
-              : Positioned.fill(
-                  top: 48,
-                  left: 32,
-                  child: _buildMyRoomCarousel()
-                ),
+            model.isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(color: GameColors.primary))
+                : Positioned.fill(
+                    top: 48, left: 32, child: _buildMyRoomCarousel()),
           ],
         ),
       ),
@@ -91,7 +90,8 @@ class MyRoomViewState extends BaseViewState<MyRoomView, MyRoomViewModel> {
               model.getMyRooms();
               context.pop();
             } else {
-              SnackBarService.showSnackBar(message: 'Failed to create room', type: MessageTypes.error);
+              SnackBarService.showSnackBar(
+                  message: 'Failed to create room', type: MessageTypes.error);
             }
           }
         });
@@ -109,9 +109,8 @@ class MyRoomViewState extends BaseViewState<MyRoomView, MyRoomViewModel> {
       itemBuilder: (context, index) {
         final room = model.rooms[index];
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: MyRoomWidget(room)
-        );
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: MyRoomWidget(room));
       },
     );
   }
@@ -120,6 +119,4 @@ class MyRoomViewState extends BaseViewState<MyRoomView, MyRoomViewModel> {
   MyRoomViewModel getViewModel() {
     return ref.read(myRoomViewModel);
   }
-  
 }
-

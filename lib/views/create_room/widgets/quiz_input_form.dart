@@ -29,9 +29,11 @@ class QuizInputForm extends BaseWidget {
   }
 }
 
-class QuizInputFormState extends BaseWidgetState<QuizInputForm, QuizInputFormModel> {
-  late final provider = ChangeNotifierProvider((ref) => QuizInputFormModel(widget.onSubmit));
-  
+class QuizInputFormState
+    extends BaseWidgetState<QuizInputForm, QuizInputFormModel> {
+  late final provider =
+      ChangeNotifierProvider((ref) => QuizInputFormModel(widget.onSubmit));
+
   @override
   Widget getWidget() {
     ref.watch(provider);
@@ -52,7 +54,7 @@ class QuizInputFormState extends BaseWidgetState<QuizInputForm, QuizInputFormMod
               AppTextFormField(
                 title: 'Question',
                 titleStyle: GoogleFonts.pressStart2p(
-                  color:  GameColors.primary,
+                  color: GameColors.primary,
                   fontSize: 16,
                 ),
                 controller: model.questionController,
@@ -61,7 +63,7 @@ class QuizInputFormState extends BaseWidgetState<QuizInputForm, QuizInputFormMod
               AppTextFormField(
                 title: 'Option A',
                 titleStyle: GoogleFonts.pressStart2p(
-                  color:  GameColors.primary,
+                  color: GameColors.primary,
                   fontSize: 16,
                 ),
                 controller: model.optionAController,
@@ -70,7 +72,7 @@ class QuizInputFormState extends BaseWidgetState<QuizInputForm, QuizInputFormMod
               AppTextFormField(
                 title: 'Option B',
                 titleStyle: GoogleFonts.pressStart2p(
-                  color:  GameColors.primary,
+                  color: GameColors.primary,
                   fontSize: 16,
                 ),
                 controller: model.optionBController,
@@ -79,7 +81,7 @@ class QuizInputFormState extends BaseWidgetState<QuizInputForm, QuizInputFormMod
               AppTextFormField(
                 title: 'Option C',
                 titleStyle: GoogleFonts.pressStart2p(
-                  color:  GameColors.primary,
+                  color: GameColors.primary,
                   fontSize: 16,
                 ),
                 controller: model.optionCController,
@@ -88,7 +90,7 @@ class QuizInputFormState extends BaseWidgetState<QuizInputForm, QuizInputFormMod
               AppTextFormField(
                 title: 'Option D',
                 titleStyle: GoogleFonts.pressStart2p(
-                  color:  GameColors.primary,
+                  color: GameColors.primary,
                   fontSize: 16,
                 ),
                 controller: model.optionDController,
@@ -126,7 +128,8 @@ class QuizInputFormState extends BaseWidgetState<QuizInputForm, QuizInputFormMod
           ),
         ),
         const SizedBox(height: 8),
-        Row(  // Changed from Wrap to Row
+        Row(
+          // Changed from Wrap to Row
           children: [
             Expanded(child: _buildRadioOption('A', 0)),
             Expanded(child: _buildRadioOption('B', 1)),
@@ -150,15 +153,17 @@ class QuizInputFormState extends BaseWidgetState<QuizInputForm, QuizInputFormMod
             groupValue: model.answer,
             onChanged: (val) => model.selectAnswer(val!),
             fillColor: MaterialStateProperty.resolveWith(
-              (states) => states.contains(MaterialState.selected) 
-                ? GameColors.primary 
-                : GameColors.primary.withOpacity(0.6),
+              (states) => states.contains(MaterialState.selected)
+                  ? GameColors.primary
+                  : GameColors.primary.withOpacity(0.6),
             ),
           ),
           Text(
             label,
             style: GoogleFonts.pressStart2p(
-              color: isSelected ? GameColors.primary : GameColors.primary.withOpacity(0.8),
+              color: isSelected
+                  ? GameColors.primary
+                  : GameColors.primary.withOpacity(0.8),
               fontSize: 14,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),
@@ -167,7 +172,7 @@ class QuizInputFormState extends BaseWidgetState<QuizInputForm, QuizInputFormMod
       ),
     );
   }
- 
+
   @override
   QuizInputFormModel getWidgetModel() {
     return ref.read(provider);
@@ -206,7 +211,11 @@ class QuizInputFormModel extends BaseWidgetModel {
     final optionC = optionCController.text.trim();
     final optionD = optionDController.text.trim();
 
-    if (question.isEmpty || optionA.isEmpty || optionB.isEmpty || optionC.isEmpty || optionD.isEmpty) {
+    if (question.isEmpty ||
+        optionA.isEmpty ||
+        optionB.isEmpty ||
+        optionC.isEmpty ||
+        optionD.isEmpty) {
       // Handle error: all fields must be filled
       return;
     }
@@ -217,9 +226,13 @@ class QuizInputFormModel extends BaseWidgetModel {
       resultB: optionB,
       resultC: optionC,
       resultD: optionD,
-      answer: answer == 0 ? "result_a" : 
-          answer == 1 ? "result_b" : 
-          answer == 2 ? "result_c" : "result_d",
+      answer: answer == 0
+          ? "result_a"
+          : answer == 1
+              ? "result_b"
+              : answer == 2
+                  ? "result_c"
+                  : "result_d",
     );
 
     onSubmit(quizModel);

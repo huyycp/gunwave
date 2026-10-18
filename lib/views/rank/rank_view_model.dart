@@ -15,9 +15,31 @@ class RankViewModel extends BaseViewModel {
   late final RankRepository _rankRepo;
 
   List<RankModel> ranks = [];
+  bool isLoading = true;
+  String? errorMessage;
+  bool _isDisposed = false;
 
-  Future<void> getRanks({String? roomId}) async {
-    ranks = await _rankRepo.getRanksByRoom(roomId: roomId);
+  Future<void> getRanks({String? roomId, String? userId}) async {
+    if (_isDisposed) return;
+    isLoading = true;
+    errorMessage = null;
     notifyListeners();
+    try {
+      ranks = await _rankRepo.getRanksByRoom(roomId: roomId, userId: userId);
+    } catch (error) {
+      if (_isDisposed) return;
+      errorMessage = 'Unable to load rankings.';
+    } finally {
+      if (!_isDisposed) {
+        isLoading = false;
+        notifyListeners();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
   }
 }

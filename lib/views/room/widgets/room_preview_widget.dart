@@ -19,38 +19,37 @@ class RoomPreviewWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.sizeOf(context).height * 0.8,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 71, 183, 181),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: GameColors.primary.withOpacity(0.5),
-            blurRadius: 10,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          Positioned.fill(
-            left: MediaQuery.sizeOf(context).width * 0.2,
-            top: 0,
-            bottom: 0,
-            child: _buildImage(),
-          ),
-          Positioned.fill(
-            child: _buildRoomInfo(),
-          ),
-          Positioned(
-            top: 16,
-            right: 16,
-            child: _buildRankInfoBtn(context),
-          ),
-        ],
-      )
-    );
+        height: MediaQuery.sizeOf(context).height * 0.8,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 71, 183, 181),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: GameColors.primary.withOpacity(0.5),
+              blurRadius: 10,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              left: MediaQuery.sizeOf(context).width * 0.2,
+              top: 0,
+              bottom: 0,
+              child: _buildImage(),
+            ),
+            Positioned.fill(
+              child: _buildRoomInfo(),
+            ),
+            Positioned(
+              top: 16,
+              right: 16,
+              child: _buildRankInfoBtn(context),
+            ),
+          ],
+        ));
   }
 
   Widget _buildImage() {
@@ -59,8 +58,8 @@ class RoomPreviewWidget extends StatelessWidget {
         return const LinearGradient(
           begin: Alignment.centerRight,
           end: Alignment.centerLeft,
-          colors: [ GameColors.primary, Colors.transparent ],
-          stops: [ 0.8, 1 ],
+          colors: [GameColors.primary, Colors.transparent],
+          stops: [0.8, 1],
         ).createShader(Rect.fromLTRB(0, 0, rect.width, rect.height));
       },
       blendMode: BlendMode.dstIn,
@@ -81,7 +80,7 @@ class RoomPreviewWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            room.name, 
+            room.name,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.pressStart2p(
@@ -145,13 +144,12 @@ class RoomPreviewWidget extends StatelessWidget {
                 ],
               ),
               GameButton(
-                onPressed: () {
-                  if (onPlay != null) {
-                    onPlay!(room);
-                  }
-                }, 
-                child: const Text('Play')
-              ),
+                  onPressed: () {
+                    if (onPlay != null) {
+                      onPlay!(room);
+                    }
+                  },
+                  child: const Text('Play')),
             ],
           )
         ],
@@ -162,12 +160,9 @@ class RoomPreviewWidget extends StatelessWidget {
   Widget _buildRankInfoBtn(BuildContext context) {
     return GameButton(
       onPressed: () {
-        context.push(
-          Routes.rank,
-          extra: {
-            'room_id': room.id, 
-          }
-        );
+        context.push(Routes.rank, extra: {
+          'room_id': room.id,
+        });
       },
       size: GameButtonSize.small,
       child: const Icon(
