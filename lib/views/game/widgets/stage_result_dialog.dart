@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_ui.dart';
 import 'package:gunwave/data/models/reward_model.dart';
+import 'package:gunwave/localization/build_context_l10n.dart';
 import 'package:gunwave/routes.dart';
 import 'package:gunwave/views/game/components/sub_components/app_banner.dart';
 
@@ -54,6 +55,7 @@ class StageResultDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = context.l10n;
     return SizedBox(
       width: 400,
       height: errorMessage == null ? 200 : 240,
@@ -67,7 +69,7 @@ class StageResultDialog extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  result ? 'Completed' : 'Failed',
+                  result ? strings.completed : strings.failed,
                   style: GoogleFonts.pressStart2p(
                     fontSize: 24,
                     color: GameColors.primary,
@@ -82,7 +84,7 @@ class StageResultDialog extends StatelessWidget {
                     spacing: 8,
                     children: [
                       Text(
-                        'Rewards',
+                        strings.rewards,
                         style: GoogleFonts.pressStart2p(
                           fontSize: 16,
                           color: GameColors.primary,
@@ -92,7 +94,7 @@ class StageResultDialog extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: rewards
-                            .map((reward) => _buildRewardItem(reward))
+                            .map((reward) => _buildRewardItem(context, reward))
                             .toList(),
                       )
                     ],
@@ -113,7 +115,7 @@ class StageResultDialog extends StatelessWidget {
                       spacing: 8,
                       children: [
                         Text(
-                          'Score',
+                          strings.score,
                           style: GoogleFonts.pressStart2p(
                             fontSize: 16,
                             color: GameColors.primary,
@@ -138,7 +140,13 @@ class StageResultDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildRewardItem(RewardModel reward) {
+  Widget _buildRewardItem(BuildContext context, RewardModel reward) {
+    final strings = context.l10n;
+    final rewardLabel = switch (reward.type) {
+      RewardType.gold => strings.rewardGold,
+      RewardType.sp => strings.rewardStatusPoints,
+      RewardType.unknown => strings.rewardUnknown,
+    };
     return Row(
       mainAxisSize: MainAxisSize.min,
       spacing: 4,
@@ -150,7 +158,7 @@ class StageResultDialog extends StatelessWidget {
             color: GameColors.primary,
           ),
         ),
-        Text(reward.type.name.toUpperCase(),
+        Text(rewardLabel,
             style: GoogleFonts.pressStart2p(
                 fontSize: 16, color: GameColors.primary)),
       ],
@@ -172,7 +180,7 @@ class StageResultDialog extends StatelessWidget {
             ),
           ),
           child: Text(
-            'Back',
+            context.l10n.back,
             style: GoogleFonts.pressStart2p(
               fontSize: 16,
               color: Colors.white,

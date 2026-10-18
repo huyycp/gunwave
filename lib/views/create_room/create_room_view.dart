@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
+import 'package:gunwave/localization/build_context_l10n.dart';
 import 'package:gunwave/utils/extensions/list_widget_ex.dart';
 import 'package:gunwave/views/create_room/create_room_view_model.dart';
 import 'package:gunwave/views/create_room/widgets/quiz_input_form.dart';
@@ -101,7 +102,7 @@ class CreateRoomViewState
       child: AppTextFormField(
         controller: model.nameController,
         statesController: model.nameStatesController,
-        title: 'Room Name',
+        title: context.l10n.roomName,
         titleStyle: GoogleFonts.pressStart2p(
           color: GameColors.primary,
           fontSize: 16,
@@ -119,7 +120,7 @@ class CreateRoomViewState
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 100),
           child: Text(
-            'Select a Map',
+            context.l10n.selectMap,
             style: GoogleFonts.pressStart2p(
               color: GameColors.primary,
               fontSize: 16,
@@ -168,9 +169,8 @@ class CreateRoomViewState
 
   Widget _buildPrivateToggle() {
     return AppListTile(
-      title: 'Private',
-      subTitle:
-          'This rooom will not be visible to others. Only invited players can join.',
+      title: context.l10n.private,
+      subTitle: context.l10n.privateRoomDescription,
       isSubTitleWrap: true,
       titleStyle: GoogleFonts.pressStart2p(
         color: GameColors.primary,
@@ -204,7 +204,7 @@ class CreateRoomViewState
         spacing: 16,
         children: [
           Text(
-            'Quizzes',
+            context.l10n.quizzes,
             style: GoogleFonts.pressStart2p(
               color: GameColors.primary,
               fontSize: 16,
@@ -227,7 +227,7 @@ class CreateRoomViewState
                 onPressed: () {
                   QuizInputForm.show(model.addQuiz);
                 },
-                child: const Text('Add Quiz'),
+                child: Text(context.l10n.addQuiz),
               ),
             ],
           ),
@@ -252,7 +252,7 @@ class CreateRoomViewState
         if (model.quizzes.isEmpty) return;
         model.createRoom();
       },
-      child: const Text('Create'),
+      child: Text(context.l10n.create),
     );
   }
 

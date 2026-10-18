@@ -7,8 +7,8 @@ import 'package:gunwave/data/constants/game/game_play_mode.dart';
 import 'package:gunwave/data/constants/game/game_ui.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/data/models/room_model.dart';
+import 'package:gunwave/localization/build_context_l10n.dart';
 import 'package:gunwave/routes.dart';
-import 'package:gunwave/utils/extensions/string_ex.dart';
 import 'package:gunwave/views/game/game_view.dart';
 import 'package:gunwave/widgets/base/base_widget.dart';
 import 'package:gunwave/widgets/base/base_widget_model.dart';
@@ -56,7 +56,7 @@ class PlayModeDialogState
         spacing: 8,
         children: [
           Text(
-            'Play Mode',
+            context.l10n.playMode,
             style: GoogleFonts.pressStart2p(
               fontSize: 20,
               color: GameColors.primary,
@@ -91,7 +91,11 @@ class PlayModeDialogState
         );
       },
       child: Text(
-        mode.name.capitalize,
+        switch (mode) {
+          GamePlayMode.joystick => context.l10n.joystick,
+          GamePlayMode.gesture => context.l10n.gesture,
+          GamePlayMode.keyboard => context.l10n.keyboard,
+        },
         style: GoogleFonts.pressStart2p(
           fontSize: 16,
           color: GameColors.primary,

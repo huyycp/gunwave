@@ -7,14 +7,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/app.dart';
 import 'package:gunwave/build_config.dart';
 import 'package:gunwave/data/data_sources/remote/api/supabase_api.dart';
+import 'package:gunwave/localization/app_locale_controller.dart';
 import 'package:gunwave/theme/theme_provider.dart';
 // import 'package:sentry_flutter/sentry_flutter.dart';
 
-void main() async {
-  startApp(BuildEnv.prod);
+Future<void> main() async {
+  await startApp(BuildEnv.prod);
 }
 
-void startApp(BuildEnv env) async {
+Future<void> startApp(BuildEnv env) async {
   WidgetsFlutterBinding.ensureInitialized();
 
   switch (env) {
@@ -30,17 +31,21 @@ void startApp(BuildEnv env) async {
   }
 
   if (kReleaseMode) debugPrint = (String? message, {int? wrapWidth}) {};
-  
+
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeRight,
   ]);
   await Flame.device.fullScreen();
   await Flame.device.setLandscape();
-  
+
+  final localeController = AppLocaleController();
+  await localeController.load();
+
   await SupabaseApi().init();
-  
+
   runApp(ProviderScope(overrides: [
     themeProvider.overrideWith((ref) => ThemeProvider()),
+    appLocaleControllerProvider.overrideWith((ref) => localeController),
   ], child: const GunwaveApp()));
 }
 

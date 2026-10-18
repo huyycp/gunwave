@@ -8,6 +8,7 @@ import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
 import 'package:gunwave/data/models/room_model.dart';
+import 'package:gunwave/localization/build_context_l10n.dart';
 import 'package:gunwave/views/home/widgets/background.dart';
 import 'package:gunwave/views/room/room_view_model.dart';
 import 'package:gunwave/views/room/widgets/play_mode_dialog.dart';
@@ -78,6 +79,10 @@ class RoomViewState extends BaseViewState<RoomView, RoomViewModel> {
 
   Widget _buildRoomCarousel() {
     final rooms = model.rooms;
+    if (rooms.isEmpty) {
+      return Text(context.l10n.noRoomsAvailable);
+    }
+
     return CarouselSlider(
       options: CarouselOptions(
         viewportFraction: 0.7,

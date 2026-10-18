@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/models/room_model.dart';
+import 'package:gunwave/localization/build_context_l10n.dart';
 import 'package:gunwave/routes.dart';
 import 'package:gunwave/utils/extensions/string_ex.dart';
 import 'package:gunwave/widgets/app_image.dart';
@@ -67,7 +68,7 @@ class MyRoomWidget extends StatelessWidget {
                             color: GameColors.primary,
                             fontSize: 16,
                           )),
-                      Text(room.map?.name.capitalize ?? 'Unknown Map',
+                      Text(room.map?.name.capitalize ?? context.l10n.unknownMap,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.pressStart2p(
@@ -77,12 +78,12 @@ class MyRoomWidget extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('${room.quizzes.length} Quizzes',
+                          Text(context.l10n.quizCount(room.quizzes.length),
                               style: GoogleFonts.pressStart2p(
                                 color: GameColors.primary,
                                 fontSize: 12,
                               )),
-                          Text('20 played',
+                          Text(context.l10n.playedCount(20),
                               style: GoogleFonts.pressStart2p(
                                 color: GameColors.primary,
                                 fontSize: 12,

@@ -20,11 +20,13 @@ class CharacterViewModel extends BaseViewModel {
   int selectedCharacterIndex = 0;
 
   bool isLoading = true;
-  
+
   Future<void> getCharacters() async {
     try {
+      setLoading(true);
       if (userRepo.appUser == null) return;
       await _characterRepo.getOwnedCharacters(userRepo.appUser!.id);
+      selectedCharacterIndex = 0;
     } catch (err, stack) {
       AppException.log(runtimeType, err, stack, function: 'getCharacters');
     } finally {
@@ -36,7 +38,7 @@ class CharacterViewModel extends BaseViewModel {
     if (index < 0 || index >= characters.length) return;
     selectedCharacterIndex = index;
     debugPrint("Character selected: ${characters[index].name}");
-    notifyListeners(); 
+    notifyListeners();
   }
 
   void setLoading(bool loading) {

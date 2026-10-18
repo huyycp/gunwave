@@ -3,12 +3,12 @@ import 'package:gunwave/data/models/room_model.dart';
 import 'package:gunwave/utils/exception/app_exception.dart';
 import 'package:gunwave/widgets/base/base_view_model.dart';
 
-final myRoomViewModel = ChangeNotifierProvider.autoDispose<MyRoomViewModel>((ref) {
+final myRoomViewModel =
+    ChangeNotifierProvider.autoDispose<MyRoomViewModel>((ref) {
   return MyRoomViewModel();
 });
 
 class MyRoomViewModel extends BaseViewModel {
-
   List<RoomModel> rooms = [];
 
   bool isLoading = true;

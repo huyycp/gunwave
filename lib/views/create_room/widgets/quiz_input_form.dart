@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/dtos/req/create_room_req.dart';
+import 'package:gunwave/localization/build_context_l10n.dart';
 import 'package:gunwave/routes.dart';
 import 'package:gunwave/utils/common_functions.dart';
 import 'package:gunwave/widgets/app_text_form_field.dart';
@@ -52,7 +53,7 @@ class QuizInputFormState
             spacing: 16,
             children: [
               AppTextFormField(
-                title: 'Question',
+                title: context.l10n.question,
                 titleStyle: GoogleFonts.pressStart2p(
                   color: GameColors.primary,
                   fontSize: 16,
@@ -61,7 +62,7 @@ class QuizInputFormState
                 statesController: model.questionStateController,
               ),
               AppTextFormField(
-                title: 'Option A',
+                title: context.l10n.optionA,
                 titleStyle: GoogleFonts.pressStart2p(
                   color: GameColors.primary,
                   fontSize: 16,
@@ -70,7 +71,7 @@ class QuizInputFormState
                 statesController: model.optionAStateController,
               ),
               AppTextFormField(
-                title: 'Option B',
+                title: context.l10n.optionB,
                 titleStyle: GoogleFonts.pressStart2p(
                   color: GameColors.primary,
                   fontSize: 16,
@@ -79,7 +80,7 @@ class QuizInputFormState
                 statesController: model.optionBStateController,
               ),
               AppTextFormField(
-                title: 'Option C',
+                title: context.l10n.optionC,
                 titleStyle: GoogleFonts.pressStart2p(
                   color: GameColors.primary,
                   fontSize: 16,
@@ -88,7 +89,7 @@ class QuizInputFormState
                 statesController: model.optionCStateController,
               ),
               AppTextFormField(
-                title: 'Option D',
+                title: context.l10n.optionD,
                 titleStyle: GoogleFonts.pressStart2p(
                   color: GameColors.primary,
                   fontSize: 16,
@@ -97,15 +98,23 @@ class QuizInputFormState
                 statesController: model.optionDStateController,
               ),
               _buildAnswerSelector(),
+              if (model.hasMissingFields)
+                Text(
+                  context.l10n.quizFieldsRequired,
+                  style: GoogleFonts.pressStart2p(
+                    color: Theme.of(context).colorScheme.error,
+                    fontSize: 12,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   GameButton(
                     onPressed: () {
-                      model.submit();
-                      context.pop();
+                      if (model.submit()) context.pop();
                     },
-                    child: const Text('Submit'),
+                    child: Text(context.l10n.submit),
                   ),
                 ],
               ),
@@ -121,7 +130,7 @@ class QuizInputFormState
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Answer',
+          context.l10n.answer,
           style: GoogleFonts.pressStart2p(
             color: GameColors.primary,
             fontSize: 16,
@@ -198,13 +207,14 @@ class QuizInputFormModel extends BaseWidgetModel {
 
   /// 0 for A, 1 for B, 2 for C, 3 for D
   int answer = 0;
+  bool hasMissingFields = false;
 
   void selectAnswer(int value) {
     answer = value;
     notifyListeners();
   }
 
-  void submit() {
+  bool submit() {
     final question = questionController.text.trim();
     final optionA = optionAController.text.trim();
     final optionB = optionBController.text.trim();
@@ -216,9 +226,12 @@ class QuizInputFormModel extends BaseWidgetModel {
         optionB.isEmpty ||
         optionC.isEmpty ||
         optionD.isEmpty) {
-      // Handle error: all fields must be filled
-      return;
+      hasMissingFields = true;
+      notifyListeners();
+      return false;
     }
+
+    hasMissingFields = false;
 
     final quizModel = CreateQuizReq(
       question: question,
@@ -236,5 +249,6 @@ class QuizInputFormModel extends BaseWidgetModel {
     );
 
     onSubmit(quizModel);
+    return true;
   }
 }

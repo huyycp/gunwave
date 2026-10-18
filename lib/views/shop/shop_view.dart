@@ -5,12 +5,14 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_ui.dart';
+import 'package:gunwave/localization/build_context_l10n.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/views/character/widgets/character_preview.dart';
 import 'package:gunwave/views/game/components/sub_components/app_banner.dart';
 import 'package:gunwave/views/shop/shop_view_model.dart';
 import 'package:gunwave/widgets/base/base_view.dart';
 import 'package:gunwave/widgets/game/game_button.dart';
+
 class ShopView extends BaseView {
   const ShopView({super.key});
 
@@ -22,15 +24,13 @@ class ShopView extends BaseView {
 
 class ShopViewState extends BaseViewState<ShopView, ShopViewModel> {
   final _background = GameWidget(
-    game: FlameGame(
-      children: [
-        AppBanner(
-          banner: GameBanners.bannerHorizontal,
-          xCount: 13,
-          yCount: 6,
-        )
-      ]  
-    ),
+    game: FlameGame(children: [
+      AppBanner(
+        banner: GameBanners.bannerHorizontal,
+        xCount: 13,
+        yCount: 6,
+      )
+    ]),
   );
 
   @override
@@ -38,7 +38,7 @@ class ShopViewState extends BaseViewState<ShopView, ShopViewModel> {
     super.onReady();
     model.getCharacters();
   }
-  
+
   @override
   Widget getView() {
     ref.watch(shopViewModel);
@@ -60,15 +60,18 @@ class ShopViewState extends BaseViewState<ShopView, ShopViewModel> {
   Widget _buildCharacters() {
     final characters = model.characters;
     return model.isLoading
-      ? const Center(child: CircularProgressIndicator(color: GameColors.primary))
-      : characters.isEmpty
-        ? const Center(child: Text('No characters available'))
-        : ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: characters.length,
-          itemBuilder: (context, index) => _buildCharacterItem(characters[index]),
-          separatorBuilder: (context, index) => const SizedBox(height: 24),
-        );
+        ? const Center(
+            child: CircularProgressIndicator(color: GameColors.primary))
+        : characters.isEmpty
+            ? Center(child: Text(context.l10n.noCharactersAvailable))
+            : ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: characters.length,
+                itemBuilder: (context, index) =>
+                    _buildCharacterItem(characters[index]),
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 24),
+              );
   }
 
   Widget _buildCharacterItem(CharacterModel character) {
@@ -83,7 +86,8 @@ class ShopViewState extends BaseViewState<ShopView, ShopViewModel> {
       ),
       child: Stack(
         children: [
-          GameWidget(game: CharacterPreview(
+          GameWidget(
+              game: CharacterPreview(
             character: character.character,
           )),
           Positioned(
@@ -108,18 +112,15 @@ class ShopViewState extends BaseViewState<ShopView, ShopViewModel> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 GameButton(
-                  onPressed: 
-                    !model.isCharacterOwned(character.id) &&
-                    model.userBalance >= character.price  
+                  onPressed: !model.isCharacterOwned(character.id) &&
+                          model.userBalance >= character.price
                       ? () {
-                        model.buyCharacter(character);
-                      } 
+                          model.buyCharacter(character);
+                        }
                       : null,
-                  child: Text(
-                    model.isCharacterOwned(character.id)
-                      ? 'Owned'
-                      : character.price.toString()
-                    ),
+                  child: Text(model.isCharacterOwned(character.id)
+                      ? context.l10n.owned
+                      : character.price.toString()),
                 ),
               ],
             ),
@@ -134,7 +135,7 @@ class ShopViewState extends BaseViewState<ShopView, ShopViewModel> {
       onPressed: () {
         context.pop();
       },
-      child: const Text('Back'),
+      child: Text(context.l10n.back),
     );
   }
 

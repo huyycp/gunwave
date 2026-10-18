@@ -6,6 +6,7 @@ import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_ui.dart';
 import 'package:gunwave/data/models/character_model.dart';
+import 'package:gunwave/localization/build_context_l10n.dart';
 import 'package:gunwave/repositories/character_repository.dart';
 import 'package:gunwave/utils/exception/app_exception.dart';
 import 'package:gunwave/views/game/components/sub_components/app_banner.dart';
@@ -75,7 +76,7 @@ class StatusBoardState
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'Status Point:',
+          context.l10n.statusPoint,
           style: GoogleFonts.pressStart2p(
             fontSize: 10,
             color: GameColors.primary,
@@ -93,11 +94,12 @@ class StatusBoardState
   }
 
   Widget _buildCharacterAttr(CharacterAttr attr, int value) {
+    final strings = context.l10n;
     final label = switch (attr) {
-      CharacterAttr.hp => 'HP',
-      CharacterAttr.str => 'Strength',
-      CharacterAttr.vit => 'Vitality',
-      CharacterAttr.agi => 'Agility',
+      CharacterAttr.hp => strings.healthPoints,
+      CharacterAttr.str => strings.strength,
+      CharacterAttr.vit => strings.vitality,
+      CharacterAttr.agi => strings.agility,
     };
     return Row(
       children: [
@@ -135,7 +137,7 @@ class StatusBoardState
 
   Widget _buildHeader() {
     return Text(
-      'Status Board',
+      context.l10n.statusBoard,
       style: GoogleFonts.pressStart2p(
         fontSize: 20,
         color: GameColors.primary,
@@ -148,7 +150,7 @@ class StatusBoardState
       onPressed: () {
         model.resetAttr(model.character);
       },
-      child: Text('Reset'),
+      child: Text(context.l10n.reset),
     );
   }
 

@@ -1,11 +1,13 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_ui.dart';
 import 'package:gunwave/data/models/character_model.dart';
+import 'package:gunwave/localization/build_context_l10n.dart';
 import 'package:gunwave/repositories/character_repository.dart';
 import 'package:gunwave/routes.dart';
 import 'package:gunwave/views/character/widgets/character_preview.dart';
@@ -37,19 +39,19 @@ class SelectCharacterWidget extends BaseWidget {
   }
 }
 
-class SelectCharacterWidgetState extends BaseWidgetState<SelectCharacterWidget, SelectCharacterWidgetModel> {
-  late final provider = ChangeNotifierProvider<SelectCharacterWidgetModel>((ref) => SelectCharacterWidgetModel(ref, widget.onCharacterSelected));
-  
+class SelectCharacterWidgetState
+    extends BaseWidgetState<SelectCharacterWidget, SelectCharacterWidgetModel> {
+  late final provider = ChangeNotifierProvider<SelectCharacterWidgetModel>(
+      (ref) => SelectCharacterWidgetModel(ref, widget.onCharacterSelected));
+
   final _background = GameWidget(
-    game: FlameGame(
-      children: [
-        AppBanner(
-          banner: GameBanners.bannerHorizontal,
-          xCount: 10,
-          yCount: 5,
-        )
-      ]
-    ),
+    game: FlameGame(children: [
+      AppBanner(
+        banner: GameBanners.bannerHorizontal,
+        xCount: 10,
+        yCount: 5,
+      )
+    ]),
   );
 
   @override
@@ -74,12 +76,31 @@ class SelectCharacterWidgetState extends BaseWidgetState<SelectCharacterWidget, 
             const Center(
               child: CircularProgressIndicator(color: GameColors.primary),
             )
-          else ...[
+          else if (model.characters.isEmpty) ...[
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(context.l10n.noCharactersAvailable),
+                const SizedBox(height: 12),
+                GameButton(
+                  onPressed: () {
+                    final router = GoRouter.of(context);
+                    Navigator.of(context).pop();
+                    router.pushReplacement(Routes.shop);
+                  },
+                  child: Text(context.l10n.openShop),
+                ),
+              ],
+            ),
+            Positioned(top: 8, left: 8, child: _buildBackBtn()),
+          ] else ...[
             Positioned(
               child: SizedBox(
                 width: 192 * 2,
-                child: GameWidget(game: CharacterPreview(
-                  character: model.characters[model.selectedCharacterIndex].character,
+                child: GameWidget(
+                    game: CharacterPreview(
+                  character:
+                      model.characters[model.selectedCharacterIndex].character,
                 )),
               ),
             ),
@@ -132,17 +153,20 @@ class SelectCharacterWidgetState extends BaseWidgetState<SelectCharacterWidget, 
   Widget _buildNextCharacterBtn() {
     return GameButton(
       onPressed: () {
-        model.selectCharacter((model.selectedCharacterIndex + 1) % model.characters.length);
+        model.selectCharacter(
+            (model.selectedCharacterIndex + 1) % model.characters.length);
       },
       size: GameButtonSize.small,
       child: const Text('>'),
     );
   }
-  
+
   Widget _buildPreviousCharacterBtn() {
     return GameButton(
       onPressed: () {
-        model.selectCharacter((model.selectedCharacterIndex - 1 + model.characters.length) % model.characters.length);
+        model.selectCharacter(
+            (model.selectedCharacterIndex - 1 + model.characters.length) %
+                model.characters.length);
       },
       size: GameButtonSize.small,
       child: const Text('<'),
@@ -154,7 +178,7 @@ class SelectCharacterWidgetState extends BaseWidgetState<SelectCharacterWidget, 
       onPressed: () {
         Navigator.of(context).pop();
       },
-      child: const Text('Back'),
+      child: Text(context.l10n.back),
     );
   }
 
@@ -162,9 +186,10 @@ class SelectCharacterWidgetState extends BaseWidgetState<SelectCharacterWidget, 
     return GameButton(
       onPressed: () {
         Navigator.of(context).pop();
-        widget.onCharacterSelected(model.characters[model.selectedCharacterIndex]);
+        widget.onCharacterSelected(
+            model.characters[model.selectedCharacterIndex]);
       },
-      child: const Text('Next'),
+      child: Text(context.l10n.next),
     );
   }
 
@@ -190,7 +215,9 @@ class SelectCharacterWidgetModel extends BaseWidgetModel {
   Future<void> getCharacters() async {
     try {
       if (userRepo.appUser == null) return;
-      characters = await _characterRepo.getOwnedCharacters(userRepo.appUser!.id);
+      characters =
+          await _characterRepo.getOwnedCharacters(userRepo.appUser!.id);
+      selectedCharacterIndex = 0;
       debugPrint("Characters loaded: $characters");
     } catch (e) {
       debugPrint("Error loading characters: $e");
@@ -205,6 +232,7 @@ class SelectCharacterWidgetModel extends BaseWidgetModel {
   }
 
   void selectCharacter(int index) {
+    if (index < 0 || index >= characters.length) return;
     selectedCharacterIndex = index;
     debugPrint("Character changed to: ${characters[index].name}");
     notifyListeners();

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
+import 'package:gunwave/localization/build_context_l10n.dart';
 import 'package:gunwave/data/models/room_model.dart';
 import 'package:gunwave/routes.dart';
 import 'package:gunwave/utils/extensions/string_ex.dart';
@@ -41,7 +42,7 @@ class RoomPreviewWidget extends StatelessWidget {
               child: _buildImage(),
             ),
             Positioned.fill(
-              child: _buildRoomInfo(),
+              child: _buildRoomInfo(context),
             ),
             Positioned(
               top: 16,
@@ -71,7 +72,7 @@ class RoomPreviewWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildRoomInfo() {
+  Widget _buildRoomInfo(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -90,7 +91,7 @@ class RoomPreviewWidget extends StatelessWidget {
             ),
           ),
           Text(
-            room.map?.name.capitalize ?? 'Unknown Map',
+            room.map?.name.capitalize ?? context.l10n.unknownMap,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.pressStart2p(
@@ -107,7 +108,7 @@ class RoomPreviewWidget extends StatelessWidget {
               isCircle: true,
               placeHolder: Container(color: GameColors.primary),
             ),
-            title: room.user?.name ?? 'Unknown Creator',
+            title: room.user?.name ?? context.l10n.unknownCreator,
             titleStyle: GoogleFonts.pressStart2p(
               fontSize: 14,
               color: GameColors.primary,
@@ -124,7 +125,7 @@ class RoomPreviewWidget extends StatelessWidget {
                 spacing: 12,
                 children: [
                   Text(
-                    '${room.quizzes.length} quizzes',
+                    context.l10n.quizzesLowercase(room.quizzes.length),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.pressStart2p(
@@ -133,7 +134,7 @@ class RoomPreviewWidget extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Time ${room.map?.timeLimit ?? 0}s',
+                    context.l10n.timeLimit(room.map?.timeLimit ?? 0),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.pressStart2p(
@@ -149,7 +150,7 @@ class RoomPreviewWidget extends StatelessWidget {
                       onPlay!(room);
                     }
                   },
-                  child: const Text('Play')),
+                  child: Text(context.l10n.play)),
             ],
           )
         ],

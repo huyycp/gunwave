@@ -7,6 +7,7 @@ import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
 import 'package:gunwave/data/models/rank_model.dart';
+import 'package:gunwave/localization/build_context_l10n.dart';
 import 'package:gunwave/views/home/widgets/background.dart';
 import 'package:gunwave/views/rank/rank_view_model.dart';
 import 'package:gunwave/widgets/base/base_view.dart';
@@ -89,33 +90,33 @@ class RankViewState extends BaseViewState<RankView, RankViewModel> {
         color: GameColors.primary.withOpacity(0.3),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: const Row(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
             child: Text(
-              'Player',
-              style: TextStyle(color: GameColors.primary, fontSize: 20),
+              context.l10n.player,
+              style: const TextStyle(color: GameColors.primary, fontSize: 20),
             ),
           ),
           Expanded(
             child: Text(
-              'Score',
+              context.l10n.score,
               textAlign: TextAlign.center,
-              style: TextStyle(color: GameColors.primary, fontSize: 20),
+              style: const TextStyle(color: GameColors.primary, fontSize: 20),
             ),
           ),
           Expanded(
             child: Text(
-              'Duration',
+              context.l10n.duration,
               textAlign: TextAlign.center,
-              style: TextStyle(color: GameColors.primary, fontSize: 20),
+              style: const TextStyle(color: GameColors.primary, fontSize: 20),
             ),
           ),
           Expanded(
             child: Text(
-              'At',
-              style: TextStyle(color: GameColors.primary, fontSize: 20),
+              context.l10n.at,
+              style: const TextStyle(color: GameColors.primary, fontSize: 20),
             ),
           ),
         ],
@@ -129,25 +130,25 @@ class RankViewState extends BaseViewState<RankView, RankViewModel> {
         child: CircularProgressIndicator(color: GameColors.primary),
       );
     }
-    if (model.errorMessage != null) {
+    if (model.hasError) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(model.errorMessage!),
+            Text(context.l10n.unableToLoadRankings),
             TextButton(
               onPressed: () => model.getRanks(
                 roomId: widget.roomId,
                 userId: widget.userId,
               ),
-              child: const Text('Retry'),
+              child: Text(context.l10n.retry),
             ),
           ],
         ),
       );
     }
     if (model.ranks.isEmpty) {
-      return const Center(child: Text('No rankings yet.'));
+      return Center(child: Text(context.l10n.noRankingsYet));
     }
     return ListView.separated(
         itemCount: model.ranks.length,
@@ -178,7 +179,7 @@ class RankViewState extends BaseViewState<RankView, RankViewModel> {
                   style: const TextStyle(
                       color: GameColors.primary, fontSize: 18))),
           Expanded(
-              child: Text('${rank.duration.inSeconds}s',
+              child: Text(context.l10n.secondsShort(rank.duration.inSeconds),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       color: GameColors.primary, fontSize: 18))),

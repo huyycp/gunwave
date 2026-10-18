@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
+import 'package:gunwave/localization/build_context_l10n.dart';
 import 'package:gunwave/routes.dart';
 import 'package:gunwave/utils/ui/snackbar.dart';
 import 'package:gunwave/views/home/widgets/background.dart';
@@ -91,7 +92,8 @@ class MyRoomViewState extends BaseViewState<MyRoomView, MyRoomViewModel> {
               context.pop();
             } else {
               SnackBarService.showSnackBar(
-                  message: 'Failed to create room', type: MessageTypes.error);
+                  message: context.l10n.failedToCreateRoom,
+                  type: MessageTypes.error);
             }
           }
         });

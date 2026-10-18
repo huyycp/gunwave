@@ -16,19 +16,19 @@ class RankViewModel extends BaseViewModel {
 
   List<RankModel> ranks = [];
   bool isLoading = true;
-  String? errorMessage;
+  bool hasError = false;
   bool _isDisposed = false;
 
   Future<void> getRanks({String? roomId, String? userId}) async {
     if (_isDisposed) return;
     isLoading = true;
-    errorMessage = null;
+    hasError = false;
     notifyListeners();
     try {
       ranks = await _rankRepo.getRanksByRoom(roomId: roomId, userId: userId);
     } catch (error) {
       if (_isDisposed) return;
-      errorMessage = 'Unable to load rankings.';
+      hasError = true;
     } finally {
       if (!_isDisposed) {
         isLoading = false;
