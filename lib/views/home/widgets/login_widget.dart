@@ -80,7 +80,7 @@ class LoginWidgetModel extends BaseWidgetModel {
       }
     } catch (err, stack) {
       onDone(false);
-      AppException.log(runtimeType, err, stack);
+      AppException.log(runtimeType, err, stack, function: 'login');
     }
   } 
 }

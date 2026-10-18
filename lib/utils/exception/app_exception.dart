@@ -8,8 +8,13 @@ class AppException implements Exception {
 
   AppException({this.code = 1, required this.message});
 
-  static log(dynamic runtimeType, Object e, StackTrace stack) {
-    if (kDebugMode) logError(runtimeType, e: e, stack: stack);
+  /// Logs a debug failure with the class and function that handled it.
+  static void log(Type source, Object e, StackTrace stack,
+      {required String function}) {
+    if (kDebugMode) {
+      AppLogger(source)
+          .error(function, e.toString(), error: e, stackTrace: stack);
+    }
     switch (e.runtimeType) {
       case const (IgnoreException):
         break;

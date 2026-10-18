@@ -32,7 +32,7 @@ class ShopViewModel extends BaseViewModel {
       debugPrint("Owned characters loaded: ${ownedCharacters.map((e) => e.toJson())}");
       notifyListeners();
     } catch (err, stack) {
-      AppException.log(runtimeType, err, stack);
+      AppException.log(runtimeType, err, stack, function: 'getCharacters');
     } finally {
       setLoading(false);
     }
@@ -48,7 +48,7 @@ class ShopViewModel extends BaseViewModel {
         userRepo.appUser?.gold -= character.price;
       }
     } catch (err, stack) {
-      AppException.log(runtimeType, err, stack);
+      AppException.log(runtimeType, err, stack, function: 'buyCharacter');
     } finally {
       userRepo.getAppUser();
       notifyListeners();

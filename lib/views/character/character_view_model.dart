@@ -26,7 +26,7 @@ class CharacterViewModel extends BaseViewModel {
       if (userRepo.appUser == null) return;
       await _characterRepo.getOwnedCharacters(userRepo.appUser!.id);
     } catch (err, stack) {
-      AppException.log(runtimeType, err, stack);
+      AppException.log(runtimeType, err, stack, function: 'getCharacters');
     } finally {
       setLoading(false);
     }

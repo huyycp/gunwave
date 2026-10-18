@@ -182,7 +182,7 @@ class StatusBoardWidgetModel extends BaseWidgetModel {
         notifyListeners();
       }
     } catch (err, stack) {
-      AppException.log(runtimeType, err, stack);
+      AppException.log(runtimeType, err, stack, function: 'updateAttr');
     }
   }
 
@@ -194,7 +194,7 @@ class StatusBoardWidgetModel extends BaseWidgetModel {
         notifyListeners();
       }
     } catch (err, stack) {
-      AppException.log(runtimeType, err, stack);
+      AppException.log(runtimeType, err, stack, function: 'resetAttr');
     }
   }
 }

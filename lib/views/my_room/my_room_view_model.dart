@@ -18,7 +18,7 @@ class MyRoomViewModel extends BaseViewModel {
       setLoading(true);
       rooms = await userRepo.getMyRooms();
     } catch (err, stack) {
-      AppException.log(runtimeType, err, stack);
+      AppException.log(runtimeType, err, stack, function: 'getMyRooms');
     } finally {
       setLoading(false);
     }
