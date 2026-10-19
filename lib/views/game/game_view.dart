@@ -6,7 +6,6 @@ import 'package:gunwave/data/constants/game/game_hud_style.dart';
 import 'package:gunwave/views/game/widgets/player_health_hud.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
-import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_play_mode.dart';
 import 'package:gunwave/data/dtos/req/update_rank_req.dart';
 import 'package:gunwave/data/models/character_model.dart';
@@ -18,6 +17,7 @@ import 'package:gunwave/views/game/gunwave.dart';
 import 'package:gunwave/views/game/widgets/quiz_widget.dart';
 import 'package:gunwave/views/game/widgets/ability_hud.dart';
 import 'package:gunwave/views/game/widgets/stage_result_dialog.dart';
+import 'package:gunwave/views/game/widgets/rank_submission_loading_dialog.dart';
 import 'package:gunwave/widgets/base/base_view.dart';
 import 'package:gunwave/widgets/game/game_button.dart';
 
@@ -43,6 +43,8 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
   bool _isCompletingStage = false;
   bool _isConfirmingExit = false;
   bool _allowExit = false;
+  DialogRoute<void>? _rankOverlayRoute;
+  NavigatorState? _rankOverlayNavigator;
   final _gameFocus = FocusNode();
 
   late final Gunwave _gunwave = Gunwave(
@@ -391,7 +393,7 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
       } catch (error) {
         rankError = error;
       } finally {
-        if (mounted) Navigator.of(context, rootNavigator: true).pop();
+        _dismissRankOverlay();
       }
     }
     if (!mounted) return;
@@ -404,15 +406,27 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
   }
 
   void showOverlay() {
-    showDialog(
-      barrierDismissible: false,
+    final navigator = Navigator.of(context, rootNavigator: true);
+    final route = DialogRoute<void>(
       context: context,
-      builder: (context) {
-        return const Center(
-          child: CircularProgressIndicator(color: GameColors.primary),
-        );
-      },
+      barrierDismissible: false,
+      barrierColor: Colors.black54,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      builder: (_) => const RankSubmissionLoadingDialog(),
     );
+    _rankOverlayNavigator = navigator;
+    _rankOverlayRoute = route;
+    unawaited(navigator.push<void>(route));
+  }
+
+  void _dismissRankOverlay() {
+    final route = _rankOverlayRoute;
+    final navigator = _rankOverlayNavigator;
+    _rankOverlayRoute = null;
+    _rankOverlayNavigator = null;
+    if (route != null && navigator?.mounted == true && route.isActive) {
+      navigator!.removeRoute(route);
+    }
   }
 
   void onCharacterReachCheckpoint(bool isReached) {
