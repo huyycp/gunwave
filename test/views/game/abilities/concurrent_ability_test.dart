@@ -193,6 +193,8 @@ class ConcurrentContext implements AbilityContext {
   bool get isBlocked => false;
   final target = FakeCombatant();
   @override
+  Iterable<Combatant> get combatants => [caster, target];
+  @override
   Iterable<Combatant> targetsWithin(double radius) => [target];
   @override
   bool dash({required double distance, required double duration}) =>

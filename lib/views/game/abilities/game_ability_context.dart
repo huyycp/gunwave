@@ -12,6 +12,12 @@ class GameAbilityContext implements AbilityContext {
   @override
   Combatant get caster => game.character;
   @override
+  Iterable<Combatant> get combatants sync* {
+    yield caster;
+    yield* game.stage?.monsters ?? const <Combatant>[];
+  }
+
+  @override
   bool get isBlocked => !game.isLoaded || game.controlsBlocked || game.paused;
   @override
   Iterable<Combatant> targetsWithin(double radius) sync* {

@@ -24,8 +24,20 @@ class AbilityController extends ChangeNotifier {
       cooldownRemaining <= 0 &&
       !context.isBlocked &&
       context.caster.isAlive;
-  double get activeRemaining =>
-      context.caster.effects[ability?.definition.key ?? '']?.duration ?? 0;
+
+  /// Longest remaining duration of this ability on a living combatant.
+  double get activeRemaining {
+    final key = ability?.definition.key;
+    if (key == null) return 0;
+    var remaining = 0.0;
+    for (final combatant in context.combatants) {
+      if (!combatant.isAlive) continue;
+      final duration = combatant.effects[key]?.duration ?? 0;
+      remaining = math.max(remaining, duration).toDouble();
+    }
+    return remaining;
+  }
+
   int? get charges =>
       context.caster.effects[ability?.definition.key ?? '']?.charges;
 
@@ -52,7 +64,7 @@ class AbilityController extends ChangeNotifier {
       activeRemaining.ceil(),
       charges,
       canActivate,
-      isUsing
+      isUsing,
     );
     if (hud == _lastHud) return;
     _lastHud = hud;

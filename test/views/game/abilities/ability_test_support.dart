@@ -32,6 +32,12 @@ class FakeCombatant implements Combatant {
 class FakeContext implements AbilityContext {
   @override
   final FakeCombatant caster = FakeCombatant();
+  @override
+  Iterable<Combatant> get combatants sync* {
+    yield caster;
+    yield* targets;
+  }
+
   bool blocked = false;
   final targets = <Combatant>[];
   final projectiles = <({int damage, double range, bool piercing})>[];

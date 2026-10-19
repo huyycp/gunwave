@@ -169,6 +169,30 @@ void main() {
     ability.dispose();
   });
 
+  test('targeted ability remains in use until its living target effect expires',
+      () {
+    final target = FakeCombatant();
+    context.targets.add(target);
+    final ability = controller(definition(
+        'hex_seal', {'move_speed_reduction': .4, 'attack_speed_reduction': .4},
+        durationMs: 3000));
+
+    expect(ability.activate(), isTrue);
+    expect(ability.activeRemaining, 3);
+    expect(ability.isUsing, isTrue);
+
+    target.effects.update(1);
+    ability.update(1);
+    expect(ability.activeRemaining, 2);
+    expect(ability.isUsing, isTrue);
+
+    target.effects.update(2);
+    ability.update(2);
+    expect(ability.activeRemaining, 0);
+    expect(ability.isUsing, isFalse);
+    ability.dispose();
+  });
+
   test('same-key statuses refresh, clear removes all modifiers', () {
     final effects = StatusEffectController();
     effects.add(StatusEffect(key: 'shield', duration: 1, damageReduction: .4));
