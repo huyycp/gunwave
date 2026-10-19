@@ -23,6 +23,29 @@ Deno.test('calculates score using room-owned monster and quiz values', () => {
   assertEquals(result, { duration: 50, score: 165 })
 })
 
+Deno.test('monster score is based on HP removed', () => {
+  const submission = (percentHpLeft: number) => calculateRank({
+    time_left: 50,
+    monsters: [{ monster_id: 'monster-1', percent_hp_left: percentHpLeft }],
+    quizzes: [{ quiz_id: 'quiz-1', answer: 'result_b', fail_attempts: 1 }],
+  }, room)
+
+  assertEquals(submission(1).score, 140)
+  assertEquals(submission(0.5).score, 165)
+  assertEquals(submission(0).score, 190)
+})
+
+Deno.test('rejects duplicate monster submissions', () => {
+  assertThrows(() => calculateRank({
+    time_left: 50,
+    monsters: [
+      { monster_id: 'monster-1', percent_hp_left: 0 },
+      { monster_id: 'monster-1', percent_hp_left: 0 },
+    ],
+    quizzes: [{ quiz_id: 'quiz-1', answer: 'result_b', fail_attempts: 0 }],
+  }, room))
+})
+
 Deno.test('rejects time outside the room limit', () => {
   assertThrows(() => calculateRank({
     time_left: 101,

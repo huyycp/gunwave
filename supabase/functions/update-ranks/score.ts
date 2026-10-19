@@ -26,6 +26,7 @@ export function calculateRank(submission: RankSubmission, room: RankRoom) {
   }
 
   const monsterScores = new Map(room.monsters.map((monster) => [monster.id, monster.score]))
+  const submittedMonsterIds = new Set<string>()
   let monsterScore = 0
   for (const value of submission.monsters) {
     if (!isRecord(value) || typeof value.monster_id !== 'string') {
@@ -36,11 +37,11 @@ export function calculateRank(submission: RankSubmission, room: RankRoom) {
     if (score === undefined || percent < 0 || percent > 1) {
       throw new RankValidationError('Monster entry is outside the room limits')
     }
-    monsterScore += Math.floor(percent * score)
-  }
-
-  if (monsterScore > room.monsters.reduce((sum, monster) => sum + monster.score, 0)) {
-    monsterScore = room.monsters.reduce((sum, monster) => sum + monster.score, 0)
+    if (submittedMonsterIds.has(value.monster_id)) {
+      throw new RankValidationError('Monster was submitted more than once')
+    }
+    submittedMonsterIds.add(value.monster_id)
+    monsterScore += Math.floor((1 - percent) * score)
   }
 
   if (submission.quizzes.length !== room.quizzes.length) {
