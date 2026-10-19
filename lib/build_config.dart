@@ -26,21 +26,31 @@ class BuildConfig {
 
     version = '';
 
-    supabaseUrl = dotenv.env['SUPABASE_URL'] ?? '';
-    supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'] ?? '';
+    _loadSupabaseConfig();
   }
 
   void prod() {
-    scheme = 'luckypool';
+    scheme = 'gunwave';
     iosAppId = 'com.huyvowkm.gunwave';
     androidBundleId = 'com.huyvowkm.gunwave';
     nativeUrl = '$scheme://';
     universalUrl = '';
-    
+
     version = '';
 
-    supabaseUrl = '';
-    supabaseAnonKey = '';
+    _loadSupabaseConfig();
+  }
+
+  void _loadSupabaseConfig() {
+    final url = dotenv.env['SUPABASE_URL'];
+    final anonKey = dotenv.env['SUPABASE_ANON_KEY'];
+    if (url == null || url.isEmpty || anonKey == null || anonKey.isEmpty) {
+      throw StateError(
+        'SUPABASE_URL and SUPABASE_ANON_KEY must be set in the selected env file.',
+      );
+    }
+    supabaseUrl = url;
+    supabaseAnonKey = anonKey;
   }
 }
 

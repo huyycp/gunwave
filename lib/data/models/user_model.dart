@@ -1,33 +1,23 @@
-import 'package:gunwave/utils/common_functions.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class UserModel {
-  UserModel({
-    required this.id,
-    required this.name,
-    required this.authId,
-    required this.gold,
-  });
+part 'user_model.freezed.dart';
+part 'user_model.g.dart';
 
-  final String id;
+// JsonKey applies to Freezed constructor parameters and is read by generation.
+// ignore_for_file: invalid_annotation_target
 
-  final String name;
-  
-  // Refers to supabase user id
-  final String authId;
+/// Holds the app profile and its in-game gold balance.
+@freezed
+abstract class UserModel with _$UserModel {
+  /// Creates an immutable app-user snapshot.
+  const factory UserModel({
+    @Default('') String id,
+    @Default('') String name,
+    @JsonKey(name: 'auth_id') @Default('') String authId,
+    @Default(0) int gold,
+  }) = _UserModel;
 
-  int gold;
-
-  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-    id: json['id']?.toString() ?? '',
-    name: json['name']?.toString() ?? '',
-    authId: json['auth_id']?.toString() ?? '',
-    gold: intFromJson(json['gold']),
-  );
-  
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'auth_id': authId,
-    'gold': gold,
-  };
+  /// Parses a user row using the database's `auth_id` column.
+  factory UserModel.fromJson(Map<String, dynamic> json) =>
+      _$UserModelFromJson(json);
 }

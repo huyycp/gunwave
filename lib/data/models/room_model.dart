@@ -1,65 +1,44 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gunwave/data/models/map_model.dart';
 import 'package:gunwave/data/models/quiz_model.dart';
 import 'package:gunwave/data/models/user_model.dart';
-import 'package:gunwave/utils/list_utils.dart';
 
-class RoomModel {
-  RoomModel({
-    required this.id,
-    required this.mapId,
-    required this.userId,
-    required this.name,
-    required this.private,
-    required this.createdAt,
-    required this.map,
-    required this.user,
-    this.quizzes = const [],
-  });
+part 'room_model.freezed.dart';
+part 'room_model.g.dart';
 
-  final String id;
-  
-  final String mapId;
+// JsonKey applies to Freezed constructor parameters and is read by generation.
+// ignore_for_file: invalid_annotation_target
 
-  /// Creator id
-  final String userId;
+/// Holds room visibility, ownership, map, and quiz data.
+@freezed
+abstract class RoomModel with _$RoomModel {
+  /// Creates an immutable room snapshot.
+  @JsonSerializable(explicitToJson: true)
+  const factory RoomModel({
+    @Default('') String id,
+    @JsonKey(name: 'map_id') @Default('') String mapId,
+    @JsonKey(name: 'user_id') @Default('') String userId,
+    @Default('') String name,
+    @Default(true) bool private,
+    @JsonKey(
+      name: 'created_at',
+      fromJson: _createdAtFromJson,
+      toJson: _createdAtToJson,
+    )
+    DateTime? createdAt,
+    @JsonKey(name: 'maps') MapModel? map,
+    @JsonKey(name: 'user', readValue: _readUser) UserModel? user,
+    @Default(<QuizModel>[]) List<QuizModel> quizzes,
+  }) = _RoomModel;
 
-  final String name;
-
-  final bool private;
-
-  final DateTime? createdAt;
-
-  final MapModel? map;
-
-  final UserModel? user;
-
-  final List<QuizModel> quizzes;
-
-  factory RoomModel.fromJson(Map<String, dynamic> json) {
-    return RoomModel(
-      id: json['id']?.toString() ?? '',
-      mapId: json['map_id']?.toString() ?? '',
-      userId: json['user_id']?.toString() ?? '',
-      name: json['name']?.toString() ?? '',
-      private: json['private'] ?? true,
-      createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at']) : null,
-      map: json['maps'] != null ? MapModel.fromJson(json['maps']) : null,
-      user: json['users'] != null ? UserModel.fromJson(json['users']) : null,
-      quizzes: listFromJson(json['quizzes'], (js) => QuizModel.fromJson(js)),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'map_id': mapId,
-      'user_id': userId,
-      'name': name,
-      'private': private,
-      'created_at': createdAt?.toIso8601String() ?? '',
-      'maps': map?.toJson(),
-      'user': user?.toJson(),
-      'quizzes': quizzes.map((e) => e.toJson()).toList(),
-    };
-  }
+  /// Parses a room row and any nested map, user, and quiz records.
+  factory RoomModel.fromJson(Map<String, dynamic> json) =>
+      _$RoomModelFromJson(json);
 }
+
+DateTime? _createdAtFromJson(Object? value) =>
+    value == null ? null : DateTime.tryParse(value.toString());
+
+String _createdAtToJson(DateTime? value) => value?.toIso8601String() ?? '';
+
+Object? _readUser(Map json, String key) => json['users'] ?? json['user'];

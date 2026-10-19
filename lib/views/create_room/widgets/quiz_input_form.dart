@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/src/consumer.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/dtos/req/create_room_req.dart';
-import 'package:gunwave/data/models/quiz_model.dart';
+import 'package:gunwave/localization/build_context_l10n.dart';
 import 'package:gunwave/routes.dart';
 import 'package:gunwave/utils/common_functions.dart';
 import 'package:gunwave/widgets/app_text_form_field.dart';
@@ -32,9 +30,11 @@ class QuizInputForm extends BaseWidget {
   }
 }
 
-class QuizInputFormState extends BaseWidgetState<QuizInputForm, QuizInputFormModel> {
-  late final provider = ChangeNotifierProvider((ref) => QuizInputFormModel(widget.onSubmit));
-  
+class QuizInputFormState
+    extends BaseWidgetState<QuizInputForm, QuizInputFormModel> {
+  late final provider =
+      ChangeNotifierProvider((ref) => QuizInputFormModel(widget.onSubmit));
+
   @override
   Widget getWidget() {
     ref.watch(provider);
@@ -53,60 +53,68 @@ class QuizInputFormState extends BaseWidgetState<QuizInputForm, QuizInputFormMod
             spacing: 16,
             children: [
               AppTextFormField(
-                title: 'Question',
+                title: context.l10n.question,
                 titleStyle: GoogleFonts.pressStart2p(
-                  color:  GameColors.primary,
+                  color: GameColors.primary,
                   fontSize: 16,
                 ),
                 controller: model.questionController,
                 statesController: model.questionStateController,
               ),
               AppTextFormField(
-                title: 'Option A',
+                title: context.l10n.optionA,
                 titleStyle: GoogleFonts.pressStart2p(
-                  color:  GameColors.primary,
+                  color: GameColors.primary,
                   fontSize: 16,
                 ),
                 controller: model.optionAController,
                 statesController: model.optionAStateController,
               ),
               AppTextFormField(
-                title: 'Option B',
+                title: context.l10n.optionB,
                 titleStyle: GoogleFonts.pressStart2p(
-                  color:  GameColors.primary,
+                  color: GameColors.primary,
                   fontSize: 16,
                 ),
                 controller: model.optionBController,
                 statesController: model.optionBStateController,
               ),
               AppTextFormField(
-                title: 'Option C',
+                title: context.l10n.optionC,
                 titleStyle: GoogleFonts.pressStart2p(
-                  color:  GameColors.primary,
+                  color: GameColors.primary,
                   fontSize: 16,
                 ),
                 controller: model.optionCController,
                 statesController: model.optionCStateController,
               ),
               AppTextFormField(
-                title: 'Option D',
+                title: context.l10n.optionD,
                 titleStyle: GoogleFonts.pressStart2p(
-                  color:  GameColors.primary,
+                  color: GameColors.primary,
                   fontSize: 16,
                 ),
                 controller: model.optionDController,
                 statesController: model.optionDStateController,
               ),
               _buildAnswerSelector(),
+              if (model.hasMissingFields)
+                Text(
+                  context.l10n.quizFieldsRequired,
+                  style: GoogleFonts.pressStart2p(
+                    color: Theme.of(context).colorScheme.error,
+                    fontSize: 12,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   GameButton(
                     onPressed: () {
-                      model.submit();
-                      context.pop();
+                      if (model.submit()) context.pop();
                     },
-                    child: const Text('Submit'),
+                    child: Text(context.l10n.submit),
                   ),
                 ],
               ),
@@ -122,14 +130,15 @@ class QuizInputFormState extends BaseWidgetState<QuizInputForm, QuizInputFormMod
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Answer',
+          context.l10n.answer,
           style: GoogleFonts.pressStart2p(
             color: GameColors.primary,
             fontSize: 16,
           ),
         ),
         const SizedBox(height: 8),
-        Row(  // Changed from Wrap to Row
+        Row(
+          // Changed from Wrap to Row
           children: [
             Expanded(child: _buildRadioOption('A', 0)),
             Expanded(child: _buildRadioOption('B', 1)),
@@ -153,15 +162,17 @@ class QuizInputFormState extends BaseWidgetState<QuizInputForm, QuizInputFormMod
             groupValue: model.answer,
             onChanged: (val) => model.selectAnswer(val!),
             fillColor: MaterialStateProperty.resolveWith(
-              (states) => states.contains(MaterialState.selected) 
-                ? GameColors.primary 
-                : GameColors.primary.withOpacity(0.6),
+              (states) => states.contains(MaterialState.selected)
+                  ? GameColors.primary
+                  : GameColors.primary.withOpacity(0.6),
             ),
           ),
           Text(
             label,
             style: GoogleFonts.pressStart2p(
-              color: isSelected ? GameColors.primary : GameColors.primary.withOpacity(0.8),
+              color: isSelected
+                  ? GameColors.primary
+                  : GameColors.primary.withOpacity(0.8),
               fontSize: 14,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),
@@ -170,7 +181,7 @@ class QuizInputFormState extends BaseWidgetState<QuizInputForm, QuizInputFormMod
       ),
     );
   }
- 
+
   @override
   QuizInputFormModel getWidgetModel() {
     return ref.read(provider);
@@ -196,23 +207,31 @@ class QuizInputFormModel extends BaseWidgetModel {
 
   /// 0 for A, 1 for B, 2 for C, 3 for D
   int answer = 0;
+  bool hasMissingFields = false;
 
   void selectAnswer(int value) {
     answer = value;
     notifyListeners();
   }
 
-  void submit() {
+  bool submit() {
     final question = questionController.text.trim();
     final optionA = optionAController.text.trim();
     final optionB = optionBController.text.trim();
     final optionC = optionCController.text.trim();
     final optionD = optionDController.text.trim();
 
-    if (question.isEmpty || optionA.isEmpty || optionB.isEmpty || optionC.isEmpty || optionD.isEmpty) {
-      // Handle error: all fields must be filled
-      return;
+    if (question.isEmpty ||
+        optionA.isEmpty ||
+        optionB.isEmpty ||
+        optionC.isEmpty ||
+        optionD.isEmpty) {
+      hasMissingFields = true;
+      notifyListeners();
+      return false;
     }
+
+    hasMissingFields = false;
 
     final quizModel = CreateQuizReq(
       question: question,
@@ -220,11 +239,16 @@ class QuizInputFormModel extends BaseWidgetModel {
       resultB: optionB,
       resultC: optionC,
       resultD: optionD,
-      answer: answer == 0 ? "result_a" : 
-          answer == 1 ? "result_b" : 
-          answer == 2 ? "result_c" : "result_d",
+      answer: answer == 0
+          ? "result_a"
+          : answer == 1
+              ? "result_b"
+              : answer == 2
+                  ? "result_c"
+                  : "result_d",
     );
 
     onSubmit(quizModel);
+    return true;
   }
 }

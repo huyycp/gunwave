@@ -36,7 +36,7 @@ class CreateRoomViewModel extends BaseViewModel {
       setLoading(true);
       maps = await _mapRepo.getMaps();
     } catch (err, stack) {
-      AppException.log(runtimeType, err, stack);
+      AppException.log(runtimeType, err, stack, function: 'getMaps');
     } finally {
       setLoading(false);
     }
@@ -78,7 +78,7 @@ class CreateRoomViewModel extends BaseViewModel {
       await _roomRepo.createRoom(req);
       onSuccess(true);
     } catch (err, stack) {
-      AppException.log(runtimeType, err, stack);
+      AppException.log(runtimeType, err, stack, function: 'createRoom');
       onSuccess(false);
     } finally {
       isCreating = false;

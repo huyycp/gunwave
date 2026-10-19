@@ -4,12 +4,9 @@ import 'package:flame/events.dart';
 import 'package:gunwave/data/constants/game/game_hub.dart';
 import 'package:gunwave/views/game/gunwave.dart';
 
-class AttachButton extends SpriteComponent with HasGameRef<Gunwave>, TapCallbacks, DoubleTapCallbacks {
-  AttachButton({
-    required this.onAttack,
-    super.position,
-    super.size,
-  });
+class AttachButton extends SpriteComponent
+    with HasGameRef<Gunwave>, TapCallbacks, DoubleTapCallbacks {
+  AttachButton({required this.onAttack, super.position, super.size});
 
   final void Function(bool attack) onAttack;
 
@@ -18,7 +15,7 @@ class AttachButton extends SpriteComponent with HasGameRef<Gunwave>, TapCallback
     add(RectangleHitbox());
 
     sprite = Sprite(game.images.fromCache(GameHubs.joystickKnob.path));
-    
+
     priority = 1;
 
     await super.onLoad();
@@ -28,6 +25,12 @@ class AttachButton extends SpriteComponent with HasGameRef<Gunwave>, TapCallback
   void onTapUp(TapUpEvent event) {
     onAttack(false);
     super.onTapUp(event);
+  }
+
+  @override
+  void onTapCancel(TapCancelEvent event) {
+    onAttack(false);
+    super.onTapCancel(event);
   }
 
   @override

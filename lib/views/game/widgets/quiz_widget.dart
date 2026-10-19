@@ -6,20 +6,19 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_ui.dart';
 import 'package:gunwave/data/models/quiz_model.dart';
-import 'package:gunwave/utils/extensions/list_widget_ex.dart';
 import 'package:gunwave/views/game/components/sub_components/app_banner.dart';
 import 'package:gunwave/widgets/base/base_widget.dart';
 import 'package:gunwave/widgets/base/base_widget_model.dart';
 
-class QuestionWidget extends BaseWidget {
-  const QuestionWidget(
+class QuizWidget extends BaseWidget {
+  const QuizWidget(
     this.question, {
     required this.onQuestionAnswered,
     super.key,
   });
 
   final QuizModel question;
-  final void Function(bool) onQuestionAnswered;
+  final void Function(String) onQuestionAnswered;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -27,14 +26,16 @@ class QuestionWidget extends BaseWidget {
   }
 }
 
-class QuestionWidgetState extends BaseWidgetState<QuestionWidget, QuestionWidgetModel> {
+class QuestionWidgetState
+    extends BaseWidgetState<QuizWidget, QuestionWidgetModel> {
   final provider = ChangeNotifierProvider((ref) => QuestionWidgetModel());
 
   @override
   Widget getWidget() {
     return Container(
       padding: const EdgeInsets.all(16),
-      constraints: const BoxConstraints(maxWidth: 800), // Prevent extreme widths
+      constraints:
+          const BoxConstraints(maxWidth: 800), // Prevent extreme widths
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center, // Center everything
@@ -58,15 +59,16 @@ class QuestionWidgetState extends BaseWidgetState<QuestionWidget, QuestionWidget
           SizedBox(
             width: double.infinity, // Take full width
             height: 128, // Fixed height
-            child: GameWidget(game: FlameGame(
-              children: [AppBanner(
+            child: GameWidget(
+                game: FlameGame(children: [
+              AppBanner(
                 banner: GameBanners.bannerHorizontal,
                 xCount: 11,
                 yCount: 2,
-              )]
-            )),
+              )
+            ])),
           ),
-          
+
           // Add padding for text
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 48.0),
@@ -87,15 +89,20 @@ class QuestionWidgetState extends BaseWidgetState<QuestionWidget, QuestionWidget
   Widget _buildResult() {
     return Container(
       constraints: const BoxConstraints(maxWidth: 700), // Match question width
-      child: Row( // Use Row with Expanded for even distribution
+      child: Row(
+        // Use Row with Expanded for even distribution
         children: <Widget>[
-          Expanded(child: _buildResultItem('result_a', widget.question.resultA)),
+          Expanded(
+              child: _buildResultItem('result_a', widget.question.resultA)),
           const SizedBox(width: 8),
-          Expanded(child: _buildResultItem('result_b', widget.question.resultB)),
+          Expanded(
+              child: _buildResultItem('result_b', widget.question.resultB)),
           const SizedBox(width: 8),
-          Expanded(child: _buildResultItem('result_c', widget.question.resultC)),
+          Expanded(
+              child: _buildResultItem('result_c', widget.question.resultC)),
           const SizedBox(width: 8),
-          Expanded(child: _buildResultItem('result_d', widget.question.resultD)),
+          Expanded(
+              child: _buildResultItem('result_d', widget.question.resultD)),
         ],
       ),
     );
@@ -104,7 +111,7 @@ class QuestionWidgetState extends BaseWidgetState<QuestionWidget, QuestionWidget
   Widget _buildResultItem(String result, String text) {
     return GestureDetector(
       onTap: () {
-        widget.onQuestionAnswered(result == widget.question.answer);
+        widget.onQuestionAnswered(result);
       },
       child: Container(
         // Width controlled by Expanded now
@@ -139,6 +146,4 @@ class QuestionWidgetState extends BaseWidgetState<QuestionWidget, QuestionWidget
   }
 }
 
-class QuestionWidgetModel extends BaseWidgetModel {
-
-}
+class QuestionWidgetModel extends BaseWidgetModel {}

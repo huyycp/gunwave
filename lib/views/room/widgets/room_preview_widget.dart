@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
+import 'package:gunwave/localization/build_context_l10n.dart';
 import 'package:gunwave/data/models/room_model.dart';
+import 'package:gunwave/routes.dart';
 import 'package:gunwave/utils/extensions/string_ex.dart';
 import 'package:gunwave/widgets/app_image.dart';
 import 'package:gunwave/widgets/app_list_tile.dart';
@@ -16,33 +20,37 @@ class RoomPreviewWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.sizeOf(context).height * 0.8,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 71, 183, 181),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: GameColors.primary.withOpacity(0.5),
-            blurRadius: 10,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          Positioned.fill(
-            left: MediaQuery.sizeOf(context).width * 0.2,
-            top: 0,
-            bottom: 0,
-            child: _buildImage(),
-          ),
-          Positioned.fill(
-            child: _buildRoomInfo(),
-          ),
-        ],
-      )
-    );
+        height: MediaQuery.sizeOf(context).height * 0.8,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 71, 183, 181),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: GameColors.primary.withOpacity(0.5),
+              blurRadius: 10,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              left: MediaQuery.sizeOf(context).width * 0.2,
+              top: 0,
+              bottom: 0,
+              child: _buildImage(),
+            ),
+            Positioned.fill(
+              child: _buildRoomInfo(context),
+            ),
+            Positioned(
+              top: 16,
+              right: 16,
+              child: _buildRankInfoBtn(context),
+            ),
+          ],
+        ));
   }
 
   Widget _buildImage() {
@@ -51,8 +59,8 @@ class RoomPreviewWidget extends StatelessWidget {
         return const LinearGradient(
           begin: Alignment.centerRight,
           end: Alignment.centerLeft,
-          colors: [ GameColors.primary, Colors.transparent ],
-          stops: [ 0.8, 1 ],
+          colors: [GameColors.primary, Colors.transparent],
+          stops: [0.8, 1],
         ).createShader(Rect.fromLTRB(0, 0, rect.width, rect.height));
       },
       blendMode: BlendMode.dstIn,
@@ -64,7 +72,7 @@ class RoomPreviewWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildRoomInfo() {
+  Widget _buildRoomInfo(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -73,7 +81,7 @@ class RoomPreviewWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            room.name, 
+            room.name,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.pressStart2p(
@@ -83,7 +91,7 @@ class RoomPreviewWidget extends StatelessWidget {
             ),
           ),
           Text(
-            room.map?.name.capitalize ?? 'Unknown Map',
+            room.map?.name.capitalize ?? context.l10n.unknownMap,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.pressStart2p(
@@ -100,7 +108,7 @@ class RoomPreviewWidget extends StatelessWidget {
               isCircle: true,
               placeHolder: Container(color: GameColors.primary),
             ),
-            title: room.user?.name ?? 'Unknown Creator',
+            title: room.user?.name ?? context.l10n.unknownCreator,
             titleStyle: GoogleFonts.pressStart2p(
               fontSize: 14,
               color: GameColors.primary,
@@ -117,7 +125,7 @@ class RoomPreviewWidget extends StatelessWidget {
                 spacing: 12,
                 children: [
                   Text(
-                    '${room.quizzes.length} quizzes',
+                    context.l10n.quizzesLowercase(room.quizzes.length),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.pressStart2p(
@@ -126,7 +134,7 @@ class RoomPreviewWidget extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Time ${room.map?.timeLimit ?? 0}s',
+                    context.l10n.timeLimit(room.map?.timeLimit ?? 0),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.pressStart2p(
@@ -137,16 +145,30 @@ class RoomPreviewWidget extends StatelessWidget {
                 ],
               ),
               GameButton(
-                onPressed: () {
-                  if (onPlay != null) {
-                    onPlay!(room);
-                  }
-                }, 
-                child: const Text('Play')
-              ),
+                  onPressed: () {
+                    if (onPlay != null) {
+                      onPlay!(room);
+                    }
+                  },
+                  child: Text(context.l10n.play)),
             ],
           )
         ],
+      ),
+    );
+  }
+
+  Widget _buildRankInfoBtn(BuildContext context) {
+    return GameButton(
+      onPressed: () {
+        context.push(Routes.rank, extra: {
+          'room_id': room.id,
+        });
+      },
+      size: GameButtonSize.small,
+      child: const Icon(
+        Icons.bar_chart,
+        color: GameColors.primary,
       ),
     );
   }

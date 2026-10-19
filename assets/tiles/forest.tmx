@@ -4,6 +4,11 @@
  <tileset firstgid="33" source="flat.tsx"/>
  <tileset firstgid="73" source="water.tsx"/>
  <tileset firstgid="74" source="foam.tsx"/>
+ <tileset firstgid="146" source="rocks_lg.tsx"/>
+ <tileset firstgid="178" source="rocks_md.tsx"/>
+ <tileset firstgid="210" source="rocks_sm.tsx"/>
+ <tileset firstgid="242" source="tree.tsx"/>
+ <tileset firstgid="350" source="bridge.tsx"/>
  <layer id="5" name="water" width="50" height="25" locked="1">
   <data encoding="csv">
 73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,

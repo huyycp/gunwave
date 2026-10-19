@@ -1,50 +1,31 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gunwave/data/constants/game/game_monster.dart';
 import 'package:gunwave/utils/common_functions.dart';
 
-class MonsterModel {
-  MonsterModel({
-    required this.id,
-    required this.name,
-    required this.filename,
-    required this.hp,
-    required this.str,
-    required this.vit,
-    required this.agi,
-  });
+part 'monster_model.freezed.dart';
+part 'monster_model.g.dart';
 
-  final String id;
+/// Holds a monster's catalogue stats and score value.
+@freezed
+abstract class MonsterModel with _$MonsterModel {
+  const MonsterModel._();
 
-  final String name;
+  /// Creates an immutable monster snapshot.
+  const factory MonsterModel({
+    @Default('') String id,
+    @Default('') String name,
+    @Default('') String filename,
+    @Default(0) int hp,
+    @Default(0) int str,
+    @Default(0) int vit,
+    @Default(0) int agi,
+    @Default(0) int score,
+  }) = _MonsterModel;
 
-  final String filename;
+  /// Parses a monster row from Supabase JSON.
+  factory MonsterModel.fromJson(Map<String, dynamic> json) =>
+      _$MonsterModelFromJson(json);
 
-  int hp;
-
-  int str;
-
-  int vit;
-  
-  int agi;
-
+  /// Resolves [filename] to the matching in-game monster asset.
   GameMonsters? get monster => monsterFromFile(filename);
-
-  factory MonsterModel.fromJson(Map<String, dynamic> json) => MonsterModel(
-    id: json['id']?.toString() ?? '',
-    name: json['name']?.toString() ?? '',
-    filename: json['filename']?.toString() ?? '',
-    hp: intFromJson(json['hp'], defaultValue: 0),
-    str: intFromJson(json['str'], defaultValue: 0),
-    vit: intFromJson(json['vit'], defaultValue: 0),
-    agi: intFromJson(json['agi'], defaultValue: 0),
-  );
-
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'filename': filename,
-    'hp': hp,
-    'str': str,
-    'vit': vit,
-    'agi': agi,
-  };
 }

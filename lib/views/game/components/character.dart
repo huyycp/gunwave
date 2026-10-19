@@ -1,30 +1,31 @@
 import 'dart:async';
-import 'dart:math';
+import 'dart:math' as math;
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
+import 'package:gunwave/views/game/components/damage_number.dart';
 import 'package:gunwave/data/constants/game/game_constants.dart';
 import 'package:gunwave/data/constants/game/game_effect.dart';
 import 'package:gunwave/data/models/character_model.dart';
-import 'package:gunwave/utils/app_math.dart';
+import 'package:gunwave/views/game/combat/combatant.dart';
+import 'package:gunwave/views/game/combat/status_effect.dart';
 import 'package:gunwave/views/game/components/sub_components/building.dart';
 import 'package:gunwave/views/game/components/sub_components/collision_component.dart';
+import 'package:gunwave/views/game/components/sub_components/collision_grid.dart';
 import 'package:gunwave/views/game/components/monster.dart';
-import 'package:gunwave/views/game/components/sub_components/health_bar.dart';
 import 'package:gunwave/views/game/components/sub_components/trap.dart';
 import 'package:gunwave/views/game/gunwave.dart';
 
-class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, KeyboardHandler, CollisionCallbacks {
-  
-  Character(
-    this.character, {
-    this.onCharacterReachCheckpoint,
-  });
+class Character extends SpriteAnimationGroupComponent
+    with HasGameRef<Gunwave>, KeyboardHandler, CollisionCallbacks
+    implements Combatant {
+  Character(this.character, {this.onCharacterReachCheckpoint});
 
   final CharacterModel character;
   final void Function(bool)? onCharacterReachCheckpoint;
-  
+
   final double stepTime = 0.08;
   late final SpriteAnimation idleAni;
   late final SpriteAnimation runAni;
@@ -34,24 +35,48 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
   late final SpriteAnimation attachTop2Ani;
   late final SpriteAnimation attachBot1Ani;
   late final SpriteAnimation attachBot2Ani;
-  List<CollisionComponent> collisionComponents = [];
-  
+  CollisionGrid? collisionGrid;
+
   final spawnPosition = Vector2.zero();
 
-  late int hp = character.hp;
+  /// One source of truth shared by combat and the fixed screen HUD.
+  late final healthNotifier = ValueNotifier<int>(character.hp);
+  int get hp => healthNotifier.value;
+  set hp(int value) => healthNotifier.value = value;
   late int str = character.str;
   late int vit = character.vit;
   late int agi = character.agi;
   late int moveSpeed = agi;
+  @override
+  final effects = StatusEffectController();
+  @override
+  int get health => hp;
+  @override
+  int get maxHealth => character.hp;
+  @override
+  int get attackPower => str;
+  @override
+  bool get isAlive => !isDead;
+  @override
+  Vector2 get combatCenter =>
+      Vector2(characterX + hitbox.width / 2, characterY + hitbox.height / 2);
+
+  final facingDirection = Vector2(1, 0);
+  Vector2 _dashDirection = Vector2.zero();
+  double _dashRemaining = 0;
+  double _dashSpeed = 0;
+  double _hurtCooldown = 0;
+  double _fireRemaining = 0;
+  int _swingDamage = 0;
   Vector2 velocity = Vector2.zero();
 
   /// Value : -1, 0, 1
-  /// 
+  ///
   /// -1 = left, 0 = none, 1 = right
   int horizontalMovement = 0;
 
   /// Value : -1, 0, 1
-  /// 
+  ///
   /// -1 = up, 0 = none, 1 = down
   int verticalMovement = 0;
 
@@ -65,15 +90,13 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
     size: Vector2(48, 56),
   );
 
-  late final attackbox = PolygonHitbox(
-    [
-      Vector2(hitbox.x + hitbox.width, 64 / 3),
-      Vector2(64 + 64 + 64 * 2 / 3, 64),
-      Vector2(64 + 64 + 64 * 4 / 5, 64 * 3 / 2),
-      Vector2(64 + 64 + 64 * 4 / 5, 64 * 2),
-      Vector2(hitbox.x + hitbox.width, 64 * 2),
-    ],
-  );
+  late final attackbox = PolygonHitbox([
+    Vector2(hitbox.x + hitbox.width, 64 / 3),
+    Vector2(64 + 64 + 64 * 2 / 3, 64),
+    Vector2(64 + 64 + 64 * 4 / 5, 64 * 3 / 2),
+    Vector2(64 + 64 + 64 * 4 / 5, 64 * 2),
+    Vector2(hitbox.x + hitbox.width, 64 * 2),
+  ]);
 
   late final movebox = RectangleHitbox(
     position: Vector2(hitbox.x, hitbox.y + hitbox.height / 2),
@@ -84,19 +107,14 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
 
   double accoumulatedTime = 0;
 
-  double get characterX => scale.x > 0 ? position.x + hitbox.x : position.x - hitbox.x - hitbox.width;
+  double get characterX => scale.x > 0
+      ? position.x + hitbox.x
+      : position.x - hitbox.x - hitbox.width;
   double get characterY => position.y + hitbox.y;
 
   bool get isDead => hp <= 0;
 
   int getHitRefreshTime = 500;
-
-  late final healthBar = HealthBar(
-    maxHealth: character.hp,
-    currentHealth: hp,
-    width: 60,
-    position: Vector2(hitbox.x + hitbox.width / 2, hitbox.y - 20), // Position above head
-  );
 
   late final fireEffect = SpriteAnimationComponent(
     animation: SpriteAnimation.fromFrameData(
@@ -109,7 +127,10 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
       ),
     ),
     size: Vector2(48, 48),
-    position: Vector2(hitbox.x + hitbox.width / 2 - 24, hitbox.y), // Position above head
+    position: Vector2(
+      hitbox.x + hitbox.width / 2 - 24,
+      hitbox.y,
+    ), // Position above head
   );
 
   // Create a set to track which checkpoints we're currently in
@@ -126,10 +147,8 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
     add(attackbox);
     add(movebox);
 
-    add(healthBar);
-
     priority = 5;
-    
+
     return super.onLoad();
   }
 
@@ -137,11 +156,16 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
   void update(double dt) {
     accoumulatedTime += dt;
     while (accoumulatedTime > GameConstants.refreshRate) {
+      effects.update(GameConstants.refreshRate);
+      _hurtCooldown = math.max(0, _hurtCooldown - GameConstants.refreshRate);
+      if (_fireRemaining > 0) {
+        _fireRemaining -= GameConstants.refreshRate;
+        if (_fireRemaining <= 0) fireEffect.removeFromParent();
+      }
       super.update(GameConstants.refreshRate);
       _updateCharacterMovement(GameConstants.refreshRate);
       attack();
       _updateCharacterState(GameConstants.refreshRate);
-      _updateCharacterCollision();
       // debugPrint('attack: $isAttacking');
       accoumulatedTime -= GameConstants.refreshRate;
     }
@@ -149,18 +173,33 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
 
   @override
   bool onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
-    final isLeftKeyPressed = 
-      keysPressed.contains(LogicalKeyboardKey.arrowLeft) ||
-      keysPressed.contains(LogicalKeyboardKey.keyA);
+    // Handle Escape here: Flame consumes handled keys before Flutter shortcuts.
+    if (game.playMode.isKeyboard &&
+        event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.escape) {
+      game.onExitRequested?.call();
+      return true;
+    }
+    if (!game.playMode.isKeyboard || game.controlsBlocked) {
+      horizontalMovement = verticalMovement = 0;
+      triggerAttack = false;
+      return true;
+    }
+    if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.keyK) {
+      game.activateAbility();
+    }
+    final isLeftKeyPressed =
+        keysPressed.contains(LogicalKeyboardKey.arrowLeft) ||
+        keysPressed.contains(LogicalKeyboardKey.keyA);
     final isRightKeyPressed =
-      keysPressed.contains(LogicalKeyboardKey.arrowRight) ||
-      keysPressed.contains(LogicalKeyboardKey.keyD);
+        keysPressed.contains(LogicalKeyboardKey.arrowRight) ||
+        keysPressed.contains(LogicalKeyboardKey.keyD);
     final isUpKeyPressed =
-      keysPressed.contains(LogicalKeyboardKey.arrowUp) ||
-      keysPressed.contains(LogicalKeyboardKey.keyW);
+        keysPressed.contains(LogicalKeyboardKey.arrowUp) ||
+        keysPressed.contains(LogicalKeyboardKey.keyW);
     final isDownKeyPressed =
-      keysPressed.contains(LogicalKeyboardKey.arrowDown) ||
-      keysPressed.contains(LogicalKeyboardKey.keyS);
+        keysPressed.contains(LogicalKeyboardKey.arrowDown) ||
+        keysPressed.contains(LogicalKeyboardKey.keyS);
 
     if ((isLeftKeyPressed && isRightKeyPressed) ||
         (isUpKeyPressed && isDownKeyPressed)) {
@@ -173,7 +212,7 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
         horizontalMovement = 1;
       } else {
         horizontalMovement = 0;
-      } 
+      }
       if (isUpKeyPressed) {
         verticalMovement = -1;
       } else if (isDownKeyPressed) {
@@ -183,15 +222,17 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
       }
     }
 
-    if (event.logicalKey == LogicalKeyboardKey.keyJ) {
-      triggerAttack = event is KeyDownEvent;
-    }
+    // Key-repeat events must keep a held attack active until J is released.
+    triggerAttack = keysPressed.contains(LogicalKeyboardKey.keyJ);
     return super.onKeyEvent(event, keysPressed);
   }
 
   @override
-  void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (other is Building && other.isCheckpoint && other.checkZone != null) {
+  void onCollisionStart(
+    Set<Vector2> intersectionPoints,
+    PositionComponent other,
+  ) {
+    if (other is Building && other.isCheckpoint) {
       if (movebox.collidingWith(other.checkZone)) {
         _activeCheckpoints.add(other);
         if (onCharacterReachCheckpoint != null) {
@@ -204,10 +245,12 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
 
   @override
   void onCollisionEnd(PositionComponent other) {
-    if (other is Building && other.isCheckpoint && _activeCheckpoints.contains(other)) {
+    if (other is Building &&
+        other.isCheckpoint &&
+        _activeCheckpoints.contains(other)) {
       // Remove from tracked checkpoints
       _activeCheckpoints.remove(other);
-      
+
       // Call the callback without checking collision status again
       if (onCharacterReachCheckpoint != null) {
         onCharacterReachCheckpoint!(false);
@@ -219,41 +262,29 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     if (other is Monster) {
-      if (
-        isAttackAvailable && 
-        other.hitbox.collisionType == CollisionType.active &&
-        attackbox.collidingWith(other.hitbox) &&
-       !other.isDead
-      ) {
-        other.hp -= str;
-        other.healthBar.updateHealth(other.hp);
-        other.setInvincible();
+      if (isAttackAvailable &&
+          other.hitbox.collisionType == CollisionType.active &&
+          attackbox.collidingWith(other.hitbox) &&
+          !other.isDead) {
+        other.takeDamage(Damage(_swingDamage, source: DamageSource.melee));
         // debugPrint('Monster HP: ${other.hp}');
       }
 
-      if (
-        other.current == MonsterState.attack1 &&
-        hitbox.collisionType == CollisionType.active && 
-        !isDead
-        // other.attackbox.collidingWith(hitbox)
-      ) {
-        hp -= other.str;
-        healthBar.updateHealth(hp);
-        setInvicible();
+      if (other.canDealContactDamage && !isDead) {
+        if (takeDamage(Damage(other.str, source: DamageSource.monster))) {
+          other.onAttackLanded();
+        }
         // debugPrint('Character HP: $hp');
       }
     }
     if (other is Trap) {
       if (other.trap == GameEffects.fire) {
-        if (
-          other.hitbox.collidingWith(hitbox) &&
-          hitbox.collisionType == CollisionType.active && 
-          !isDead
-        ) {
-          hp -= other.damage;
-          healthBar.updateHealth(hp);
-          setInvicible();
-          setFireEffect();
+        if (other.hitbox.collidingWith(hitbox) &&
+            hitbox.collisionType == CollisionType.active &&
+            !isDead) {
+          if (takeDamage(Damage(other.damage, source: DamageSource.fire))) {
+            setFireEffect();
+          }
           // debugPrint('Character HP: $hp');
         }
       }
@@ -262,14 +293,46 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
   }
 
   void onLoadAnimation() {
-    idleAni       = _createAnimation(frameAmount: 6, loop: true, texturePosition: Vector2(0, 0));
-    runAni        = _createAnimation(frameAmount: 6, loop: true, texturePosition: Vector2(0, 192));
-    attach1Ani    = _createAnimation(frameAmount: 6, loop: false, texturePosition: Vector2(0, 192 * 2));
-    attach2Ani    = _createAnimation(frameAmount: 6, loop: false, texturePosition: Vector2(0, 192 * 3));
-    attachTop1Ani = _createAnimation(frameAmount: 6, loop: false, texturePosition: Vector2(0, 192 * 4));
-    attachTop2Ani = _createAnimation(frameAmount: 6, loop: false, texturePosition: Vector2(0, 192 * 5));
-    attachBot1Ani = _createAnimation(frameAmount: 6, loop: false, texturePosition: Vector2(0, 192 * 6));
-    attachBot2Ani = _createAnimation(frameAmount: 6, loop: false, texturePosition: Vector2(0, 192 * 7));
+    idleAni = _createAnimation(
+      frameAmount: 6,
+      loop: true,
+      texturePosition: Vector2(0, 0),
+    );
+    runAni = _createAnimation(
+      frameAmount: 6,
+      loop: true,
+      texturePosition: Vector2(0, 192),
+    );
+    attach1Ani = _createAnimation(
+      frameAmount: 6,
+      loop: false,
+      texturePosition: Vector2(0, 192 * 2),
+    );
+    attach2Ani = _createAnimation(
+      frameAmount: 6,
+      loop: false,
+      texturePosition: Vector2(0, 192 * 3),
+    );
+    attachTop1Ani = _createAnimation(
+      frameAmount: 6,
+      loop: false,
+      texturePosition: Vector2(0, 192 * 4),
+    );
+    attachTop2Ani = _createAnimation(
+      frameAmount: 6,
+      loop: false,
+      texturePosition: Vector2(0, 192 * 5),
+    );
+    attachBot1Ani = _createAnimation(
+      frameAmount: 6,
+      loop: false,
+      texturePosition: Vector2(0, 192 * 6),
+    );
+    attachBot2Ani = _createAnimation(
+      frameAmount: 6,
+      loop: false,
+      texturePosition: Vector2(0, 192 * 7),
+    );
 
     animations = {
       GameCharacterStates.idle: idleAni,
@@ -291,7 +354,6 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
     int? framePerRow,
     bool loop = true,
   }) {
-  
     return SpriteAnimation.fromFrameData(
       game.images.fromCache(character.character!.path),
       SpriteAnimationData.sequenced(
@@ -312,10 +374,7 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
     } else {
       final isMovingLeft = velocity.x < 0;
       final isMovingRight = velocity.x > 0;
-      if (
-        (isMovingLeft && scale.x > 0) || 
-        (isMovingRight && scale.x < 0)
-      ) {
+      if ((isMovingLeft && scale.x > 0) || (isMovingRight && scale.x < 0)) {
         flipHorizontallyAroundCenter();
       }
       if (!isAttacking) current = GameCharacterStates.run;
@@ -323,71 +382,78 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
   }
 
   void _updateCharacterMovement(double dt) {
-    velocity.x = horizontalMovement * moveSpeed * 1.0;
-    position.x += velocity.x * dt;
+    final dashing = _dashRemaining > 0;
+    if (dashing) {
+      dt = math.min(dt, _dashRemaining);
+      _dashRemaining = math.max(0, _dashRemaining - dt);
+      velocity.setFrom(_dashDirection * _dashSpeed);
+    } else {
+      velocity.x = horizontalMovement * moveSpeed * effects.moveSpeedMultiplier;
+      velocity.y = verticalMovement * moveSpeed * effects.moveSpeedMultiplier;
+      if (velocity.length2 > 0) facingDirection.setFrom(velocity.normalized());
+    }
+    final grid = collisionGrid;
+    if (grid == null) {
+      position += velocity * dt;
+      if (dashing && _dashRemaining <= 0) effects.remove('quickstep');
+      return;
+    }
 
-    velocity.y = verticalMovement * moveSpeed * 1.0;
-    position.y += velocity.y * dt;
-  }
-  
-  void _updateCharacterCollision() {
-    for (var component in collisionComponents) {
-      if (checkCollision(component)) {
+    final bodyLeft = characterX;
+    final bodyTop = position.y + movebox.y;
+    final targetLeft = bodyLeft + velocity.x * dt;
+    final horizontalBounds = Rect.fromLTRB(
+      bodyLeft < targetLeft ? bodyLeft : targetLeft,
+      bodyTop,
+      (bodyLeft > targetLeft ? bodyLeft : targetLeft) + movebox.width,
+      bodyTop + movebox.height,
+    );
+    final resolvedLeft = AabbMovement.resolveHorizontal(
+      left: bodyLeft,
+      top: bodyTop,
+      width: movebox.width,
+      height: movebox.height,
+      delta: velocity.x * dt,
+      obstacles: grid.query(horizontalBounds).map(_collisionRect),
+    );
+    position.x += resolvedLeft - bodyLeft;
+    if (resolvedLeft != targetLeft) velocity.x = 0;
 
-        final aPoint = Vector2(component.x - movebox.width, component.y - movebox.height);
-        final bPoint = Vector2(component.x + component.width, component.y - movebox.height);
-        final cPoint = Vector2(component.x + component.width, component.y + component.height);
-        final dPoint = Vector2(component.x - movebox.width, component.y + component.height);
-        
-        double angCB = calculateAngle(cPoint, component.position, bPoint);
-        double angCA = calculateAngle(cPoint, component.position, aPoint);
-        double angCD = calculateAngle(cPoint, component.position, dPoint);
-
-        if (angCB < 0) angCB += 2 * pi;
-        if (angCA < 0) angCA += 2 * pi;
-        if (angCD < 0) angCD += 2 * pi;
-
-        // debugPrint('component: ${component.position}');
-        // debugPrint('movebox: ${movebox.position}');
-
-        // debugPrint('angCB: ${angCB * 180 / pi}');
-        // debugPrint('angCA: ${angCA * 180 / pi}');
-        // debugPrint('angCD: ${angCD * 180 / pi}');
-
-        double angCChar = calculateAngle(cPoint, component.position, Vector2(characterX - hitbox.x + movebox.x, characterY - hitbox.y + movebox.y));
-
-        
-        if (angCChar < 0) angCChar += 2 * pi;
-
-        // debugPrint('angChar: ${angCChar * 180 / pi}');
-
-        if (angCChar >= 0 && angCChar < angCB) {
-          // right
-          debugPrint('right');
-          position.x = scale.x > 0 
-            ? component.x + component.width - movebox.x
-            : component.x + component.width + movebox.width + movebox.x;
-        } else if (angCChar >= angCB && angCChar < angCA) {
-          // top
-          debugPrint('top');
-          position.y = component.y - movebox.height - movebox.y;
-        } else if (angCChar >= angCA && angCChar < angCD) {
-          // left
-          debugPrint('left');
-          position.x = scale.x > 0
-            ? component.x - movebox.width - movebox.x
-            : component.x + movebox.x;
-        } else if (angCChar >= angCD && angCChar < 2 * pi) {
-          // bottom
-          debugPrint('bottom');
-          position.y = component.y + component.height - movebox.y;
-        }
-      }
+    final targetTop = bodyTop + velocity.y * dt;
+    final verticalBounds = Rect.fromLTRB(
+      resolvedLeft,
+      bodyTop < targetTop ? bodyTop : targetTop,
+      resolvedLeft + movebox.width,
+      (bodyTop > targetTop ? bodyTop : targetTop) + movebox.height,
+    );
+    final resolvedTop = AabbMovement.resolveVertical(
+      left: resolvedLeft,
+      top: bodyTop,
+      width: movebox.width,
+      height: movebox.height,
+      delta: velocity.y * dt,
+      obstacles: grid.query(verticalBounds).map(_collisionRect),
+    );
+    position.y += resolvedTop - bodyTop;
+    if (resolvedTop != targetTop) velocity.y = 0;
+    if (dashing &&
+        (_dashRemaining <= 0 ||
+            resolvedLeft != targetLeft ||
+            resolvedTop != targetTop)) {
+      _dashRemaining = 0;
+      effects.remove('quickstep');
     }
   }
 
-  void attack({bool isDouble = false}) {
+  Rect _collisionRect(CollisionComponent component) => Rect.fromLTWH(
+    component.x,
+    component.y,
+    component.width,
+    component.height,
+  );
 
+  void attack({bool isDouble = false}) {
+    if (isDead || effects.isStunned) return;
     if (triggerAttack) {
       if ([
         GameCharacterStates.attack1,
@@ -400,21 +466,19 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
         return;
       }
       isAttacking = true;
+      _swingDamage = (str * effects.consumeAttackMultiplier()).round();
       current = GameCharacterStates.attack1;
-      debugPrint('attack');
       animationTicker?.onFrame = (frame) {
         if ([3, 4, 5].contains(frame)) {
           isAttackAvailable = true;
         }
       };
-        animationTicker?.completed.then((_) {
-            debugPrint('completed');
-            isAttacking = false;
-            isAttackAvailable = false;
-            animationTicker?.reset();
-            // current = GameCharacterStates.idle;
-          
-        });
+      animationTicker?.completed.then((_) {
+        isAttacking = false;
+        isAttackAvailable = false;
+        animationTicker?.reset();
+        // current = GameCharacterStates.idle;
+      });
     }
 
     // if (isDoubleAttack) {
@@ -425,33 +489,53 @@ class Character extends SpriteAnimationGroupComponent with HasGameRef<Gunwave>, 
     // current = GameCharacterStates.idle;
   }
 
-
-  bool checkCollision(CollisionComponent component) {
-    final componentX = component.position.x;
-    final componentY = component.position.y;
-    final componentWidth = component.width;
-    final componentHeight = component.height;
-    
-    return (
-      characterX < componentX + componentWidth &&
-      characterX + movebox.width > componentX &&
-      characterY - hitbox.y + movebox.y < componentY + componentHeight &&
-      characterY - hitbox.y + movebox.y + movebox.height > componentY
-    );
-  }
-
   void setInvicible() {
-    hitbox.collisionType = CollisionType.inactive;
-    Future.delayed(Duration(milliseconds: getHitRefreshTime), () {
-      hitbox.collisionType = CollisionType.active;
-    });
+    _hurtCooldown = getHitRefreshTime / 1000;
   }
 
   void setFireEffect() {
-    add(fireEffect);
-    Future.delayed(const Duration(milliseconds: 500), () {
-      fireEffect.removeFromParent();
-    });
+    _fireRemaining = getHitRefreshTime / 1000;
+    if (!fireEffect.isMounted && fireEffect.parent == null) add(fireEffect);
+  }
+
+  /// Resolves fire and combat damage while keeping checkpoint hitboxes active.
+  @override
+  bool takeDamage(Damage damage) {
+    if (isDead || _hurtCooldown > 0) return false;
+    final amount = effects.incomingDamage(damage.amount);
+    if (amount <= 0) return false;
+    final previous = hp;
+    hp = (hp - amount).clamp(0, maxHealth);
+    DamageNumber.show(parent, combatCenter, previous - hp, player: true);
+    setInvicible();
+    return true;
+  }
+
+  @override
+  void heal(int amount) {
+    if (isDead || amount <= 0) return;
+    hp = (hp + amount).clamp(0, maxHealth);
+  }
+
+  /// Moves in the last facing direction through the normal swept wall resolver.
+  bool startDash({required double distance, required double duration}) {
+    if (isDead || _dashRemaining > 0 || distance <= 0 || duration <= 0) {
+      return false;
+    }
+    _dashDirection = facingDirection.clone();
+    _dashRemaining = duration;
+    _dashSpeed = distance / duration;
+    effects.add(
+      StatusEffect(key: 'quickstep', duration: duration, invulnerable: true),
+    );
+    return true;
+  }
+
+  @override
+  void onRemove() {
+    effects.clear();
+    _dashRemaining = 0;
+    super.onRemove();
   }
 }
 

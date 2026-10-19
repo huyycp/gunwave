@@ -1,12 +1,12 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
+import 'package:gunwave/localization/build_context_l10n.dart';
 import 'package:gunwave/routes.dart';
 import 'package:gunwave/utils/ui/snackbar.dart';
 import 'package:gunwave/views/home/widgets/background.dart';
@@ -25,22 +25,23 @@ class MyRoomView extends BaseView {
 }
 
 class MyRoomViewState extends BaseViewState<MyRoomView, MyRoomViewModel> {
-  late final Widget _background = GameWidget(game: FlameGame(
-    world: Background(
-      backgroundPath: GameMaps.loading,
-      screenSize: Vector2(MediaQuery.sizeOf(context).width, MediaQuery.sizeOf(context).height),
-    ),
-    camera: CameraComponent()
-      ..viewfinder.anchor = Anchor.topLeft
-      ..viewfinder.zoom = 1.0
-  ));
+  late final Widget _background = GameWidget(
+      game: FlameGame(
+          world: Background(
+            backgroundPath: GameMaps.loading,
+            screenSize: Vector2(MediaQuery.sizeOf(context).width,
+                MediaQuery.sizeOf(context).height),
+          ),
+          camera: CameraComponent()
+            ..viewfinder.anchor = Anchor.topLeft
+            ..viewfinder.zoom = 1.0));
 
   @override
   void onReady() {
     super.onReady();
     model.getMyRooms();
   }
-  
+
   @override
   Widget getView() {
     ref.watch(myRoomViewModel);
@@ -60,13 +61,11 @@ class MyRoomViewState extends BaseViewState<MyRoomView, MyRoomViewModel> {
               right: 32,
               child: _buildCreateRoomBtn(),
             ),
-            model.isLoading 
-              ? const Center(child: CircularProgressIndicator(color: GameColors.primary))
-              : Positioned.fill(
-                  top: 48,
-                  left: 32,
-                  child: _buildMyRoomCarousel()
-                ),
+            model.isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(color: GameColors.primary))
+                : Positioned.fill(
+                    top: 48, left: 32, child: _buildMyRoomCarousel()),
           ],
         ),
       ),
@@ -92,7 +91,9 @@ class MyRoomViewState extends BaseViewState<MyRoomView, MyRoomViewModel> {
               model.getMyRooms();
               context.pop();
             } else {
-              SnackBarService.showSnackBar(message: 'Failed to create room', type: MessageTypes.error);
+              SnackBarService.showSnackBar(
+                  message: context.l10n.failedToCreateRoom,
+                  type: MessageTypes.error);
             }
           }
         });
@@ -110,9 +111,8 @@ class MyRoomViewState extends BaseViewState<MyRoomView, MyRoomViewModel> {
       itemBuilder: (context, index) {
         final room = model.rooms[index];
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: MyRoomWidget(room)
-        );
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: MyRoomWidget(room));
       },
     );
   }
@@ -121,6 +121,4 @@ class MyRoomViewState extends BaseViewState<MyRoomView, MyRoomViewModel> {
   MyRoomViewModel getViewModel() {
     return ref.read(myRoomViewModel);
   }
-  
 }
-

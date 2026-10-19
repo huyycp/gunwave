@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/utils/exception/app_exception.dart';
+import 'package:gunwave/localization/build_context_l10n.dart';
 import 'package:gunwave/widgets/base/base_widget.dart';
 import 'package:gunwave/widgets/base/base_widget_model.dart';
 import 'package:gunwave/widgets/game/game_button.dart';
 
 class LoginWidget extends BaseWidget {
-  const LoginWidget(this.onLogin, {super.key});
+  const LoginWidget(this.onLogin, {required this.onBack, super.key});
 
   final void Function(bool) onLogin;
+  final VoidCallback onBack;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -18,7 +20,7 @@ class LoginWidget extends BaseWidget {
 
 class LoginWidgetState extends BaseWidgetState<LoginWidget, LoginWidgetModel> {
   final provider = ChangeNotifierProvider((ref) => LoginWidgetModel());
-  
+
   @override
   Widget getWidget() {
     return Container(
@@ -37,14 +39,14 @@ class LoginWidgetState extends BaseWidgetState<LoginWidget, LoginWidgetModel> {
         children: [
           TextField(
             controller: model.emailController,
-            decoration: const InputDecoration(
-              labelText: 'Email',
+            decoration: InputDecoration(
+              labelText: context.l10n.email,
             ),
           ),
           TextField(
             controller: model.passwordController,
-            decoration: const InputDecoration(
-              labelText: 'Password',
+            decoration: InputDecoration(
+              labelText: context.l10n.password,
             ),
             obscureText: true,
           ),
@@ -52,7 +54,11 @@ class LoginWidgetState extends BaseWidgetState<LoginWidget, LoginWidgetModel> {
             onPressed: () {
               model.login(widget.onLogin);
             },
-            child: const Text('Login'),
+            child: Text(context.l10n.login),
+          ),
+          TextButton(
+            onPressed: widget.onBack,
+            child: Text(context.l10n.back),
           ),
         ],
       ),
@@ -63,7 +69,6 @@ class LoginWidgetState extends BaseWidgetState<LoginWidget, LoginWidgetModel> {
   LoginWidgetModel getWidgetModel() {
     return ref.read(provider);
   }
-
 }
 
 class LoginWidgetModel extends BaseWidgetModel {
@@ -72,7 +77,8 @@ class LoginWidgetModel extends BaseWidgetModel {
 
   Future<void> login(void Function(bool) onDone) async {
     try {
-      await userRepo.signInWithEmail(emailController.text, passwordController.text);
+      await userRepo.signInWithEmail(
+          emailController.text, passwordController.text);
       if (userRepo.user != null) {
         onDone(true);
       } else {
@@ -80,7 +86,7 @@ class LoginWidgetModel extends BaseWidgetModel {
       }
     } catch (err, stack) {
       onDone(false);
-      AppException.log(runtimeType, err, stack);
+      AppException.log(runtimeType, err, stack, function: 'login');
     }
-  } 
+  }
 }

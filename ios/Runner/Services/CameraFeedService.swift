@@ -372,8 +372,10 @@ class CameraFeedService: NSObject {
  */
 extension CameraFeedService: AVCaptureVideoDataOutputSampleBufferDelegate {
 
-  /** This method delegates the CVPixelBuffer of the frame seen by the camera currently.
-   */
+  /// Forwards each captured frame and its current device orientation to the gesture delegate.
+  ///
+  /// AVFoundation invokes this callback on the configured sample-buffer queue. Keep this
+  /// path free of blocking work and per-frame logging; the delegate owns frame processing.
   func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
       let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!
       if (imageBufferSize == nil) {
@@ -381,7 +383,6 @@ extension CameraFeedService: AVCaptureVideoDataOutputSampleBufferDelegate {
       }
     let deviceOrientation = UIDevice.current.orientation
     let imageOrientation = UIImage.Orientation.from(deviceOrientation: deviceOrientation)
-    print("Device Orientation: \(deviceOrientation.rawValue), Image Orientation: \(imageOrientation)")
     delegate?.didOutput(sampleBuffer: sampleBuffer, orientation: imageOrientation)
   }
 }

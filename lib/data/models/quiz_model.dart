@@ -1,49 +1,26 @@
-class QuizModel {
-  QuizModel({
-    required this.id,
-    required this.question,
-    required this.resultA,
-    required this.resultB,
-    required this.resultC,
-    required this.resultD,
-    required this.answer,
-  });
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  final String id;
+part 'quiz_model.freezed.dart';
+part 'quiz_model.g.dart';
 
-  final String question;
+// JsonKey applies to Freezed constructor parameters and is read by generation.
+// ignore_for_file: invalid_annotation_target
 
-  final String resultA;
+/// Holds a quiz question, its four choices, and the correct answer.
+@freezed
+abstract class QuizModel with _$QuizModel {
+  /// Creates an immutable quiz question.
+  const factory QuizModel({
+    @Default('') String id,
+    @Default('') String question,
+    @JsonKey(name: 'result_a') @Default('') String resultA,
+    @JsonKey(name: 'result_b') @Default('') String resultB,
+    @JsonKey(name: 'result_c') @Default('') String resultC,
+    @JsonKey(name: 'result_d') @Default('') String resultD,
+    @Default('') String answer,
+  }) = _QuizModel;
 
-  final String resultB;
-
-  final String resultC;
-
-  final String resultD;
-  
-  final String answer;
-
-  factory QuizModel.fromJson(Map<String, dynamic> json) {
-    return QuizModel(
-      id: json['id']?.toString() ?? '',
-      question: json['question']?.toString() ?? '',
-      resultA: json['result_a']?.toString() ?? '',
-      resultB: json['result_b']?.toString() ?? '',
-      resultC: json['result_c']?.toString() ?? '',
-      resultD: json['result_d']?.toString() ?? '',
-      answer: json['answer']?.toString() ?? '',
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'question': question,
-      'result_a': resultA,
-      'result_b': resultB,
-      'result_c': resultC,
-      'result_d': resultD,
-      'answer': answer,
-    };
-  }
+  /// Parses a quiz row using the database's `result_a` through `result_d` keys.
+  factory QuizModel.fromJson(Map<String, dynamic> json) =>
+      _$QuizModelFromJson(json);
 }

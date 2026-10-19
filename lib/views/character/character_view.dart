@@ -7,6 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
+import 'package:gunwave/localization/build_context_l10n.dart';
+import 'package:gunwave/routes.dart';
 import 'package:gunwave/views/character/character_view_model.dart';
 import 'package:gunwave/views/character/widgets/character_preview.dart';
 import 'package:gunwave/views/character/widgets/status_board.dart';
@@ -23,17 +25,21 @@ class CharacterView extends BaseView {
   }
 }
 
-class CharacterViewState extends BaseViewState<CharacterView, CharacterViewModel> {
-  late final Widget _background = GameWidget(game: FlameGame(
-    world: Background(
-      backgroundPath: GameMaps.loading,
-      screenSize: Vector2(MediaQuery.sizeOf(context).width, MediaQuery.sizeOf(context).height),
-    ),
-    camera: CameraComponent()
-      ..viewfinder.anchor = Anchor.topLeft
-      ..viewfinder.zoom = 1.0  // Use full size since we're scaling the component
-  ));
-  
+class CharacterViewState
+    extends BaseViewState<CharacterView, CharacterViewModel> {
+  late final Widget _background = GameWidget(
+      game: FlameGame(
+          world: Background(
+            backgroundPath: GameMaps.loading,
+            screenSize: Vector2(MediaQuery.sizeOf(context).width,
+                MediaQuery.sizeOf(context).height),
+          ),
+          camera: CameraComponent()
+            ..viewfinder.anchor = Anchor.topLeft
+            ..viewfinder.zoom =
+                1.0 // Use full size since we're scaling the component
+          ));
+
   @override
   void onReady() {
     super.onReady();
@@ -54,22 +60,26 @@ class CharacterViewState extends BaseViewState<CharacterView, CharacterViewModel
           ),
           _background,
           Center(
-            child: !model.isLoading 
-              ? LayoutBuilder(
-                builder: (context, constaint) => SizedBox(
-                  height: height,
-                  width: width,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(child: _buildCharacterPreview(constaint.maxHeight, constaint.maxWidth)),
-                      Expanded(child: _buildStatusBoard()),
-                    ],
-                  ),
-                ),
-              ) 
-              : const Center(child: CircularProgressIndicator(color: GameColors.primary)),
+            child: model.isLoading
+                ? const CircularProgressIndicator(color: GameColors.primary)
+                : model.characters.isEmpty
+                    ? _buildEmptyState()
+                    : LayoutBuilder(
+                        builder: (context, constaint) => SizedBox(
+                          height: height,
+                          width: width,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Expanded(
+                                  child: _buildCharacterPreview(
+                                      constaint.maxHeight, constaint.maxWidth)),
+                              Expanded(child: _buildStatusBoard()),
+                            ],
+                          ),
+                        ),
+                      ),
           ),
           Positioned(
             top: 12,
@@ -78,6 +88,20 @@ class CharacterViewState extends BaseViewState<CharacterView, CharacterViewModel
           )
         ],
       ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(context.l10n.noCharactersAvailable),
+        const SizedBox(height: 12),
+        GameButton(
+          onPressed: () => context.pushReplacement(Routes.shop),
+          child: Text(context.l10n.openShop),
+        ),
+      ],
     );
   }
 
@@ -92,8 +116,10 @@ class CharacterViewState extends BaseViewState<CharacterView, CharacterViewModel
       child: Stack(
         children: [
           Positioned(
-            child: GameWidget(game: CharacterPreview(
-              character: model.characters[model.selectedCharacterIndex].character,
+            child: GameWidget(
+                game: CharacterPreview(
+              character:
+                  model.characters[model.selectedCharacterIndex].character,
             )),
           ),
           Positioned(
@@ -140,17 +166,20 @@ class CharacterViewState extends BaseViewState<CharacterView, CharacterViewModel
   Widget _buildNextCharacterBtn() {
     return GameButton(
       onPressed: () {
-        model.onCharacterSelected((model.selectedCharacterIndex + 1) % model.characters.length);
+        model.onCharacterSelected(
+            (model.selectedCharacterIndex + 1) % model.characters.length);
       },
       size: GameButtonSize.small,
       child: const Text('>'),
     );
   }
-  
+
   Widget _buildPreviousCharacterBtn() {
     return GameButton(
       onPressed: () {
-        model.onCharacterSelected((model.selectedCharacterIndex - 1 + model.characters.length) % model.characters.length);
+        model.onCharacterSelected(
+            (model.selectedCharacterIndex - 1 + model.characters.length) %
+                model.characters.length);
       },
       size: GameButtonSize.small,
       child: const Text('<'),
@@ -162,7 +191,7 @@ class CharacterViewState extends BaseViewState<CharacterView, CharacterViewModel
       onPressed: () {
         context.pop();
       },
-      child: const Text('Back'),
+      child: Text(context.l10n.back),
     );
   }
 

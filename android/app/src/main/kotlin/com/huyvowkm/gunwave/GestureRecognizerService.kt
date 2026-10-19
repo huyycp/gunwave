@@ -1,21 +1,23 @@
 package com.huyvowkm.gunwave
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.media.Image
 import android.util.Log
 import androidx.camera.core.ImageProxy
-import com.google.mediapipe.tasks.vision.gesturerecognizer.GestureRecognizer
-import com.google.mediapipe.tasks.vision.core.RunningMode
-import com.google.mediapipe.framework.image.BitmapImageBuilder
-import com.google.mediapipe.framework.image.MPImage
+import com.google.mediapipe.framework.image.MediaImageBuilder
 import com.google.mediapipe.tasks.core.BaseOptions
-import java.io.File
-import java.nio.ByteBuffer
-import java.util.concurrent.Executor
+import com.google.mediapipe.tasks.vision.core.ImageProcessingOptions
+import com.google.mediapipe.tasks.vision.core.RunningMode
+import com.google.mediapipe.tasks.vision.gesturerecognizer.GestureRecognizer
+import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.Executors
 
+/**
+ * Runs MediaPipe gesture recognition for CameraX frames and emits gesture-name changes.
+ *
+ * Pass each [ImageProxy] from the camera analyzer to [processImage]. This service takes
+ * ownership of that frame and closes it after recognition or when it is skipped. Call
+ * [release] after stopping the camera so the recognizer closes after any active inference.
+ */
 class GestureRecognizerService(
     private val context: Context,
     private val modelPath: String,
@@ -23,20 +25,19 @@ class GestureRecognizerService(
 ) {
     private val TAG = "GestureRecognizerService"
     private var gestureRecognizer: GestureRecognizer? = null
-    private var isProcessing = false
+    @Volatile private var isProcessing = false
+    @Volatile private var releaseRequested = false
+    private var lastEmittedGesture: String? = null
     private val executor = Executors.newSingleThreadExecutor()
 
     init {
         initializeGestureRecognizer()
     }
 
+    /** Creates the IMAGE-mode recognizer from the model packaged in the app assets. */
     private fun initializeGestureRecognizer() {
         try {
             Log.d(TAG, "Initializing gesture recognizer with model: $modelPath")
-            
-            // Check if the model file exists
-            val assetsPath = modelPath
-            val file = File(assetsPath)
             
             // Build model options
             val baseOptionsBuilder = BaseOptions.builder()
@@ -64,78 +65,87 @@ class GestureRecognizerService(
         }
     }
 
+    /**
+     * Recognizes one CameraX frame without converting it to a bitmap or compressed JPEG.
+     *
+     * The incoming [ImageProxy] is always closed by this method. Frames are dropped while
+     * another inference is running, and [ImageProxy.imageInfo] rotation is passed to
+     * MediaPipe so the model receives the camera frame in the correct orientation.
+     */
     fun processImage(imageProxy: ImageProxy) {
-        if (isProcessing || gestureRecognizer == null) {
+        if (releaseRequested || isProcessing || gestureRecognizer == null) {
             imageProxy.close()
             return
         }
         
         isProcessing = true
         
-        executor.execute {
-            try {
-                Log.d(TAG, "Processing image...")
-                val bitmap = imageProxy.toBitmap()
-                val mpImage = BitmapImageBuilder(bitmap).build()
-                
-                // Process the image
-                val result = gestureRecognizer?.recognize(mpImage)
-                
-                // Handle the result
-                if (result != null && !result.gestures().isEmpty()) {
-                    val topGesture = result.gestures().get(0)
-                    if (topGesture.isNotEmpty()) {
-                        val category = topGesture[0]
-                        val gestureName = category.categoryName()
-                        val score = category.score()
-                        Log.d(TAG, "Detected gesture: $gestureName with score: $score")
-                        onGestureRecognized(gestureName)
-                    } else {
-                        Log.d(TAG, "No gesture detected in hand")
+        try {
+            executor.execute {
+                try {
+                    val mediaImage = imageProxy.image ?: return@execute
+                    val mpImage = MediaImageBuilder(mediaImage).build()
+                    try {
+                        val imageOptions = ImageProcessingOptions.builder()
+                            .setRotationDegrees(imageProxy.imageInfo.rotationDegrees)
+                            .build()
+                        val result = gestureRecognizer?.recognize(mpImage, imageOptions)
+                        val gesture = result?.gestures()?.firstOrNull()?.firstOrNull()
+                        emitGestureIfChanged(gesture?.categoryName() ?: "Unknown")
+                    } finally {
+                        mpImage.close()
                     }
-                } else {
-                    Log.d(TAG, "No hand detected")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error processing image: ${e.message}")
+                    e.printStackTrace()
+                } finally {
+                    isProcessing = false
+                    imageProxy.close()
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error processing image: ${e.message}")
-                e.printStackTrace()
-            } finally {
-                isProcessing = false
-                imageProxy.close()
             }
+        } catch (e: RejectedExecutionException) {
+            // release() may shut down the executor while a camera callback is arriving.
+            isProcessing = false
+            imageProxy.close()
         }
     }
 
-    private fun ImageProxy.toBitmap(): Bitmap {
-        val yBuffer = planes[0].buffer
-        val uBuffer = planes[1].buffer
-        val vBuffer = planes[2].buffer
-        
-        val ySize = yBuffer.remaining()
-        val uSize = uBuffer.remaining()
-        val vSize = vBuffer.remaining()
-        
-        val nv21 = ByteArray(ySize + uSize + vSize)
-        
-        // U and V are swapped
-        yBuffer.get(nv21, 0, ySize)
-        vBuffer.get(nv21, ySize, vSize)
-        uBuffer.get(nv21, ySize + vSize, uSize)
-        
-        val yuvImage = android.graphics.YuvImage(nv21, android.graphics.ImageFormat.NV21, width, height, null)
-        val out = java.io.ByteArrayOutputStream()
-        yuvImage.compressToJpeg(android.graphics.Rect(0, 0, width, height), 100, out)
-        val imageBytes = out.toByteArray()
-        return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+    /** Emits only changes so an unchanged gesture does not trigger repeated UI updates. */
+    private fun emitGestureIfChanged(gesture: String) {
+        if (gesture == lastEmittedGesture) return
+        lastEmittedGesture = gesture
+        onGestureRecognized(gesture)
     }
 
+    /**
+     * Stops accepting frames and closes MediaPipe after any queued inference completes.
+     *
+     * Call this after stopping the camera. Cleanup runs on the recognition executor so
+     * the native recognizer is never closed while an inference is using it.
+     */
+    @Synchronized
     fun release() {
+        if (releaseRequested) return
+        releaseRequested = true
         try {
             Log.d(TAG, "Releasing gesture recognizer...")
-            gestureRecognizer?.close()
-            gestureRecognizer = null
+            executor.execute {
+                try {
+                    emitGestureIfChanged("Unknown")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error resetting gesture state during release: ${e.message}")
+                } finally {
+                    try {
+                        gestureRecognizer?.close()
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error closing gesture recognizer: ${e.message}")
+                    } finally {
+                        gestureRecognizer = null
+                        Log.d(TAG, "Gesture recognizer released")
+                    }
+                }
+            }
             executor.shutdown()
-            Log.d(TAG, "Gesture recognizer released successfully")
         } catch (e: Exception) {
             Log.e(TAG, "Error releasing gesture recognizer: ${e.message}")
         }
