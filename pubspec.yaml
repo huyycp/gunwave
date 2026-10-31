@@ -4,19 +4,102 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.13.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  cached_network_image: ^3.4.1
+  flutter_dotenv: ^5.2.1
+  flutter_riverpod: ^2.6.1
+  flutter_svg: ^2.1.0
+  go_router: ^15.0.0
+  google_fonts: ^8.0.2
+  gradient_borders: ^1.0.1
+  intl: ^0.20.2
+  shared_preferences: ^2.5.6
+  permission_handler: ^12.0.0+1
+  random_avatar: ^0.0.8
+  string_validator: ^1.1.0
+  flame: ^1.36.0
+  flame_tiled: ^2.0.3
+  carousel_slider:
+    git:
+      url: https://github.com/fennelmarkets/flutter_carousel_slider.git
+  supabase_flutter: ^2.9.0
+  collection: ^1.19.1
+  freezed_annotation: ^3.0.0
+  json_annotation: ^4.12.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+  build_runner:
+  freezed: ^4.0.0
+  json_serializable: ^6.9.0
+  flutter_gen_runner:
 
 flutter:
   uses-material-design: true
+  generate: true
   
   assets:
-    - android/app/src/main/assets/gesture_recognizer.task 
+    - dev.env
+    - prod.env
+    - assets/tiles/
+    - assets/images/
+    - assets/images/hub/joystick/
+    - assets/images/ui/banners/
+    - assets/images/ui/buttons/
+    - assets/images/ui/icons/
+    - assets/images/ui/pointers/
+    - assets/images/ui/ribbons/
+    - assets/images/deco/
+    - assets/images/buildings/castle/
+    - assets/images/buildings/house/
+    - assets/images/buildings/tower/
+    - assets/images/buildings/wood_house/
+    - assets/images/buildings/wood_tower/
+    - assets/images/effects/explosion/
+    - assets/images/effects/fire/
+    - assets/images/resources/
+    - assets/images/resources/dynamite/
+    - assets/images/resources/gold_bag/
+    - assets/images/resources/gold_mine/
+    - assets/images/resources/meat/
+    - assets/images/resources/sheep/
+    - assets/images/resources/trees/
+    - assets/images/resources/wood/
+    - assets/images/terrain/
+    - assets/images/terrain/water/
+    - assets/images/terrain/water/foam/
+    - assets/images/terrain/water/rocks/
+    - assets/images/factions/knights/dead/
+    - assets/images/factions/knights/warrior/blue/
+    - assets/images/factions/knights/warrior/red/
+    - assets/images/factions/knights/warrior/yellow/
+    - assets/images/factions/knights/warrior/purple/
+    - assets/images/factions/knights/archer/blue/
+    - assets/images/factions/knights/archer/red/
+    - assets/images/factions/knights/archer/yellow/
+    - assets/images/factions/knights/archer/purple/
+    - assets/images/factions/knights/pawn/blue/
+    - assets/images/factions/knights/pawn/red/
+    - assets/images/factions/knights/pawn/yellow/
+    - assets/images/factions/knights/pawn/purple/
+    - assets/images/factions/monsters/barrel/blue/
+    - assets/images/factions/monsters/barrel/red/
+    - assets/images/factions/monsters/barrel/yellow/
+    - assets/images/factions/monsters/barrel/purple/
+    - assets/images/factions/monsters/torch/blue/
+    - assets/images/factions/monsters/torch/red/
+    - assets/images/factions/monsters/torch/yellow/
+    - assets/images/factions/monsters/torch/purple/
+    - assets/images/factions/monsters/tnt/blue/
+    - assets/images/factions/monsters/tnt/red/
+    - assets/images/factions/monsters/tnt/yellow/
+    - assets/images/factions/monsters/tnt/purple/
