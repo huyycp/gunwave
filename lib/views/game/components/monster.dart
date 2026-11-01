@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'dart:math' as math;
 
 import 'package:gunwave/views/game/components/damage_number.dart';
+import 'package:gunwave/views/game/components/hit_impact.dart';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
@@ -303,6 +304,12 @@ class Monster extends SpriteAnimationGroupComponent
     final previous = hp;
     hp = (hp - amount).clamp(0, maxHealth);
     DamageNumber.show(parent, combatCenter, previous - hp, player: false);
+    HitImpact.show(
+      parent,
+      combatCenter,
+      width: hitbox.width,
+      height: hitbox.height,
+    );
     healthBar.updateHealth(hp);
     setInvincible();
     return true;

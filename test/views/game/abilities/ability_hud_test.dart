@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gunwave/data/models/ability_model.dart';
+import 'package:gunwave/data/constants/game/game_hud_style.dart';
+import 'package:gunwave/gen/assets.gen.dart';
 import 'package:gunwave/l10n/app_localizations.dart';
 import 'package:gunwave/views/game/abilities/ability_controller.dart';
 import 'package:gunwave/views/game/abilities/ability_registry.dart';
@@ -112,6 +114,27 @@ void main() {
     );
     addTearDown(controller.dispose);
     await mount(tester, controller, keyboard: false);
+    expect(
+      tester.getSize(find.byType(InkWell)),
+      const Size.square(GameHudStyle.abilitySize),
+    );
+    final frameFinder = find.byKey(const ValueKey('ability-control-frame'));
+    expect(
+      (tester.widget<Image>(frameFinder).image as AssetImage).assetName,
+      Assets.images.ui.buttons.buttonRed.path,
+    );
+    tester.widget<InkWell>(find.byType(InkWell)).onHighlightChanged!(true);
+    await tester.pump();
+    expect(
+      (tester.widget<Image>(frameFinder).image as AssetImage).assetName,
+      Assets.images.ui.buttons.buttonRedPressed.path,
+    );
+    tester.widget<InkWell>(find.byType(InkWell)).onHighlightChanged!(false);
+    await tester.pump();
+    expect(
+      (tester.widget<Image>(frameFinder).image as AssetImage).assetName,
+      Assets.images.ui.buttons.buttonRed.path,
+    );
     await tester.tap(find.byType(InkWell));
     await tester.pump();
     expect(find.text('In use'), findsNothing);

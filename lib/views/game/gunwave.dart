@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/data/constants/app_gesture.dart';
 import 'package:gunwave/data/constants/game/game_constants.dart';
-import 'package:gunwave/data/constants/game/game_hub.dart';
+import 'package:gunwave/data/constants/game/game_hud_style.dart';
 import 'package:gunwave/data/constants/game/game_play_mode.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/data/models/map_model.dart';
@@ -19,6 +19,8 @@ import 'package:gunwave/views/game/components/stage.dart';
 import 'package:gunwave/views/game/components/sub_components/attack_button.dart';
 import 'package:gunwave/views/game/game_view_model.dart';
 import 'package:gunwave/views/game/gesture_controls.dart';
+import 'package:gunwave/views/game/game_touch_control_layout.dart';
+import 'package:gunwave/views/game/components/sub_components/pixel_joystick_disc.dart';
 
 class Gunwave extends FlameGame
     with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection {
@@ -28,6 +30,7 @@ class Gunwave extends FlameGame
     required this.gameCharacters,
     required this.playMode,
     required this.onStageCompleted,
+    this.safeAreaInsets = EdgeInsets.zero,
     this.onCharacterReachCheckpoint,
     this.onExitRequested,
   });
@@ -40,6 +43,9 @@ class Gunwave extends FlameGame
   final CharacterModel gameCharacters;
   final GamePlayMode playMode;
   final void Function(bool) onStageCompleted;
+
+  /// OS padding used to keep Flame touch controls clear of system UI.
+  final EdgeInsets safeAreaInsets;
   final void Function(bool)? onCharacterReachCheckpoint;
   final VoidCallback? onExitRequested;
 
@@ -127,15 +133,9 @@ class Gunwave extends FlameGame
 
   void addJoystick() {
     joystick = JoystickComponent(
-      knob: SpriteComponent(
-        sprite: Sprite(images.fromCache(GameHubs.joystickKnob.path)),
-        size: Vector2.all(64),
-      ),
-      background: SpriteComponent(
-        sprite: Sprite(images.fromCache(GameHubs.joystickBackground.path)),
-        size: Vector2.all(128),
-      ),
-      margin: const EdgeInsets.only(left: 60, bottom: 40),
+      knob: PixelJoystickDisc.knob(),
+      background: PixelJoystickDisc.background(),
+      margin: GameTouchControlLayout.joystickMargin(safeAreaInsets),
     );
 
     camera.viewport.add(joystick);
@@ -147,8 +147,8 @@ class Gunwave extends FlameGame
         _touchAttackPressed = attack && !controlsBlocked;
         character.triggerAttack = _touchAttackPressed;
       },
-      position: Vector2(size.x - 130, size.y - 130),
-      size: Vector2.all(64),
+      position: GameTouchControlLayout.attackPosition(size, safeAreaInsets),
+      size: Vector2.all(GameHudStyle.touchAttackSize),
     );
 
     camera.viewport.add(attachBtn);

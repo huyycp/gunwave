@@ -11,8 +11,18 @@ class GameHubs {
   static final values = [
     joystickKnob,
     joystickBackground,
+    attackButton,
+    attackButtonPressed,
   ];
 
   static final joystickKnob = GameHubs._(basePath.joystick.knob.path);
-  static final joystickBackground = GameHubs._(basePath.joystick.background.path);
+  static final joystickBackground = GameHubs._(
+    basePath.joystick.background.path,
+  );
+  static final attackButton = GameHubs._(
+    Assets.images.ui.buttons.buttonRed.path,
+  );
+  static final attackButtonPressed = GameHubs._(
+    Assets.images.ui.buttons.buttonRedPressed.path,
+  );
 }

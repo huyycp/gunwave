@@ -10,31 +10,38 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   test('shockwave stays at cast origin while stun stars follow the target', () {
     final target = FakeCombatant();
-    final shockwave =
-        AbilityFeedback(style: AbilityVisualStyle.thunderCrash, target: target);
+    final shockwave = AbilityFeedback(
+      style: AbilityVisualStyle.thunderCrash,
+      target: target,
+    );
     target.center.x = 80;
     shockwave.update(.1);
     expect(shockwave.position.x, 0);
-    target.effects
-        .add(StatusEffect(key: 'thunder_crash', duration: .8, stunned: true));
-    final stars =
-        AbilityFeedback(style: AbilityVisualStyle.thunderCrash, target: target);
+    target.effects.add(
+      StatusEffect(key: 'thunder_crash', duration: .8, stunned: true),
+    );
+    final stars = AbilityFeedback(
+      style: AbilityVisualStyle.thunderCrash,
+      target: target,
+    );
     target.center.x = 100;
     stars.update(.1);
     expect(stars.position.x, 100);
   });
 
   test(
-      'directional cast feedback keeps its original facing when the actor turns',
-      () {
-    final direction = Vector2(1, 0);
-    final slash = AbilityFeedback(
+    'directional cast feedback keeps its original facing when the actor turns',
+    () {
+      final direction = Vector2(1, 0);
+      final slash = AbilityFeedback(
         style: AbilityVisualStyle.riftSlash,
         target: FakeCombatant(),
-        direction: direction);
-    direction.setValues(0, 1);
-    expect(slash.direction, Vector2(1, 0));
-  });
+        direction: direction,
+      );
+      direction.setValues(0, 1);
+      expect(slash.direction, Vector2(1, 0));
+    },
+  );
   test('all eight abilities produce distinct visible shapes', () async {
     final fingerprints = <int>{};
     for (final style in AbilityVisualStyle.values) {
@@ -55,11 +62,25 @@ void main() {
     expect(fingerprints.length, 8);
   });
 
+  test('rift slash pixels fade with the rest of the instant effect', () async {
+    final slash = AbilityFeedback(
+      style: AbilityVisualStyle.riftSlash,
+      target: FakeCombatant(),
+    );
+    final initialOpacity = await _renderedOpacity(slash);
+    slash.update(.35);
+    final halfwayOpacity = await _renderedOpacity(slash);
+
+    expect(halfwayOpacity, lessThan(initialOpacity));
+  });
+
   test('shield visual follows movement and ends when the shield expires', () {
     final target = FakeCombatant();
     target.effects.add(StatusEffect(key: 'bulwark', duration: 3));
-    final effect =
-        AbilityFeedback(style: AbilityVisualStyle.bulwark, target: target);
+    final effect = AbilityFeedback(
+      style: AbilityVisualStyle.bulwark,
+      target: target,
+    );
     target.center.x = 80;
     effect.update(1);
     expect(effect.position.x, 80);
@@ -72,9 +93,12 @@ void main() {
   test('charged visual remains until the last enhanced swing is consumed', () {
     final target = FakeCombatant();
     target.effects.add(
-        StatusEffect(key: 'power_break', charges: 1, damageMultiplier: 1.5));
-    final effect =
-        AbilityFeedback(style: AbilityVisualStyle.powerBreak, target: target);
+      StatusEffect(key: 'power_break', charges: 1, damageMultiplier: 1.5),
+    );
+    final effect = AbilityFeedback(
+      style: AbilityVisualStyle.powerBreak,
+      target: target,
+    );
     effect.update(5);
     expect(effect.isFinished, isFalse);
     target.effects.consumeAttackMultiplier();
@@ -84,15 +108,34 @@ void main() {
 
   test('instant feedback expires and death removes persistent feedback', () {
     final target = FakeCombatant();
-    final heal =
-        AbilityFeedback(style: AbilityVisualStyle.firstAid, target: target);
+    final heal = AbilityFeedback(
+      style: AbilityVisualStyle.firstAid,
+      target: target,
+    );
     heal.update(2);
     expect(heal.isFinished, isTrue);
     target.effects.add(StatusEffect(key: 'hex_seal', duration: 3));
-    final hex =
-        AbilityFeedback(style: AbilityVisualStyle.hexSeal, target: target);
+    final hex = AbilityFeedback(
+      style: AbilityVisualStyle.hexSeal,
+      target: target,
+    );
     target.hp = 0;
     hex.update(.01);
     expect(hex.isFinished, isTrue);
   });
+}
+
+Future<int> _renderedOpacity(AbilityFeedback effect) async {
+  final recorder = PictureRecorder();
+  effect.render(Canvas(recorder));
+  final picture = recorder.endRecording();
+  final image = await picture.toImage(128, 128);
+  final bytes = (await image.toByteData())!.buffer.asUint8List();
+  var opacity = 0;
+  for (var channel = 3; channel < bytes.length; channel += 4) {
+    opacity += bytes[channel];
+  }
+  image.dispose();
+  picture.dispose();
+  return opacity;
 }

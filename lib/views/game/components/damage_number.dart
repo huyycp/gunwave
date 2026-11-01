@@ -23,7 +23,12 @@ class DamageNumber extends TextComponent {
              color: player
                  ? GameHudStyle.damageTaken
                  : GameHudStyle.damageDealt,
-             shadows: const [Shadow(blurRadius: 2, color: Colors.black)],
+             shadows: const [
+               Shadow(color: Colors.black, offset: Offset(-1, 0)),
+               Shadow(color: Colors.black, offset: Offset(1, 0)),
+               Shadow(color: Colors.black, offset: Offset(0, -1)),
+               Shadow(color: Colors.black, offset: Offset(0, 1)),
+             ],
            ),
          ),
        );
@@ -31,7 +36,7 @@ class DamageNumber extends TextComponent {
   // A short rise stays readable without covering the next attack's number.
   static const duration = .7;
   static const rise = 32.0;
-  static const fontSize = 16.0;
+  static const fontSize = 14.0;
   static const maxVisible = 32;
   static final _visible = Expando<int>();
   Component? _owner;

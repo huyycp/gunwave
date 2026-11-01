@@ -16,6 +16,7 @@ import 'package:gunwave/views/game/game_view_model.dart';
 import 'package:gunwave/views/game/gunwave.dart';
 import 'package:gunwave/views/game/widgets/quiz_widget.dart';
 import 'package:gunwave/views/game/widgets/ability_hud.dart';
+import 'package:gunwave/views/game/game_touch_control_layout.dart';
 import 'package:gunwave/views/game/widgets/stage_result_dialog.dart';
 import 'package:gunwave/views/game/widgets/rank_submission_loading_dialog.dart';
 import 'package:gunwave/widgets/base/base_view.dart';
@@ -52,6 +53,7 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
     map: widget.room.map!,
     playMode: widget.playMode,
     gameCharacters: widget.character,
+    safeAreaInsets: MediaQuery.paddingOf(context),
     onStageCompleted: onStageCompleted,
     onCharacterReachCheckpoint: onCharacterReachCheckpoint,
     onExitRequested: () => unawaited(_requestExit()),
@@ -113,6 +115,9 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
   @override
   Widget getView() {
     ref.watch(gameViewModel);
+    final touchAbilityInsets = GameTouchControlLayout.abilityInsets(
+      MediaQuery.paddingOf(context),
+    );
     _gunwave.controlsBlocked =
         model.isQuizVisible || _isCompletingStage || _isConfirmingExit;
     return PopScope(
@@ -220,13 +225,9 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
                 _gunwave.abilities.ability != null &&
                 !model.isQuizVisible)
               Positioned(
-                right: GameHudStyle.touchRight,
-                bottom: GameHudStyle.touchBottom,
-                child: SafeArea(
-                  top: false,
-                  left: false,
-                  child: _buildAbilityControls(),
-                ),
+                right: touchAbilityInsets.right,
+                bottom: touchAbilityInsets.bottom,
+                child: _buildAbilityControls(),
               ),
           ],
         ),

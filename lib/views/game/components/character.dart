@@ -6,6 +6,7 @@ import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gunwave/views/game/components/damage_number.dart';
+import 'package:gunwave/views/game/components/hit_impact.dart';
 import 'package:gunwave/data/constants/game/game_constants.dart';
 import 'package:gunwave/data/constants/game/game_effect.dart';
 import 'package:gunwave/data/models/character_model.dart';
@@ -507,6 +508,12 @@ class Character extends SpriteAnimationGroupComponent
     final previous = hp;
     hp = (hp - amount).clamp(0, maxHealth);
     DamageNumber.show(parent, combatCenter, previous - hp, player: true);
+    HitImpact.show(
+      parent,
+      combatCenter,
+      width: hitbox.width,
+      height: hitbox.height,
+    );
     setInvicible();
     return true;
   }

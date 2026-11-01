@@ -2,24 +2,29 @@ import 'package:flame/components.dart';
 import 'package:flame/text.dart';
 import 'package:flutter/material.dart';
 import 'package:gunwave/data/constants/game/game_hud_style.dart';
+import 'package:gunwave/views/game/components/sub_components/pixel_health_bar_painter.dart';
 
 /// Monster HP with a numeric label kept upright when the sprite flips.
 class HealthBar extends PositionComponent {
   HealthBar({
     required this.maxHealth,
-    required this.currentHealth,
+    required int currentHealth,
     required this.width,
     super.position,
-  }) : super(size: Vector2(width, barHeight), anchor: Anchor.bottomCenter);
+  }) : currentHealth = currentHealth.clamp(0, maxHealth > 0 ? maxHealth : 0),
+       super(size: Vector2(width, barHeight), anchor: Anchor.bottomCenter);
 
-  static const barHeight = 8.0;
+  static const barHeight = GameHudStyle.healthWorldHeight;
   static const textGap = 2.0;
   @override
   final double width;
   final int maxHealth;
   int currentHealth;
-  final _bgPaint = Paint()..color = GameHudStyle.healthBackground;
-  final _fgPaint = Paint()..color = GameHudStyle.healthFill;
+
+  /// Current fill ratio after the configured HP bounds have been applied.
+  double get healthRatio => maxHealth > 0
+      ? PixelHealthBarPainter.normalizedRatio(currentHealth / maxHealth)
+      : 0;
   // TextComponent caches layout; monster HP text is not relaid out per frame.
   late final _label = TextComponent(
     text: label,
@@ -38,11 +43,11 @@ class HealthBar extends PositionComponent {
 
   @override
   void render(Canvas canvas) {
-    canvas.drawRect(Rect.fromLTWH(0, 0, width, height), _bgPaint);
-    final ratio = maxHealth > 0
-        ? (currentHealth / maxHealth).clamp(0.0, 1.0)
-        : 0.0;
-    canvas.drawRect(Rect.fromLTWH(0, 0, width * ratio, height), _fgPaint);
+    PixelHealthBarPainter.draw(
+      canvas,
+      Rect.fromLTWH(0, 0, width, height),
+      healthRatio,
+    );
     canvas.save();
     if (parent is PositionComponent &&
         (parent! as PositionComponent).scale.x < 0) {

@@ -8,20 +8,21 @@ import 'package:gunwave/views/game/combat/combatant.dart';
 /// Draws a distinct cast or status effect that follows its actor in world space.
 ///
 /// Status feedback lasts until the corresponding modifier ends. Instant casts
-/// expire after a short flash. Rendering uses a few canvas paths, without assets,
-/// shaders, per-particle components or Flutter rebuilds.
+/// expire after a short flash. Rendering uses a few block-based canvas draws,
+/// without shaders, per-particle components or Flutter rebuilds.
 class AbilityFeedback extends PositionComponent {
-  AbilityFeedback(
-      {required this.style,
-      required this.target,
-      this.radius = GameConstants.tileSize / 2,
-      Vector2? direction})
-      : direction = (direction ?? Vector2(1, 0)).clone(),
-        super(
-            position: target.combatCenter.clone(),
-            size: Vector2.all(radius * 2),
-            anchor: Anchor.center,
-            priority: 11) {
+  AbilityFeedback({
+    required this.style,
+    required this.target,
+    this.radius = GameConstants.tileSize / 2,
+    Vector2? direction,
+  }) : direction = (direction ?? Vector2(1, 0)).clone(),
+       super(
+         position: target.combatCenter.clone(),
+         size: Vector2.all(radius * 2),
+         anchor: Anchor.center,
+         priority: 11,
+       ) {
     _tracksStatus = target.effects[style.key] != null;
   }
 
@@ -29,10 +30,13 @@ class AbilityFeedback extends PositionComponent {
   final Combatant target;
   final double radius;
   final Vector2 direction;
-  final Paint _paint = Paint();
+  final Paint _paint = Paint()..isAntiAlias = false;
   late bool _tracksStatus;
   double _elapsed = 0;
   bool _finished = false;
+
+  /// Pixel-grid spacing for ability effects in the 64-unit game tile.
+  static const pixelCellSize = GameConstants.tileSize / 16;
 
   bool get isFinished => _finished;
 
@@ -65,12 +69,13 @@ class AbilityFeedback extends PositionComponent {
     if (_finished) return;
     canvas.save();
     canvas.translate(radius, radius);
-    final progress =
-        (_elapsed / GameConstants.abilityFeedbackDuration).clamp(0.0, 1.0);
+    final progress = (_elapsed / GameConstants.abilityFeedbackDuration).clamp(
+      0.0,
+      1.0,
+    );
     final alpha = _tracksStatus
         ? .7 + .2 * math.sin(_elapsed * math.pi * 2)
         : 1 - progress;
-    _stroke(alpha);
     switch (style) {
       case AbilityVisualStyle.bulwark:
         _shield(canvas, alpha);
@@ -84,7 +89,7 @@ class AbilityFeedback extends PositionComponent {
         }
       case AbilityVisualStyle.riftSlash:
         canvas.rotate(math.atan2(direction.y, direction.x));
-        _slash(canvas, progress);
+        _slash(canvas, progress, alpha);
       case AbilityVisualStyle.firstAid:
         _healing(canvas, progress, alpha);
       case AbilityVisualStyle.flameBrand:
@@ -99,162 +104,191 @@ class AbilityFeedback extends PositionComponent {
     canvas.restore();
   }
 
-  void _stroke(double alpha, {double width = 3}) {
-    _paint
-      ..color = style.color.withValues(alpha: alpha.clamp(0, 1))
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = width
-      ..strokeCap = StrokeCap.round;
-  }
+  double get _cellSize => math.min(pixelCellSize, math.max(1, radius / 8));
 
-  void _fill(double alpha) {
+  // Coordinates in the helpers below are pixel-cell units, then snapped once.
+  void _pixel(Canvas canvas, int x, int y, double alpha, {int scale = 1}) {
+    final cell = _cellSize;
     _paint
       ..color = style.color.withValues(alpha: alpha.clamp(0, 1))
       ..style = PaintingStyle.fill;
+    canvas.drawRect(
+      Rect.fromLTWH(x * cell, y * cell, cell * scale, cell * scale),
+      _paint,
+    );
   }
 
-  void _shield(Canvas canvas, double alpha) {
-    final path = Path()
-      ..moveTo(0, -radius)
-      ..lineTo(radius * .8, -radius * .6)
-      ..lineTo(radius * .65, radius * .4)
-      ..quadraticBezierTo(radius * .5, radius * .8, 0, radius)
-      ..quadraticBezierTo(-radius * .5, radius * .8, -radius * .65, radius * .4)
-      ..lineTo(-radius * .8, -radius * .6)
-      ..close();
-    _fill(alpha * .12);
-    canvas.drawPath(path, _paint);
-    _stroke(alpha);
-    canvas.drawPath(path, _paint);
-    canvas.drawLine(Offset(0, -radius * .55), Offset(0, radius * .5), _paint);
-    canvas.drawLine(Offset(-radius * .35, -radius * .05),
-        Offset(radius * .35, -radius * .05), _paint);
+  void _pixelAt(
+    Canvas canvas,
+    double x,
+    double y,
+    double alpha, {
+    int scale = 1,
+  }) {
+    _pixel(
+      canvas,
+      (x / _cellSize).round(),
+      (y / _cellSize).round(),
+      alpha,
+      scale: scale,
+    );
   }
 
-  void _power(Canvas canvas, double alpha) {
-    canvas.drawArc(Rect.fromCircle(center: Offset.zero, radius: radius),
-        -.7 + _elapsed, math.pi, false, _paint);
-    canvas.drawLine(Offset(-radius * .55, radius * .55),
-        Offset(radius * .55, -radius * .55), _paint);
-    canvas.drawLine(Offset(radius * .55, radius * .55),
-        Offset(-radius * .55, -radius * .55), _paint);
-    final charges = target.effects[style.key]?.charges ?? 3;
-    // Limit drawn pips even if an administrator configures many attack charges.
-    for (var i = 0; i < math.min(charges, 5); i++) {
-      _fill(alpha);
-      canvas.drawCircle(
-          Offset((i - (math.min(charges, 5) - 1) / 2) * 9, -radius - 9),
-          3,
-          _paint);
-    }
-  }
-
-  void _lightning(Canvas canvas, double progress, double alpha) {
-    final reach = radius * (.15 + .85 * progress);
-    canvas.drawCircle(Offset.zero, reach, _paint);
-    const spokes = 8;
-    for (var i = 0; i < spokes; i++) {
-      final angle = i * math.pi * 2 / spokes;
-      final path = Path()
-        ..moveTo(math.cos(angle) * reach * .35, math.sin(angle) * reach * .35)
-        ..lineTo(math.cos(angle + .2) * reach * .7,
-            math.sin(angle + .2) * reach * .7)
-        ..lineTo(math.cos(angle) * reach, math.sin(angle) * reach);
-      canvas.drawPath(path, _paint);
-    }
-  }
-
-  void _stunStars(Canvas canvas, double alpha) {
-    const stars = 3;
-    for (var i = 0; i < stars; i++) {
-      final angle = _elapsed * 3 + i * math.pi * 2 / stars;
-      final x = math.cos(angle) * radius * .7;
-      final y = -radius + math.sin(angle) * radius * .2;
-      final star = Path()
-        ..moveTo(x, y - 5)
-        ..lineTo(x + 2, y - 1)
-        ..lineTo(x + 6, y)
-        ..lineTo(x + 2, y + 2)
-        ..lineTo(x, y + 6)
-        ..lineTo(x - 2, y + 2)
-        ..lineTo(x - 6, y)
-        ..lineTo(x - 2, y - 1)
-        ..close();
-      _fill(alpha);
-      canvas.drawPath(star, _paint);
-    }
-  }
-
-  void _slash(Canvas canvas, double progress) {
-    final angle = -1.2 + progress * 1.2;
-    canvas.drawArc(Rect.fromCircle(center: Offset.zero, radius: radius), angle,
-        1.8, false, _paint);
-    canvas.drawArc(Rect.fromCircle(center: Offset.zero, radius: radius * .65),
-        angle + .15, 1.4, false, _paint);
-  }
-
-  void _healing(Canvas canvas, double progress, double alpha) {
-    const crosses = 3;
-    for (var i = 0; i < crosses; i++) {
-      final x = (i - 1) * radius * .65;
-      final y = radius * .3 - progress * radius - (i.isEven ? 0 : radius * .4);
-      _stroke(alpha, width: 4);
-      canvas.drawLine(Offset(x - 5, y), Offset(x + 5, y), _paint);
-      canvas.drawLine(Offset(x, y - 5), Offset(x, y + 5), _paint);
-    }
-  }
-
-  void _flame(Canvas canvas, double progress, double alpha) {
-    final reach = radius * (.6 + progress * .4);
-    final path = Path()
-      ..moveTo(reach, 0)
-      ..quadraticBezierTo(0, -radius, -radius * .6, -radius * .35)
-      ..quadraticBezierTo(-radius * .15, -radius * .05, -radius, 0)
-      ..quadraticBezierTo(-radius * .1, radius * .7, reach, 0)
-      ..close();
-    _fill(alpha * .5);
-    canvas.drawPath(path, _paint);
-    _stroke(alpha);
-    canvas.drawPath(path, _paint);
-  }
-
-  void _dash(Canvas canvas, double alpha) {
-    const streaks = 4;
-    for (var i = 0; i < streaks; i++) {
-      final y = (i - 1.5) * radius * .4;
-      _stroke(alpha * (1 - i * .15));
-      canvas.drawLine(Offset(-radius * (1.6 + i * .25), y),
-          Offset(-radius * .25, y), _paint);
-    }
-    _stroke(alpha * .5);
-    canvas.drawOval(
-        Rect.fromCenter(
-            center: Offset.zero, width: radius, height: radius * 1.6),
-        _paint);
-  }
-
-  void _rune(Canvas canvas, double alpha) {
-    canvas.save();
-    canvas.rotate(_elapsed * .6);
-    final rune = Path();
-    const corners = 6;
-    for (var i = 0; i < corners; i++) {
-      final angle = i * math.pi * 2 / corners;
-      final x = math.cos(angle) * radius;
-      final y = math.sin(angle) * radius;
-      if (i == 0) {
-        rune.moveTo(x, y);
-      } else {
-        rune.lineTo(x, y);
+  void _line(Canvas canvas, int x0, int y0, int x1, int y1, double alpha) {
+    var x = x0;
+    var y = y0;
+    final dx = (x1 - x0).abs();
+    final sx = x0 < x1 ? 1 : -1;
+    final dy = -(y1 - y0).abs();
+    final sy = y0 < y1 ? 1 : -1;
+    var error = dx + dy;
+    while (true) {
+      _pixel(canvas, x, y, alpha);
+      if (x == x1 && y == y1) break;
+      final twiceError = 2 * error;
+      if (twiceError >= dy) {
+        error += dy;
+        x += sx;
+      }
+      if (twiceError <= dx) {
+        error += dx;
+        y += sy;
       }
     }
-    rune.close();
-    canvas.drawPath(rune, _paint);
-    canvas.drawLine(Offset(-radius * .4, -radius * .4),
-        Offset(radius * .4, radius * .4), _paint);
-    canvas.drawLine(Offset(radius * .4, -radius * .4),
-        Offset(-radius * .4, radius * .4), _paint);
-    canvas.drawCircle(Offset.zero, radius * .4, _paint);
-    canvas.restore();
+  }
+
+  /// Draws a compact shield silhouette with a brighter center seam.
+  void _shield(Canvas canvas, double alpha) {
+    const halfWidths = [2, 3, 3, 2, 2, 1];
+    for (var row = 0; row < halfWidths.length; row++) {
+      for (var column = -halfWidths[row]; column <= halfWidths[row]; column++) {
+        _pixel(canvas, column, row - 3, alpha);
+      }
+    }
+    _line(canvas, 0, -2, 0, 1, alpha * .55);
+    _line(canvas, -1, -1, 1, -1, alpha * .55);
+  }
+
+  /// Draws a fractured strike mark and at most five remaining charge pips.
+  void _power(Canvas canvas, double alpha) {
+    for (var offset = -3; offset <= 3; offset++) {
+      _pixel(canvas, offset, offset, alpha);
+      _pixel(canvas, offset, -offset, alpha);
+    }
+    _line(canvas, -4, 0, 4, 0, alpha * .55);
+    final charges = math.min(target.effects[style.key]?.charges ?? 3, 5);
+    for (var i = 0; i < charges; i++) {
+      _pixel(canvas, i - (charges - 1) ~/ 2, -6, alpha);
+    }
+  }
+
+  /// Draws a jagged bolt and four short sparks for Thunder Crash.
+  void _lightning(Canvas canvas, double progress, double alpha) {
+    final fade = alpha * (.55 + progress * .45);
+    _line(canvas, -1, -5, -1, -3, fade);
+    _line(canvas, -1, -3, 1, -3, fade);
+    _line(canvas, 1, -3, -1, 0, fade);
+    _line(canvas, -1, 0, 1, 0, fade);
+    _line(canvas, 1, 0, -1, 3, fade);
+    _line(canvas, -1, 3, -1, 5, fade);
+    for (var i = 0; i < 4; i++) {
+      _pixel(canvas, i.isEven ? -4 : 3, i - 2, alpha * (1 - progress * .5));
+    }
+  }
+
+  /// Orbits three block stars while the target remains stunned.
+  void _stunStars(Canvas canvas, double alpha) {
+    for (var i = 0; i < 3; i++) {
+      final angle = _elapsed * 2 + i * math.pi * 2 / 3;
+      final x = math.cos(angle) * radius * .55;
+      final y = -radius * .8 + math.sin(angle) * radius * .15;
+      _pixelAt(canvas, x, y - _cellSize, alpha);
+      _pixelAt(canvas, x, y, alpha);
+      _pixelAt(canvas, x - _cellSize, y, alpha);
+      _pixelAt(canvas, x + _cellSize, y, alpha);
+      _pixelAt(canvas, x, y + _cellSize, alpha);
+    }
+  }
+
+  /// Draws two stepped arcs and fades them with the instant cast lifetime.
+  void _slash(Canvas canvas, double progress, double alpha) {
+    for (var i = 0; i <= 16; i++) {
+      final angle = -1.15 + progress * .7 + i * 1.8 / 16;
+      final outer = radius * .78;
+      final inner = radius * .55;
+      _pixelAt(canvas, math.cos(angle) * outer, math.sin(angle) * outer, alpha);
+      if (i % 2 == 0) {
+        _pixelAt(
+          canvas,
+          math.cos(angle) * inner,
+          math.sin(angle) * inner,
+          alpha * .7,
+        );
+      }
+    }
+  }
+
+  /// Floats three pixel crosses upward to distinguish healing from damage.
+  void _healing(Canvas canvas, double progress, double alpha) {
+    for (var i = 0; i < 3; i++) {
+      final x = (i - 1) * radius * .55;
+      final y = radius * .2 - progress * radius - (i.isEven ? 0 : radius * .25);
+      _pixelAt(canvas, x, y, alpha);
+      _pixelAt(canvas, x - _cellSize, y, alpha);
+      _pixelAt(canvas, x + _cellSize, y, alpha);
+      _pixelAt(canvas, x, y - _cellSize, alpha);
+      _pixelAt(canvas, x, y + _cellSize, alpha);
+    }
+  }
+
+  /// Builds a small right-facing flame from stepped rows of square pixels.
+  void _flame(Canvas canvas, double progress, double alpha) {
+    final reach = 2 + (progress * 2).round();
+    const rows = [-2, -1, 0, 1, 2];
+    for (final row in rows) {
+      final width = row == 0 ? reach + 2 : reach + 1 - row.abs() ~/ 2;
+      for (var column = 0; column < width; column++) {
+        _pixel(canvas, column - 2, row, alpha * (column < 2 ? .7 : 1));
+      }
+    }
+    _pixel(canvas, 1, -3, alpha * .8);
+    _pixel(canvas, 1, 3, alpha * .8);
+  }
+
+  /// Leaves staggered horizontal pixels behind the dash direction.
+  void _dash(Canvas canvas, double alpha) {
+    for (var row = -3; row <= 3; row++) {
+      final length = 4 + row.abs() % 3;
+      for (var column = -length; column <= -1; column++) {
+        if ((column + row).isEven) _pixel(canvas, column, row, alpha);
+      }
+    }
+    for (var column = -1; column <= 1; column++) {
+      _pixel(canvas, column, -1, alpha * .65);
+      _pixel(canvas, column, 0, alpha);
+      _pixel(canvas, column, 1, alpha * .65);
+    }
+  }
+
+  /// Draws a slowly stepped hex seal with a crossed center rune.
+  void _rune(Canvas canvas, double alpha) {
+    const corners = 6;
+    final rotation = (_elapsed * 2).floor() % corners;
+    final vertices = <(int, int)>[];
+    for (var i = 0; i < corners; i++) {
+      final angle = ((i + rotation) % corners) * math.pi * 2 / corners;
+      vertices.add((
+        (math.cos(angle) * 5).round(),
+        (math.sin(angle) * 5).round(),
+      ));
+    }
+    for (var i = 0; i < corners; i++) {
+      final start = vertices[i];
+      final end = vertices[(i + 1) % corners];
+      _line(canvas, start.$1, start.$2, end.$1, end.$2, alpha);
+    }
+    _line(canvas, -2, -2, 2, 2, alpha * .8);
+    _line(canvas, 2, -2, -2, 2, alpha * .8);
+    _pixel(canvas, 0, 0, alpha);
   }
 }
