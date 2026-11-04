@@ -15,6 +15,8 @@ class CampaignUiLabels {
     required this.completed,
     required this.failed,
     required this.rewards,
+    required this.rewardsAlreadyClaimed,
+    required this.progressSaveFailed,
     required this.retry,
     required this.continueCampaign,
     required this.campaign,
@@ -37,6 +39,8 @@ class CampaignUiLabels {
   final String completed;
   final String failed;
   final String rewards;
+  final String rewardsAlreadyClaimed;
+  final String progressSaveFailed;
   final String retry;
   final String continueCampaign;
   final String campaign;

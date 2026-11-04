@@ -5,12 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gunwave/data/constants/game/game_play_mode.dart';
+import 'package:gunwave/data/models/campaign_progress_model.dart';
 import 'package:gunwave/data/models/campaign_stage_model.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/l10n/app_localizations.dart';
 import 'package:gunwave/localization/app_locale_controller.dart';
 import 'package:gunwave/localization/app_locale_mode.dart';
 import 'package:gunwave/repositories/campaign_repository.dart';
+import 'package:gunwave/repositories/campaign_progress_repository.dart';
 import 'package:gunwave/repositories/character_repository.dart';
 import 'package:gunwave/repositories/user_repository.dart';
 import 'package:gunwave/routes.dart';
@@ -40,6 +42,7 @@ class _RpgMenuHostState extends ConsumerState<RpgMenuHost> {
   String? _selectedStageId;
   RpgMenuPage? _previousPage;
   List<CampaignStageModel> _stages = const [];
+  CampaignProgressModel _campaignProgress = CampaignProgressModel();
   List<CharacterModel> _ownedHeroes = const [];
   List<CharacterModel> _shopHeroes = const [];
   int _selectedHeroIndex = 0;
@@ -86,6 +89,9 @@ class _RpgMenuHostState extends ConsumerState<RpgMenuHost> {
   Future<void> _loadMenuData() async {
     try {
       _stages = await ref.read(campaignRepositoryProvider).getStages();
+      _campaignProgress = await ref
+          .read(campaignProgressRepositoryProvider)
+          .getProgress();
       if (_pageNeedsHeroes(widget.initialPage)) {
         _gold = ref.read(userRepoProvider).appUser?.gold ?? 0;
         await _loadHeroData();
@@ -103,8 +109,10 @@ class _RpgMenuHostState extends ConsumerState<RpgMenuHost> {
     stages: List.unmodifiable(_stages),
     ownedHeroes: List.unmodifiable(_ownedHeroes),
     shopHeroes: List.unmodifiable(_shopHeroes),
-    clearedStageIds: const {},
+    clearedStageIds: _campaignProgress.completedStageIds,
     gold: _gold,
+    campaignGold: _campaignProgress.goldBalance,
+    campaignStatusPoints: _campaignProgress.statusPointBalance,
     selectedHeroIndex: _selectedHeroIndex,
     selectedStageId: _selectedStageId,
     localeMode: ref.read(appLocaleControllerProvider).mode,
@@ -189,11 +197,15 @@ class _RpgMenuHostState extends ConsumerState<RpgMenuHost> {
       _ownedHeroes = List.unmodifiable(characterRepository.ownedCharacters);
       _shopHeroes = List.unmodifiable(shopModel.characters);
       _gold = ref.read(userRepoProvider).appUser?.gold ?? shopModel.userBalance;
-      _selectedHeroIndex = ref
-          .read(characterViewModel)
-          .selectedCharacterIndex
-          .clamp(0, _ownedHeroes.isEmpty ? 0 : _ownedHeroes.length - 1)
-          .toInt();
+      final persistedHeroIndex = _ownedHeroes.indexWhere(
+        (hero) => hero.id == _campaignProgress.selectedHeroId,
+      );
+      _selectedHeroIndex =
+          (persistedHeroIndex >= 0
+                  ? persistedHeroIndex
+                  : ref.read(characterViewModel).selectedCharacterIndex)
+              .clamp(0, _ownedHeroes.isEmpty ? 0 : _ownedHeroes.length - 1)
+              .toInt();
       _heroDataLoaded = true;
     } finally {
       _heroDataLoading = false;
@@ -206,12 +218,20 @@ class _RpgMenuHostState extends ConsumerState<RpgMenuHost> {
     _game.updateSnapshot(_snapshot);
   }
 
-  void _selectHero(int index) {
+  Future<void> _selectHero(int index) async {
+    if (index < 0 || index >= _ownedHeroes.length) return;
     ref.read(characterViewModel).onCharacterSelected(index);
     _selectedHeroIndex = index;
     _ownedHeroes = List.unmodifiable(
       ref.read(characterRepoProvider).ownedCharacters,
     );
+    try {
+      _campaignProgress = await ref
+          .read(campaignProgressRepositoryProvider)
+          .selectHero(_ownedHeroes[index].id);
+    } catch (error, stackTrace) {
+      debugPrint('Unable to save selected campaign hero: $error\n$stackTrace');
+    }
     _snapshot = _createSnapshot(isLoading: false);
     _replaceGame();
   }
@@ -290,11 +310,24 @@ class _RpgMenuHostState extends ConsumerState<RpgMenuHost> {
           campaignStage: stage,
           character: hero,
           playMode: GamePlayMode.joystick,
+          onCampaignStageCompleted: _completeCampaignStage,
           onContinueCampaign: _returnToCampaignMap,
           onReturnToCampaign: _returnToCampaignMap,
         ),
       ),
     );
+  }
+
+  Future<CampaignStageCompletion> _completeCampaignStage(
+    CampaignStageModel stage,
+  ) async {
+    final completion = await ref
+        .read(campaignProgressRepositoryProvider)
+        .completeStage(stage);
+    _campaignProgress = completion.progress;
+    _snapshot = _createSnapshot(isLoading: false);
+    _game.updateSnapshot(_snapshot);
+    return completion;
   }
 
   void _returnToCampaignMap() {

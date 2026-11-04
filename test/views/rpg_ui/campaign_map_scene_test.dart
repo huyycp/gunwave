@@ -59,4 +59,34 @@ void main() {
       );
     },
   );
+
+  testWithGame(
+    'Campaign Map restores the next stage as available after a saved clear',
+    () => testRpgMenuGame(
+      initialPage: RpgMenuPage.campaignMap,
+      snapshot: testRpgMenuSnapshot(
+        stages: [
+          testCampaignStage(),
+          testCampaignStage().copyWith(
+            id: 'stage_2',
+            order: 2,
+            unlockRequirementStageId: 'stage_1',
+          ),
+        ],
+        clearedStageIds: const {'stage_1'},
+      ),
+    ),
+    (game) async {
+      await game.ready();
+      final map = activeRpgMenuScene(game) as CampaignMapScene;
+      final buttons = map.children.whereType<AssetButtonComponent>().toList();
+      expect(buttons[1].enabled, isTrue);
+      expect(buttons[2].enabled, isTrue);
+      final statusLabels = map.children
+          .whereType<TextComponent<SpriteFontRenderer>>()
+          .map((component) => component.text);
+      expect(statusLabels, contains('Cleared'));
+      expect(statusLabels, contains('Available'));
+    },
+  );
 }

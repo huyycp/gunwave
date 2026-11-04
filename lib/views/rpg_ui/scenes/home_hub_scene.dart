@@ -31,6 +31,8 @@ class HomeHubScene extends RpgMenuScene {
   late final TextComponent<SpriteFontRenderer> _roundSummary;
   late final TextComponent<SpriteFontRenderer> _goldLabel;
   late final TextComponent<SpriteFontRenderer> _goldValue;
+  late final TextComponent<SpriteFontRenderer> _statusPointsLabel;
+  late final TextComponent<SpriteFontRenderer> _statusPointsValue;
   late final AssetButtonComponent _continueButton;
   late final AssetButtonComponent _loadoutButton;
   late final AssetButtonComponent _shopButton;
@@ -63,7 +65,12 @@ class HomeHubScene extends RpgMenuScene {
       scale: 0.75,
     );
     _goldLabel = addText(labels.gold, scale: 0.65);
-    _goldValue = addText(snapshot.gold.toString(), scale: 0.8);
+    _goldValue = addText(snapshot.campaignGold.toString(), scale: 0.8);
+    _statusPointsLabel = addText(labels.statusPoints, scale: 0.55);
+    _statusPointsValue = addText(
+      snapshot.campaignStatusPoints.toString(),
+      scale: 0.8,
+    );
     _heroPreview = await loadHeroPreview(
       snapshot.selectedHero,
       size: Vector2.all(192),
@@ -143,11 +150,19 @@ class HomeHubScene extends RpgMenuScene {
       top + 196 * scale,
     );
     _goldLabel.position = Vector2(
-      bounds.right - 232 * scale,
+      bounds.right - 190 * scale,
       bounds.top + 28 * scale,
     );
     _goldValue.position = Vector2(
-      bounds.right - 156 * scale,
+      bounds.right - 116 * scale,
+      bounds.top + 28 * scale,
+    );
+    _statusPointsLabel.position = Vector2(
+      bounds.right - 364 * scale,
+      bounds.top + 28 * scale,
+    );
+    _statusPointsValue.position = Vector2(
+      bounds.right - 280 * scale,
       bounds.top + 28 * scale,
     );
     final hero = _heroPreview;

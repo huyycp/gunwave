@@ -9,11 +9,13 @@ import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_play_mode.dart';
 import 'package:gunwave/data/dtos/req/update_rank_req.dart';
 import 'package:gunwave/data/models/campaign_stage_model.dart';
+import 'package:gunwave/data/models/campaign_progress_model.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/data/models/rank_model.dart';
 import 'package:gunwave/data/models/reward_model.dart';
 import 'package:gunwave/data/models/room_model.dart';
 import 'package:gunwave/localization/build_context_l10n.dart';
+import 'package:gunwave/l10n/app_localizations.dart';
 import 'package:gunwave/views/game/game_view_model.dart';
 import 'package:gunwave/views/game/gunwave.dart';
 import 'package:gunwave/views/game/ui/campaign_ui_labels.dart';
@@ -31,6 +33,7 @@ class GameView extends BaseView {
     this.campaignStage,
     required this.character,
     required this.playMode,
+    this.onCampaignStageCompleted,
     this.onContinueCampaign,
     this.onReturnToCampaign,
     super.key,
@@ -40,6 +43,8 @@ class GameView extends BaseView {
   final CampaignStageModel? campaignStage;
   final CharacterModel character;
   final GamePlayMode playMode;
+  final Future<CampaignStageCompletion> Function(CampaignStageModel stage)?
+  onCampaignStageCompleted;
   final VoidCallback? onContinueCampaign;
   final VoidCallback? onReturnToCampaign;
 
@@ -409,6 +414,7 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
 
   Future<void> _completeStage(bool isSuccess) async {
     if (_isCompletingStage) return;
+    final campaignStrings = widget.campaignStage == null ? null : context.l10n;
     _isCompletingStage = true;
     _gunwave.controlsBlocked = true;
     model.stopTimer();
@@ -422,13 +428,33 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
 
     final campaignStage = widget.campaignStage;
     if (campaignStage != null) {
-      final rewardLines = isSuccess
-          ? campaignStage.rewards.map(_formatCampaignReward).toList()
+      var canShowFirstCompletionRewards = isSuccess;
+      String? progressMessage;
+      final strings = campaignStrings!;
+      final completionHandler = widget.onCampaignStageCompleted;
+      if (isSuccess && completionHandler != null) {
+        try {
+          final completion = await completionHandler(campaignStage);
+          canShowFirstCompletionRewards = completion.wasFirstCompletion;
+          if (!completion.wasFirstCompletion) {
+            progressMessage = strings.campaignRewardsAlreadyClaimed;
+          }
+        } catch (error, stackTrace) {
+          debugPrint('Unable to save campaign completion: $error\n$stackTrace');
+          canShowFirstCompletionRewards = false;
+          progressMessage = strings.campaignProgressSaveFailed;
+        }
+      }
+      final rewardLines = canShowFirstCompletionRewards
+          ? campaignStage.rewards
+                .map((reward) => _formatCampaignReward(reward, strings))
+                .toList()
           : const <String>[];
       if (!mounted) return;
       await _gunwave.showStageResult(
         isSuccess: isSuccess,
         rewardLines: rewardLines,
+        progressMessage: progressMessage,
         onRetry: () => unawaited(_retryCampaignStage()),
         onContinue: widget.onContinueCampaign,
         onCampaign: _returnToCampaign,
@@ -528,6 +554,8 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
       completed: l10n.completed,
       failed: l10n.failed,
       rewards: l10n.rewards,
+      rewardsAlreadyClaimed: l10n.campaignRewardsAlreadyClaimed,
+      progressSaveFailed: l10n.campaignProgressSaveFailed,
       retry: l10n.retry,
       continueCampaign: l10n.continueCampaign,
       campaign: l10n.campaign,
@@ -540,11 +568,11 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
     );
   }
 
-  String _formatCampaignReward(RewardModel reward) {
+  String _formatCampaignReward(RewardModel reward, AppLocalizations strings) {
     final label = switch (reward.type) {
-      RewardType.gold => context.l10n.rewardGold,
-      RewardType.sp => context.l10n.rewardStatusPoints,
-      RewardType.unknown => context.l10n.rewardUnknown,
+      RewardType.gold => strings.rewardGold,
+      RewardType.sp => strings.rewardStatusPoints,
+      RewardType.unknown => strings.rewardUnknown,
     };
     return '${reward.amount} $label';
   }
@@ -557,6 +585,7 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
           campaignStage: widget.campaignStage!,
           character: widget.character,
           playMode: widget.playMode,
+          onCampaignStageCompleted: widget.onCampaignStageCompleted,
           onContinueCampaign: widget.onContinueCampaign,
           onReturnToCampaign: widget.onReturnToCampaign,
         ),

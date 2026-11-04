@@ -1,5 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flame/text.dart';
 import 'package:flame_test/flame_test.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,15 +17,26 @@ void main() {
 
   testWithGame(
     'Home Hub renders its primary actions and routes to the campaign map',
-    () => testRpgMenuGame(initialPage: RpgMenuPage.homeHub),
+    () => testRpgMenuGame(
+      initialPage: RpgMenuPage.homeHub,
+      snapshot: testRpgMenuSnapshot(
+        campaignGold: 100,
+        campaignStatusPoints: 25,
+      ),
+    ),
     (game) async {
       await game.ready();
       expect(game.router.currentRoute.name, RpgMenuPage.homeHub.routeName);
       final hub = activeRpgMenuScene(game) as HomeHubScene;
       final buttons = hub.children.whereType<AssetButtonComponent>();
+      final labels = hub.children
+          .whereType<TextComponent<SpriteFontRenderer>>()
+          .map((component) => component.text);
       expect(buttons.map((button) => button.label), contains('Continue'));
       expect(buttons.map((button) => button.label), contains('Hero Loadout'));
       expect(buttons.map((button) => button.label), contains('Shop'));
+      expect(labels, contains('100'));
+      expect(labels, contains('25'));
 
       game.onGameResize(Vector2(640, 360));
       final actionButtons =

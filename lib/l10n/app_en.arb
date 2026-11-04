@@ -126,5 +126,7 @@
   "loading": "Loading",
   "noCampaignStages": "No campaign stages available",
   "roundsCount": "{count} rounds",
-  "@roundsCount": {"placeholders": {"count": {"type": "int"}}}
+  "@roundsCount": {"placeholders": {"count": {"type": "int"}}},
+  "campaignRewardsAlreadyClaimed": "First-clear rewards already claimed",
+  "campaignProgressSaveFailed": "Progress could not be saved; rewards were not granted"
 }

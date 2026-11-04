@@ -117,5 +117,7 @@
   "gold": "Vàng",
   "loading": "Đang tải",
   "noCampaignStages": "Chưa có màn chiến dịch",
-  "roundsCount": "{count} vòng"
+  "roundsCount": "{count} vòng",
+  "campaignRewardsAlreadyClaimed": "Phần thưởng vượt màn lần đầu đã nhận",
+  "campaignProgressSaveFailed": "Không lưu được tiến trình; chưa nhận phần thưởng"
 }

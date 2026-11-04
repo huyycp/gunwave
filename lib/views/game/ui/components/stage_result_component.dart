@@ -19,6 +19,7 @@ class StageResultComponent extends PositionComponent {
   StageResultComponent._({
     required this.isSuccess,
     required this.rewardLines,
+    required this.progressMessage,
     required this.onContinue,
     required this.safeAreaInsets,
     required RectangleComponent backdrop,
@@ -26,6 +27,7 @@ class StageResultComponent extends PositionComponent {
     required AssetPanelComponent panel,
     required TextComponent<SpriteFontRenderer> title,
     required TextComponent<SpriteFontRenderer> rewardsHeader,
+    required TextComponent<SpriteFontRenderer> progressNote,
     required List<TextComponent<SpriteFontRenderer>> rewardTexts,
     required AssetButtonComponent retryButton,
     required AssetButtonComponent continueButton,
@@ -35,6 +37,7 @@ class StageResultComponent extends PositionComponent {
        _panel = panel,
        _title = title,
        _rewardsHeader = rewardsHeader,
+       _progressNote = progressNote,
        _rewardTexts = rewardTexts,
        _retryButton = retryButton,
        _continueButton = continueButton,
@@ -46,6 +49,7 @@ class StageResultComponent extends PositionComponent {
       panel,
       title,
       rewardsHeader,
+      progressNote,
       ...rewardTexts,
       retryButton,
       continueButton,
@@ -60,6 +64,7 @@ class StageResultComponent extends PositionComponent {
 
   final bool isSuccess;
   final List<String> rewardLines;
+  final String? progressMessage;
   final VoidCallback? onContinue;
   final EdgeInsets safeAreaInsets;
   final RectangleComponent _backdrop;
@@ -67,6 +72,7 @@ class StageResultComponent extends PositionComponent {
   final AssetPanelComponent _panel;
   final TextComponent<SpriteFontRenderer> _title;
   final TextComponent<SpriteFontRenderer> _rewardsHeader;
+  final TextComponent<SpriteFontRenderer> _progressNote;
   final List<TextComponent<SpriteFontRenderer>> _rewardTexts;
   final AssetButtonComponent _retryButton;
   final AssetButtonComponent _continueButton;
@@ -81,6 +87,7 @@ class StageResultComponent extends PositionComponent {
     required EdgeInsets safeAreaInsets,
     required bool isSuccess,
     required List<String> rewardLines,
+    String? progressMessage,
     required VoidCallback onRetry,
     VoidCallback? onContinue,
     required VoidCallback onCampaign,
@@ -105,6 +112,11 @@ class StageResultComponent extends PositionComponent {
     );
     final rewardsHeader = TextComponent<SpriteFontRenderer>(
       text: isSuccess && rewardLines.isNotEmpty ? labels.rewards : '',
+      textRenderer: font,
+      anchor: Anchor.center,
+    );
+    final progressNote = TextComponent<SpriteFontRenderer>(
+      text: progressMessage ?? '',
       textRenderer: font,
       anchor: Anchor.center,
     );
@@ -152,6 +164,7 @@ class StageResultComponent extends PositionComponent {
     return StageResultComponent._(
       isSuccess: isSuccess,
       rewardLines: List.unmodifiable(rewardLines),
+      progressMessage: progressMessage,
       onContinue: onContinue,
       safeAreaInsets: safeAreaInsets,
       backdrop: backdrop,
@@ -159,6 +172,7 @@ class StageResultComponent extends PositionComponent {
       panel: panel,
       title: title,
       rewardsHeader: rewardsHeader,
+      progressNote: progressNote,
       rewardTexts: rewardTexts,
       retryButton: retryButton,
       continueButton: continueButton,
@@ -191,6 +205,12 @@ class StageResultComponent extends PositionComponent {
       ..position.setValues(
         (bounds.left + bounds.right) / 2,
         panelTop + 54 * scale,
+      )
+      ..scale.setValues(scale, scale);
+    _progressNote
+      ..position.setValues(
+        (bounds.left + bounds.right) / 2,
+        panelTop + 88 * scale,
       )
       ..scale.setValues(scale, scale);
 

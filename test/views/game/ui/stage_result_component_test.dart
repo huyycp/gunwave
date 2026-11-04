@@ -59,6 +59,27 @@ void main() {
     expect(campaignReturns, 1);
   });
 
+  testWithFlameGame(
+    'replay result explains that first-clear rewards are claimed',
+    (game) async {
+      final result = await StageResultComponent.load(
+        game.images,
+        labels: testCampaignUiLabels(),
+        safeAreaInsets: EdgeInsets.zero,
+        isSuccess: true,
+        rewardLines: const [],
+        progressMessage: 'First clear rewards already claimed',
+        onRetry: () {},
+        onCampaign: () {},
+      );
+      await game.ensureAdd(result);
+
+      expect(result.isSuccess, isTrue);
+      expect(result.rewardLines, isEmpty);
+      expect(result.progressMessage, 'First clear rewards already claimed');
+    },
+  );
+
   testWithFlameGame('failed result has no rewards or continue action', (
     game,
   ) async {

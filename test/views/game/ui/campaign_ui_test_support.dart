@@ -12,6 +12,8 @@ CampaignUiLabels testCampaignUiLabels() => CampaignUiLabels(
   completed: 'Completed',
   failed: 'Failed',
   rewards: 'Rewards',
+  rewardsAlreadyClaimed: 'First clear rewards already claimed',
+  progressSaveFailed: 'Progress could not be saved',
   retry: 'Retry',
   continueCampaign: 'Continue',
   campaign: 'Campaign',

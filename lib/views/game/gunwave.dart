@@ -218,6 +218,7 @@ class Gunwave extends FlameGame
   Future<void> showStageResult({
     required bool isSuccess,
     required List<String> rewardLines,
+    String? progressMessage,
     required VoidCallback onRetry,
     VoidCallback? onContinue,
     required VoidCallback onCampaign,
@@ -233,6 +234,7 @@ class Gunwave extends FlameGame
       safeAreaInsets: safeAreaInsets,
       isSuccess: isSuccess,
       rewardLines: rewardLines,
+      progressMessage: progressMessage,
       onRetry: onRetry,
       onContinue: onContinue,
       onCampaign: onCampaign,

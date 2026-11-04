@@ -136,6 +136,8 @@ class RpgMenuSnapshot {
     this.shopHeroes = const [],
     this.clearedStageIds = const {},
     this.gold = 0,
+    this.campaignGold = 0,
+    this.campaignStatusPoints = 0,
     this.selectedHeroIndex = 0,
     this.selectedStageId,
     this.localeMode = AppLocaleMode.system,
@@ -146,7 +148,15 @@ class RpgMenuSnapshot {
   final List<CharacterModel> ownedHeroes;
   final List<CharacterModel> shopHeroes;
   final Set<String> clearedStageIds;
+
+  /// Online account balance used by the existing character shop.
   final int gold;
+
+  /// Local balance earned through first-time campaign completions.
+  final int campaignGold;
+
+  /// Local status-point rewards earned through the campaign.
+  final int campaignStatusPoints;
   final int selectedHeroIndex;
   final String? selectedStageId;
   final AppLocaleMode localeMode;
