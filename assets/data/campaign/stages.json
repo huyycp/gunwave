@@ -1,0 +1,110 @@
+{
+  "stages": [
+    {
+      "id": "stage_1",
+      "order": 1,
+      "name": "Forest Outskirts",
+      "mapKey": "forest",
+      "unlockRequirementStageId": null,
+      "enemies": [
+        {
+          "id": "blue_torch_guard",
+          "name": "Torch Guard",
+          "filename": "torch_blue",
+          "hp": 3,
+          "str": 1,
+          "vit": 0,
+          "agi": 1,
+          "score": 10
+        },
+        {
+          "id": "red_torch_raider",
+          "name": "Torch Raider",
+          "filename": "torch_red",
+          "hp": 4,
+          "str": 1,
+          "vit": 1,
+          "agi": 1,
+          "score": 15
+        },
+        {
+          "id": "red_barrel_bomber",
+          "name": "Barrel Bomber",
+          "filename": "barrel_red",
+          "hp": 5,
+          "str": 2,
+          "vit": 1,
+          "agi": 0,
+          "score": 20
+        },
+        {
+          "id": "blue_tnt_bomber",
+          "name": "TNT Bomber",
+          "filename": "tnt_blue",
+          "hp": 6,
+          "str": 2,
+          "vit": 1,
+          "agi": 1,
+          "score": 25
+        },
+        {
+          "id": "elder_torch_boss",
+          "name": "Elder Torch",
+          "filename": "torch_purple",
+          "hp": 24,
+          "str": 3,
+          "vit": 2,
+          "agi": 1,
+          "score": 100
+        }
+      ],
+      "rounds": [
+        {
+          "id": "stage_1_round_1",
+          "number": 1,
+          "isBoss": false,
+          "encounters": [
+            { "enemyId": "blue_torch_guard", "spawnMarker": "torch_blue", "count": 1 }
+          ]
+        },
+        {
+          "id": "stage_1_round_2",
+          "number": 2,
+          "isBoss": false,
+          "encounters": [
+            { "enemyId": "red_torch_raider", "spawnMarker": "torch_red", "count": 1 }
+          ]
+        },
+        {
+          "id": "stage_1_round_3",
+          "number": 3,
+          "isBoss": false,
+          "encounters": [
+            { "enemyId": "red_barrel_bomber", "spawnMarker": "torch_red", "count": 1 }
+          ]
+        },
+        {
+          "id": "stage_1_round_4",
+          "number": 4,
+          "isBoss": false,
+          "encounters": [
+            { "enemyId": "blue_tnt_bomber", "spawnMarker": "torch_blue", "count": 1 },
+            { "enemyId": "red_torch_raider", "spawnMarker": "torch_red", "count": 1 }
+          ]
+        },
+        {
+          "id": "stage_1_round_5",
+          "number": 5,
+          "isBoss": true,
+          "encounters": [
+            { "enemyId": "elder_torch_boss", "spawnMarker": "torch_blue", "count": 1 }
+          ]
+        }
+      ],
+      "rewards": [
+        { "type": "gold", "amount": 100 },
+        { "type": "sp", "amount": 25 }
+      ]
+    }
+  ]
+}

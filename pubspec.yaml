@@ -51,6 +51,7 @@ flutter:
     - dev.env
     - prod.env
     - assets/tiles/
+    - assets/data/campaign/
     - assets/images/
     - assets/images/hub/joystick/
     - assets/images/ui/banners/
