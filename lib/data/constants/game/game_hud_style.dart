@@ -4,6 +4,13 @@ import 'package:flutter/material.dart';
 abstract final class GameHudStyle {
   static const edge = 6.0;
   static const gap = 6.0;
+  static const panelPadding = 12.0;
+  static const panelBorderInset = 20.0;
+  static const buttonBorderInset = 12.0;
+  static const progressBarBorderInset = buttonBorderInset;
+  static const progressBarInset = buttonBorderInset - 4.0;
+  static const minimumTouchSize = 48.0;
+  static const uiFontScale = 1.0;
   static const guideFontSize = 10.0;
   static const labelFontSize = 11.0;
   static const playerPanelMaxWidth = 320.0;

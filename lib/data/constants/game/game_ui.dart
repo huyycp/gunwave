@@ -9,9 +9,12 @@ class GameBanners {
   static const className = 'banners';
   static final basePath = Assets.images.ui.banners;
 
-  bool get isVertical => this == bannerVertical || this == bannerDown || this == bannerUp;
-  bool get isHorizontal => this == bannerHorizontal || this == bannerLeft || this == bannerRight;
-  bool get isCarved => this == carved || this == carvedSlide || this == carvedSquare;
+  bool get isVertical =>
+      this == bannerVertical || this == bannerDown || this == bannerUp;
+  bool get isHorizontal =>
+      this == bannerHorizontal || this == bannerLeft || this == bannerRight;
+  bool get isCarved =>
+      this == carved || this == carvedSlide || this == carvedSquare;
 
   static final values = [
     bannerDown,
@@ -30,10 +33,7 @@ class GameBanners {
     basePath.bannerDown.path,
   );
 
-  static final bannerUp = GameBanners._(
-    'banner_up',
-    basePath.bannerUp.path,
-  );
+  static final bannerUp = GameBanners._('banner_up', basePath.bannerUp.path);
 
   static final bannerLeft = GameBanners._(
     'banner_left',
@@ -55,10 +55,7 @@ class GameBanners {
     basePath.bannerHorizontal.path,
   );
 
-  static final carved = GameBanners._(
-    'carved',
-    basePath.carved.path,
-  );
+  static final carved = GameBanners._('carved', basePath.carved.path);
 
   static final carvedSlide = GameBanners._(
     'carved_slide',
@@ -69,4 +66,15 @@ class GameBanners {
     'carved_square',
     basePath.carvedSquare.path,
   );
+}
+
+/// Shared image and metadata paths used by the Flame RPG interface.
+abstract final class GameUiAssets {
+  static final panel = Assets.images.ui.banners.carvedSquare;
+  static final font = Assets.images.ui.fonts.uiFont;
+  static final fontMetadataPath = Assets.images.ui.fonts.uiFontGlyphs;
+  static final progressFrame = Assets.images.ui.buttons.buttonSquare;
+  static final progressBackground =
+      Assets.images.ui.buttons.buttonSquareDisabled;
+  static final progressFill = Assets.images.ui.buttons.buttonSquareHover;
 }
