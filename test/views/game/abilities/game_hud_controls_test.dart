@@ -14,7 +14,7 @@ import 'package:gunwave/views/game/components/sub_components/pixel_joystick_disc
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('joystick, attack, and ability positions include safe-area insets', () {
+  test('joystick and attack positions include safe-area insets', () {
     const safeArea = EdgeInsets.fromLTRB(10, 12, 20, 30);
 
     expect(
@@ -24,10 +24,6 @@ void main() {
     expect(
       GameTouchControlLayout.attackPosition(Vector2(390, 844), safeArea),
       Vector2(282, 726),
-    );
-    expect(
-      GameTouchControlLayout.abilityInsets(safeArea),
-      const EdgeInsets.only(right: 44, bottom: 130),
     );
   });
 

@@ -12,7 +12,6 @@ import 'package:gunwave/data/constants/game/game_effect.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/views/game/combat/combatant.dart';
 import 'package:gunwave/views/game/combat/status_effect.dart';
-import 'package:gunwave/views/game/components/sub_components/building.dart';
 import 'package:gunwave/views/game/components/sub_components/collision_component.dart';
 import 'package:gunwave/views/game/components/sub_components/collision_grid.dart';
 import 'package:gunwave/views/game/components/monster.dart';
@@ -22,10 +21,9 @@ import 'package:gunwave/views/game/gunwave.dart';
 class Character extends SpriteAnimationGroupComponent
     with HasGameRef<Gunwave>, KeyboardHandler, CollisionCallbacks
     implements Combatant {
-  Character(this.character, {this.onCharacterReachCheckpoint});
+  Character(this.character);
 
   final CharacterModel character;
-  final void Function(bool)? onCharacterReachCheckpoint;
 
   final double stepTime = 0.08;
   late final SpriteAnimation idleAni;
@@ -134,9 +132,6 @@ class Character extends SpriteAnimationGroupComponent
     ), // Position above head
   );
 
-  // Create a set to track which checkpoints we're currently in
-  final Set<Building> _activeCheckpoints = {};
-
   @override
   FutureOr<void> onLoad() {
     onLoadAnimation();
@@ -226,38 +221,6 @@ class Character extends SpriteAnimationGroupComponent
     // Key-repeat events must keep a held attack active until J is released.
     triggerAttack = keysPressed.contains(LogicalKeyboardKey.keyJ);
     return super.onKeyEvent(event, keysPressed);
-  }
-
-  @override
-  void onCollisionStart(
-    Set<Vector2> intersectionPoints,
-    PositionComponent other,
-  ) {
-    if (other is Building && other.isCheckpoint) {
-      if (movebox.collidingWith(other.checkZone)) {
-        _activeCheckpoints.add(other);
-        if (onCharacterReachCheckpoint != null) {
-          onCharacterReachCheckpoint!(true);
-        }
-      }
-    }
-    super.onCollisionStart(intersectionPoints, other);
-  }
-
-  @override
-  void onCollisionEnd(PositionComponent other) {
-    if (other is Building &&
-        other.isCheckpoint &&
-        _activeCheckpoints.contains(other)) {
-      // Remove from tracked checkpoints
-      _activeCheckpoints.remove(other);
-
-      // Call the callback without checking collision status again
-      if (onCharacterReachCheckpoint != null) {
-        onCharacterReachCheckpoint!(false);
-      }
-    }
-    super.onCollisionEnd(other);
   }
 
   @override

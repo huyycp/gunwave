@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/data/data_sources/remote/api/supabase_api.dart';
-import 'package:gunwave/data/models/room_model.dart';
 import 'package:gunwave/data/models/user_model.dart';
 import 'package:gunwave/utils/logger/app_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -37,10 +36,11 @@ class UserRemoteDataSource {
         .eq('auth_id', authId)
         .maybeSingle();
     _logger.info(
-        'getAppUser',
-        response == null
-            ? 'Application profile not found.'
-            : 'Application profile loaded.');
+      'getAppUser',
+      response == null
+          ? 'Application profile not found.'
+          : 'Application profile loaded.',
+    );
     return response == null ? null : UserModel.fromJson(response);
   }
 
@@ -54,16 +54,5 @@ class UserRemoteDataSource {
         .single();
     _logger.info('createGuestProfile', 'Guest profile created.');
     return UserModel.fromJson(response);
-  }
-
-  Future<List<RoomModel>> getRoomsByUser(String userId) async {
-    final response = await client
-        .from('rooms')
-        .select('*, maps(*), users(*), quizzes(*)')
-        .eq('user_id', userId)
-        .order('created_at', ascending: false);
-    _logger.info('getRoomsByUser', 'Loaded ${response.length} rooms.');
-    return List<RoomModel>.from(
-        response.map((json) => RoomModel.fromJson(json)));
   }
 }

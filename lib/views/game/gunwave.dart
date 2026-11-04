@@ -10,7 +10,6 @@ import 'package:gunwave/data/constants/game/game_hud_style.dart';
 import 'package:gunwave/data/constants/game/game_play_mode.dart';
 import 'package:gunwave/data/models/campaign_stage_model.dart';
 import 'package:gunwave/data/models/character_model.dart';
-import 'package:gunwave/data/models/map_model.dart';
 import 'package:gunwave/utils/enum_utils.dart';
 import 'package:gunwave/views/game/abilities/ability_controller.dart';
 import 'package:gunwave/views/game/abilities/ability_registry.dart';
@@ -32,32 +31,28 @@ class Gunwave extends FlameGame
     with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection {
   Gunwave(
     this.ref, {
-    this.map,
-    this.campaignStage,
+    required this.campaignStage,
     required this.gameCharacters,
     required this.playMode,
     required this.onStageCompleted,
-    this.campaignUiLabels,
+    required this.campaignUiLabels,
     this.safeAreaInsets = EdgeInsets.zero,
-    this.onCharacterReachCheckpoint,
     this.onExitRequested,
     this.onPauseRequested,
-  }) : assert((map != null) != (campaignStage != null));
+  });
 
   @override
-  bool get pauseWhenBackgrounded => campaignStage != null;
+  bool get pauseWhenBackgrounded => true;
 
   WidgetRef ref;
-  final MapModel? map;
-  final CampaignStageModel? campaignStage;
+  final CampaignStageModel campaignStage;
   final CharacterModel gameCharacters;
   final GamePlayMode playMode;
   final void Function(bool) onStageCompleted;
-  final CampaignUiLabels? campaignUiLabels;
+  final CampaignUiLabels campaignUiLabels;
 
   /// OS padding used to keep Flame touch controls clear of system UI.
   final EdgeInsets safeAreaInsets;
-  final void Function(bool)? onCharacterReachCheckpoint;
   final VoidCallback? onExitRequested;
   final VoidCallback? onPauseRequested;
 
@@ -92,10 +87,7 @@ class Gunwave extends FlameGame
 
   double accoumulatedTime = 0;
 
-  late final Character character = Character(
-    gameCharacters,
-    onCharacterReachCheckpoint: onCharacterReachCheckpoint,
-  );
+  late final Character character = Character(gameCharacters);
 
   @override
   Future<void> onLoad() async {
@@ -103,7 +95,6 @@ class Gunwave extends FlameGame
     await images.loadAllImages();
 
     stage = Stage(
-      world: map,
       campaignStage: campaignStage,
       character: character,
       onStageCompleted: onStageCompleted,
@@ -121,27 +112,21 @@ class Gunwave extends FlameGame
       addJoystick();
     }
     if (!playMode.isKeyboard) addAttachBtn();
-    if (campaignStage != null) {
-      final labels = campaignUiLabels;
-      if (labels == null) {
-        throw StateError('Campaign UI labels are required for campaign play.');
-      }
-      _combatHud = await CombatHudComponent.load(
-        images,
-        labels: labels,
-        safeAreaInsets: safeAreaInsets,
-        showAbility: abilities.ability != null,
-        showKeyboardGuide: playMode.isKeyboard,
-        onPause: () => onPauseRequested?.call(),
-        onActivateAbility: activateAbility,
-      );
-      camera.viewport.add(_combatHud!);
-      _updateCombatHud();
-      final pendingNotice = _pendingCampaignNotice;
-      if (pendingNotice != null) {
-        _combatHud!.showNotice(pendingNotice);
-        _pendingCampaignNotice = null;
-      }
+    _combatHud = await CombatHudComponent.load(
+      images,
+      labels: campaignUiLabels,
+      safeAreaInsets: safeAreaInsets,
+      showAbility: abilities.ability != null,
+      showKeyboardGuide: playMode.isKeyboard,
+      onPause: () => onPauseRequested?.call(),
+      onActivateAbility: activateAbility,
+    );
+    camera.viewport.add(_combatHud!);
+    _updateCombatHud();
+    final pendingNotice = _pendingCampaignNotice;
+    if (pendingNotice != null) {
+      _combatHud!.showNotice(pendingNotice);
+      _pendingCampaignNotice = null;
     }
 
     return super.onLoad();
@@ -176,15 +161,11 @@ class Gunwave extends FlameGame
     required VoidCallback onResume,
     required VoidCallback onExitConfirmed,
   }) async {
-    if (campaignStage == null || _pauseMenu != null || _stageResult != null) {
-      return;
-    }
-    final labels = campaignUiLabels;
-    if (labels == null) return;
+    if (_pauseMenu != null || _stageResult != null) return;
     controlsBlocked = true;
     final menu = await PauseMenuComponent.load(
       images,
-      labels: labels,
+      labels: campaignUiLabels,
       safeAreaInsets: safeAreaInsets,
       onResume: () {
         hidePauseMenu();
@@ -223,14 +204,12 @@ class Gunwave extends FlameGame
     VoidCallback? onContinue,
     required VoidCallback onCampaign,
   }) async {
-    if (campaignStage == null || _stageResult != null) return;
-    final labels = campaignUiLabels;
-    if (labels == null) return;
+    if (_stageResult != null) return;
     controlsBlocked = true;
     hidePauseMenu();
     final result = await StageResultComponent.load(
       images,
-      labels: labels,
+      labels: campaignUiLabels,
       safeAreaInsets: safeAreaInsets,
       isSuccess: isSuccess,
       rewardLines: rewardLines,
@@ -254,8 +233,7 @@ class Gunwave extends FlameGame
   void _updateCombatHud() {
     final hud = _combatHud;
     final stageComponent = stage;
-    final labels = campaignUiLabels;
-    if (hud == null || stageComponent == null || labels == null) return;
+    if (hud == null || stageComponent == null) return;
 
     final round = stageComponent.currentRound;
     final boss = round?.isBoss == true
@@ -270,17 +248,17 @@ class Gunwave extends FlameGame
     final cooldown = abilities.cooldownRemaining.ceil();
     final active = abilities.activeRemaining.ceil();
     final abilityStatus = cooldown > 0
-        ? labels.abilityCooldown(cooldown)
+        ? campaignUiLabels.abilityCooldown(cooldown)
         : active > 0
-        ? labels.abilityActive(active)
-        : labels.ready;
+        ? campaignUiLabels.abilityActive(active)
+        : campaignUiLabels.ready;
 
     hud.updateSnapshot(
       CombatHudSnapshot(
         playerHealth: character.hp,
         playerMaxHealth: character.maxHealth,
         round: round?.number ?? 1,
-        roundCount: campaignStage!.rounds.length,
+        roundCount: campaignStage.rounds.length,
         abilityAvailable: abilities.canActivate,
         abilityStatus: abilityStatus,
         bossHealth: boss?.hp,

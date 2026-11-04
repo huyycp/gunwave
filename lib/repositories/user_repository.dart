@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/data/data_sources/remote/user_remote_data_source.dart';
-import 'package:gunwave/data/models/room_model.dart';
 import 'package:gunwave/data/models/user_model.dart';
 import 'package:gunwave/utils/logger/app_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -63,10 +62,5 @@ class UserRepository {
     }
     appUser = profile;
     _logger.info('getAppUser', 'Application profile ready.');
-  }
-
-  Future<List<RoomModel>> getMyRooms() async {
-    if (appUser == null) return [];
-    return _userRemote.getRoomsByUser(appUser!.id);
   }
 }

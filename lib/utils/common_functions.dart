@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_character.dart';
-import 'package:gunwave/data/constants/game/game_map.dart';
 import 'package:gunwave/data/constants/game/game_monster.dart';
 import 'package:gunwave/theme/theme_provider.dart';
 import 'package:random_avatar/random_avatar.dart';
@@ -65,12 +64,5 @@ GameMonsters? monsterFromFile(String filename, {GameMonsters? defaultFile}) {
   return GameMonsters.values.firstWhere(
     (monster) => monster.name == filename,
     orElse: () => defaultFile ?? GameMonsters.blueTorch,
-  );
-}
-
-GameMaps? mapFromFile(String filename, {GameMaps? defaultFile}) {
-  return GameMaps.values.firstWhere(
-    (map) => map.name == filename,
-    orElse: () => defaultFile ?? GameMaps.forest,
   );
 }

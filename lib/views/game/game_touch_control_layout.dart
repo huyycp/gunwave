@@ -22,14 +22,4 @@ abstract final class GameTouchControlLayout {
             safeArea.bottom -
             GameHudStyle.touchAttackSize,
       );
-
-  /// Stacks the ability button one gap above attack on the same right edge.
-  static EdgeInsets abilityInsets(EdgeInsets safeArea) => EdgeInsets.only(
-    right: GameHudStyle.touchEdge + safeArea.right,
-    bottom:
-        GameHudStyle.touchEdge +
-        GameHudStyle.touchAttackSize +
-        GameHudStyle.touchControlGap +
-        safeArea.bottom,
-  );
 }
