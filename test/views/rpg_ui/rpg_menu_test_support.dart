@@ -1,4 +1,5 @@
 import 'package:flutter/painting.dart';
+import 'package:gunwave/data/constants/game/game_play_mode.dart';
 import 'package:gunwave/data/models/campaign_stage_model.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/data/models/monster_model.dart';
@@ -37,6 +38,10 @@ RpgMenuLabels testRpgMenuLabels() => RpgMenuLabels(
   owned: 'Owned',
   noCharacters: 'No heroes',
   language: 'Language',
+  gameControls: 'Game controls',
+  joystick: 'Joystick',
+  keyboard: 'Keyboard',
+  gesture: 'Gesture',
   deviceLanguage: 'Device language',
   english: 'English',
   vietnamese: 'Vietnamese',
@@ -54,6 +59,7 @@ RpgMenuActions testRpgMenuActions({
   void Function(int index)? onSelectHero,
   Future<void> Function(CharacterModel hero)? onPurchase,
   void Function(AppLocaleMode mode)? onSelectLocale,
+  void Function(GamePlayMode mode)? onSelectPlayMode,
   Future<void> Function(CharacterModel hero, CharacterAttr attr)? onUpgradeHero,
 }) => RpgMenuActions(
   onPageChanged: onPageChanged ?? (_) {},
@@ -63,6 +69,7 @@ RpgMenuActions testRpgMenuActions({
   onSelectHero: onSelectHero ?? (_) {},
   onPurchase: onPurchase ?? (_) async {},
   onSelectLocale: onSelectLocale ?? (_) {},
+  onSelectPlayMode: onSelectPlayMode ?? (_) {},
   onUpgradeHero: onUpgradeHero ?? (_, _) async {},
 );
 
@@ -119,6 +126,7 @@ RpgMenuSnapshot testRpgMenuSnapshot({
   int campaignStatusPoints = 0,
   int selectedHeroIndex = 0,
   String? selectedStageId,
+  GamePlayMode selectedPlayMode = GamePlayMode.joystick,
   AppLocaleMode localeMode = AppLocaleMode.system,
   bool isLoading = false,
 }) => RpgMenuSnapshot(
@@ -131,6 +139,7 @@ RpgMenuSnapshot testRpgMenuSnapshot({
   campaignStatusPoints: campaignStatusPoints,
   selectedHeroIndex: selectedHeroIndex,
   selectedStageId: selectedStageId,
+  selectedPlayMode: selectedPlayMode,
   localeMode: localeMode,
   isLoading: isLoading,
 );

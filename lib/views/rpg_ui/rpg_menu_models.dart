@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:gunwave/data/constants/game/game_play_mode.dart';
 import 'package:gunwave/data/models/campaign_stage_model.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/l10n/app_localizations.dart';
@@ -47,9 +48,13 @@ class RpgMenuLabels {
     required this.owned,
     required this.noCharacters,
     required this.language,
+    required this.gameControls,
     required this.deviceLanguage,
     required this.english,
     required this.vietnamese,
+    required this.joystick,
+    required this.keyboard,
+    required this.gesture,
     required this.health,
     required this.strength,
     required this.vitality,
@@ -82,9 +87,13 @@ class RpgMenuLabels {
   final String owned;
   final String noCharacters;
   final String language;
+  final String gameControls;
   final String deviceLanguage;
   final String english;
   final String vietnamese;
+  final String joystick;
+  final String keyboard;
+  final String gesture;
   final String health;
   final String strength;
   final String vitality;
@@ -118,9 +127,13 @@ class RpgMenuLabels {
         owned: strings.owned,
         noCharacters: strings.noCharactersAvailable,
         language: strings.language,
+        gameControls: strings.gameControls,
         deviceLanguage: strings.deviceLanguage,
         english: strings.english,
         vietnamese: strings.vietnamese,
+        joystick: strings.joystick,
+        keyboard: strings.keyboard,
+        gesture: strings.gesture,
         health: strings.healthPoints,
         strength: strings.strength,
         vitality: strings.vitality,
@@ -140,6 +153,7 @@ class RpgMenuSnapshot {
     this.campaignStatusPoints = 0,
     this.selectedHeroIndex = 0,
     this.selectedStageId,
+    this.selectedPlayMode = GamePlayMode.joystick,
     this.localeMode = AppLocaleMode.system,
     this.isLoading = true,
   });
@@ -159,6 +173,7 @@ class RpgMenuSnapshot {
   final int campaignStatusPoints;
   final int selectedHeroIndex;
   final String? selectedStageId;
+  final GamePlayMode selectedPlayMode;
   final AppLocaleMode localeMode;
   final bool isLoading;
 
@@ -201,6 +216,7 @@ class RpgMenuActions {
     required this.onSelectHero,
     required this.onPurchase,
     required this.onSelectLocale,
+    required this.onSelectPlayMode,
     required this.onUpgradeHero,
   });
 
@@ -212,6 +228,7 @@ class RpgMenuActions {
   final ValueChanged<int> onSelectHero;
   final Future<void> Function(CharacterModel character) onPurchase;
   final ValueChanged<AppLocaleMode> onSelectLocale;
+  final ValueChanged<GamePlayMode> onSelectPlayMode;
   final Future<void> Function(CharacterModel character, CharacterAttr attr)
   onUpgradeHero;
 }

@@ -40,6 +40,7 @@ class _RpgMenuHostState extends ConsumerState<RpgMenuHost> {
   late EdgeInsets _safeAreaInsets;
   late Locale _gameLocale;
   String? _selectedStageId;
+  GamePlayMode _selectedPlayMode = GamePlayMode.joystick;
   RpgMenuPage? _previousPage;
   List<CampaignStageModel> _stages = const [];
   CampaignProgressModel _campaignProgress = CampaignProgressModel();
@@ -115,6 +116,7 @@ class _RpgMenuHostState extends ConsumerState<RpgMenuHost> {
     campaignStatusPoints: _campaignProgress.statusPointBalance,
     selectedHeroIndex: _selectedHeroIndex,
     selectedStageId: _selectedStageId,
+    selectedPlayMode: _selectedPlayMode,
     localeMode: ref.read(appLocaleControllerProvider).mode,
     isLoading: isLoading,
   );
@@ -149,6 +151,7 @@ class _RpgMenuHostState extends ConsumerState<RpgMenuHost> {
       onSelectHero: _selectHero,
       onPurchase: _purchase,
       onSelectLocale: _selectLocale,
+      onSelectPlayMode: _selectPlayMode,
       onUpgradeHero: _upgradeHero,
     ),
   );
@@ -276,6 +279,13 @@ class _RpgMenuHostState extends ConsumerState<RpgMenuHost> {
     _replaceGame();
   }
 
+  void _selectPlayMode(GamePlayMode mode) {
+    if (_selectedPlayMode == mode) return;
+    _selectedPlayMode = mode;
+    _snapshot = _createSnapshot(isLoading: false);
+    _replaceGame();
+  }
+
   void _onBack() {
     if (_currentPage == widget.initialPage &&
         widget.initialPage != RpgMenuPage.homeHub) {
@@ -309,7 +319,7 @@ class _RpgMenuHostState extends ConsumerState<RpgMenuHost> {
         builder: (_) => GameView(
           campaignStage: stage,
           character: hero,
-          playMode: GamePlayMode.joystick,
+          playMode: _selectedPlayMode,
           onCampaignStageCompleted: _completeCampaignStage,
           onContinueCampaign: _returnToCampaignMap,
           onReturnToCampaign: _returnToCampaignMap,

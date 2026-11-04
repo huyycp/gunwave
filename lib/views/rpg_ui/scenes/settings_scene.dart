@@ -3,12 +3,13 @@ import 'dart:math' as math;
 import 'package:flame/components.dart';
 import 'package:flame/text.dart';
 import 'package:gunwave/data/constants/game/game_hud_style.dart';
+import 'package:gunwave/data/constants/game/game_play_mode.dart';
 import 'package:gunwave/localization/app_locale_mode.dart';
 import 'package:gunwave/views/game/ui/components/asset_button_component.dart';
 import 'package:gunwave/views/game/ui/components/asset_panel_component.dart';
 import 'package:gunwave/views/rpg_ui/scenes/rpg_menu_scene.dart';
 
-/// Asset-rendered settings scene for the persisted app language preference.
+/// Asset-rendered settings scene for language and game input preferences.
 class SettingsScene extends RpgMenuScene {
   SettingsScene({
     required super.snapshot,
@@ -21,14 +22,17 @@ class SettingsScene extends RpgMenuScene {
   late final AssetPanelComponent _panel;
   late final TextComponent<SpriteFontRenderer> _title;
   late final TextComponent<SpriteFontRenderer> _languageLabel;
+  late final TextComponent<SpriteFontRenderer> _gameControlsLabel;
   late final AssetButtonComponent _backButton;
   late final List<AssetButtonComponent> _localeButtons;
+  late final List<AssetButtonComponent> _playModeButtons;
 
   @override
   Future<void> loadScene() async {
     _panel = addPanel(Vector2.all(1));
     _title = addText(labels.settings, scale: 1.15);
     _languageLabel = addText(labels.language, scale: 0.8);
+    _gameControlsLabel = addText(labels.gameControls, scale: 0.8);
     _backButton = await addButton(
       labels.back,
       actions.onBack,
@@ -48,12 +52,24 @@ class SettingsScene extends RpgMenuScene {
           enabled: snapshot.localeMode != mode,
         ),
     ];
+    final playModes = [
+      (GamePlayMode.joystick, labels.joystick),
+      (GamePlayMode.keyboard, labels.keyboard),
+      (GamePlayMode.gesture, labels.gesture),
+    ];
+    _playModeButtons = [
+      for (final (mode, title) in playModes)
+        await addButton(
+          snapshot.selectedPlayMode == mode ? '[x] $title' : title,
+          () => actions.onSelectPlayMode(mode),
+          buttonSize: Vector2(200, 56),
+        ),
+    ];
   }
 
   @override
   void layoutScene() {
-    // Keep the language choices in a centered, narrow panel with room for the
-    // landscape back target below the three options.
+    // Keep both preference rows and the back target visible at compact sizes.
     final bounds = contentBounds;
     final scale = uiScale;
     final panelWidth = math.min(
@@ -69,23 +85,57 @@ class SettingsScene extends RpgMenuScene {
     _panel
       ..size = Vector2(panelWidth, panelHeight)
       ..position = Vector2(left, top);
-    _title.position = Vector2(bounds.center.dx, top + 48 * scale);
-    _languageLabel.position = Vector2(bounds.center.dx, top + 128 * scale);
+    _title.position = Vector2(bounds.center.dx, top + panelHeight * 0.1);
+    _languageLabel.position = Vector2(
+      bounds.center.dx,
+      top + panelHeight * 0.22,
+    );
+    _gameControlsLabel.position = Vector2(
+      bounds.center.dx,
+      top + panelHeight * 0.54,
+    );
     _backButton
       ..size = Vector2(150 * scale, 56 * scale)
-      ..position = Vector2(left + 100 * scale, top + panelHeight - 24 * scale)
+      ..position = Vector2(bounds.center.dx, top + panelHeight - 20 * scale)
       ..anchor = Anchor.bottomCenter;
-    final availableHeight = panelHeight - 174 * scale;
-    final buttonHeight = math.min(64 * scale, availableHeight / 3);
-    for (var index = 0; index < _localeButtons.length; index++) {
-      _localeButtons[index]
-        ..size = Vector2(
-          math.min(232 * scale, panelWidth - 56 * scale),
-          buttonHeight,
-        )
+    const buttonGap = 8.0;
+    final buttonWidth = math.min(
+      200 * scale,
+      (panelWidth - 32 * scale - buttonGap * 2) / 3,
+    );
+    final buttonHeight = math.min(56 * scale, panelHeight * 0.14);
+    _layoutButtonRow(
+      _localeButtons,
+      centerX: bounds.center.dx,
+      y: top + panelHeight * 0.34,
+      width: buttonWidth,
+      height: buttonHeight,
+      gap: buttonGap,
+    );
+    _layoutButtonRow(
+      _playModeButtons,
+      centerX: bounds.center.dx,
+      y: top + panelHeight * 0.66,
+      width: buttonWidth,
+      height: buttonHeight,
+      gap: buttonGap,
+    );
+  }
+
+  void _layoutButtonRow(
+    List<AssetButtonComponent> buttons, {
+    required double centerX,
+    required double y,
+    required double width,
+    required double height,
+    required double gap,
+  }) {
+    for (var index = 0; index < buttons.length; index++) {
+      buttons[index]
+        ..size = Vector2(width, height)
         ..position = Vector2(
-          bounds.center.dx,
-          top + (188 + index * 76) * scale,
+          centerX + (index - (buttons.length - 1) / 2) * (width + gap),
+          y,
         );
     }
   }
