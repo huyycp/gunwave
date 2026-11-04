@@ -8,12 +8,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_play_mode.dart';
 import 'package:gunwave/data/dtos/req/update_rank_req.dart';
+import 'package:gunwave/data/models/campaign_stage_model.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/data/models/rank_model.dart';
+import 'package:gunwave/data/models/reward_model.dart';
 import 'package:gunwave/data/models/room_model.dart';
 import 'package:gunwave/localization/build_context_l10n.dart';
 import 'package:gunwave/views/game/game_view_model.dart';
 import 'package:gunwave/views/game/gunwave.dart';
+import 'package:gunwave/views/game/ui/campaign_ui_labels.dart';
 import 'package:gunwave/views/game/widgets/quiz_widget.dart';
 import 'package:gunwave/views/game/widgets/ability_hud.dart';
 import 'package:gunwave/views/game/game_touch_control_layout.dart';
@@ -24,15 +27,21 @@ import 'package:gunwave/widgets/game/game_button.dart';
 
 class GameView extends BaseView {
   const GameView({
-    required this.room,
+    this.room,
+    this.campaignStage,
     required this.character,
     required this.playMode,
+    this.onContinueCampaign,
+    this.onReturnToCampaign,
     super.key,
-  });
+  }) : assert((room != null) != (campaignStage != null));
 
-  final RoomModel room;
+  final RoomModel? room;
+  final CampaignStageModel? campaignStage;
   final CharacterModel character;
   final GamePlayMode playMode;
+  final VoidCallback? onContinueCampaign;
+  final VoidCallback? onReturnToCampaign;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -43,6 +52,7 @@ class GameView extends BaseView {
 class GameViewState extends BaseViewState<GameView, GameViewModel> {
   bool _isCompletingStage = false;
   bool _isConfirmingExit = false;
+  bool _isCampaignPaused = false;
   bool _allowExit = false;
   DialogRoute<void>? _rankOverlayRoute;
   NavigatorState? _rankOverlayNavigator;
@@ -50,26 +60,31 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
 
   late final Gunwave _gunwave = Gunwave(
     ref,
-    map: widget.room.map!,
+    map: widget.room?.map,
+    campaignStage: widget.campaignStage,
     playMode: widget.playMode,
     gameCharacters: widget.character,
+    campaignUiLabels: widget.campaignStage == null
+        ? null
+        : _buildCampaignUiLabels(),
     safeAreaInsets: MediaQuery.paddingOf(context),
     onStageCompleted: onStageCompleted,
     onCharacterReachCheckpoint: onCharacterReachCheckpoint,
-    onExitRequested: () => unawaited(_requestExit()),
+    onExitRequested: () => unawaited(
+      widget.campaignStage == null ? _requestExit() : _openCampaignPause(),
+    ),
+    onPauseRequested: () => unawaited(_openCampaignPause()),
   );
 
   @override
   void onReady() {
     super.onReady();
 
-    // Initialize timer in view model
-    model.initializeTimer(widget.room.map!.timeLimit);
-
-    // Start the timer
-    model.startTimer(() {
-      onStageCompleted(false);
-    });
+    final room = widget.room;
+    if (room != null) {
+      model.initializeTimer(room.map!.timeLimit);
+      model.startTimer(() => onStageCompleted(false));
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
@@ -78,6 +93,10 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
           await model.startGestureRecognition();
         } catch (error) {
           if (!mounted) return;
+          if (widget.campaignStage != null) {
+            _gunwave.showCampaignNotice(context.l10n.gestureInputUnavailable);
+            return;
+          }
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -115,6 +134,20 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
   @override
   Widget getView() {
     ref.watch(gameViewModel);
+    if (widget.campaignStage != null) {
+      _gunwave.controlsBlocked = _isCampaignPaused || _isCompletingStage;
+      return PopScope(
+        canPop: _allowExit || _isCompletingStage,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) unawaited(_openCampaignPause());
+        },
+        child: Scaffold(
+          backgroundColor: Colors.black,
+          body: GameWidget(game: _gunwave, focusNode: _gameFocus),
+        ),
+      );
+    }
+
     final touchAbilityInsets = GameTouchControlLayout.abilityInsets(
       MediaQuery.paddingOf(context),
     );
@@ -272,6 +305,36 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
     if (widget.playMode.isKeyboard) _gameFocus.requestFocus();
   }
 
+  /// Opens the asset-rendered campaign pause and deliberate-exit confirmation.
+  Future<void> _openCampaignPause() async {
+    if (widget.campaignStage == null ||
+        _isCampaignPaused ||
+        _isCompletingStage ||
+        _allowExit) {
+      return;
+    }
+    setState(() => _isCampaignPaused = true);
+    _gunwave.controlsBlocked = true;
+    await _gunwave.showPauseMenu(
+      onResume: () {
+        if (!mounted) return;
+        setState(() => _isCampaignPaused = false);
+        if (widget.playMode.isKeyboard) _gameFocus.requestFocus();
+      },
+      onExitConfirmed: () => unawaited(_exitCampaign()),
+    );
+  }
+
+  Future<void> _exitCampaign() async {
+    if (!mounted || _allowExit || _isCompletingStage) return;
+    setState(() {
+      _allowExit = true;
+      _isCampaignPaused = false;
+    });
+    await WidgetsBinding.instance.endOfFrame;
+    if (mounted) Navigator.of(context).pop();
+  }
+
   Widget _buildAbilityControls() {
     return AbilityHud(
       controller: _gunwave.abilities,
@@ -294,16 +357,16 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
   }
 
   Widget _buildQuiz() {
+    final room = widget.room!;
     // Quiz doesn't depend on time now
     return QuizWidget(
-      widget.room.quizzes[model.currentQuizIndex],
+      room.quizzes[model.currentQuizIndex],
       onQuestionAnswered: (answer) {
-        final isCorrect =
-            answer == widget.room.quizzes[model.currentQuizIndex].answer;
+        final isCorrect = answer == room.quizzes[model.currentQuizIndex].answer;
         debugPrint('Quiz answered: $isCorrect');
         model.onQuizAnswered(answer, isCorrect);
         if (isCorrect) {
-          if (model.currentQuizIndex < widget.room.quizzes.length - 1) {
+          if (model.currentQuizIndex < room.quizzes.length - 1) {
             model.setNextQuiz();
           } else {
             onStageCompleted(true);
@@ -357,6 +420,22 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
       }
     }
 
+    final campaignStage = widget.campaignStage;
+    if (campaignStage != null) {
+      final rewardLines = isSuccess
+          ? campaignStage.rewards.map(_formatCampaignReward).toList()
+          : const <String>[];
+      if (!mounted) return;
+      await _gunwave.showStageResult(
+        isSuccess: isSuccess,
+        rewardLines: rewardLines,
+        onRetry: () => unawaited(_retryCampaignStage()),
+        onContinue: widget.onContinueCampaign,
+        onCampaign: _returnToCampaign,
+      );
+      return;
+    }
+
     RankModel? result;
     Object? rankError;
     if (isSuccess) {
@@ -365,7 +444,7 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
         result = await model.rankRepo.updateUserRank(
           UpdateRankReq(
             characterId: widget.character.id,
-            roomId: widget.room.id,
+            roomId: widget.room!.id,
             timeLeft: model.timeRemaining.value,
             monsters:
                 _gunwave.stage?.monsters
@@ -383,7 +462,7 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
             quizzes: model.quizResult.entries
                 .map(
                   (entry) => (
-                    quizId: widget.room.quizzes[entry.key].id,
+                    quizId: widget.room!.quizzes[entry.key].id,
                     answer: entry.value.answer,
                     failAttempts: entry.value.failAttempts,
                   ),
@@ -400,7 +479,7 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
     if (!mounted) return;
     StageResultDialog.show(
       result: isSuccess,
-      rewards: widget.room.map!.rewards,
+      rewards: widget.room!.map!.rewards,
       score: result?.score,
       errorMessage: rankError == null ? null : context.l10n.scoreNotSaved,
     );
@@ -433,6 +512,65 @@ class GameViewState extends BaseViewState<GameView, GameViewModel> {
   void onCharacterReachCheckpoint(bool isReached) {
     debugPrint('Character reached checkpoint: $isReached');
     model.setShowQuizBtnVisible(isReached);
+  }
+
+  CampaignUiLabels _buildCampaignUiLabels() {
+    final l10n = context.l10n;
+    return CampaignUiLabels(
+      health: l10n.healthPoints,
+      boss: l10n.boss,
+      specialAbility: l10n.specialAbility,
+      ready: l10n.abilityReady,
+      paused: l10n.paused,
+      resume: l10n.resume,
+      exitStage: l10n.exitStage,
+      exitConfirmation: l10n.pauseExitPrompt,
+      completed: l10n.completed,
+      failed: l10n.failed,
+      rewards: l10n.rewards,
+      retry: l10n.retry,
+      continueCampaign: l10n.continueCampaign,
+      campaign: l10n.campaign,
+      keyboardGuide: l10n.keyboardControlsGuide,
+      keyboardAbilityGuide: l10n.keyboardAbilityControlsGuide,
+      gestureInputUnavailable: l10n.gestureInputUnavailable,
+      abilityCooldown: l10n.abilityCooldownHud,
+      abilityActive: l10n.abilityActiveHud,
+      roundProgress: l10n.roundLabel,
+    );
+  }
+
+  String _formatCampaignReward(RewardModel reward) {
+    final label = switch (reward.type) {
+      RewardType.gold => context.l10n.rewardGold,
+      RewardType.sp => context.l10n.rewardStatusPoints,
+      RewardType.unknown => context.l10n.rewardUnknown,
+    };
+    return '${reward.amount} $label';
+  }
+
+  Future<void> _retryCampaignStage() async {
+    if (!mounted) return;
+    await Navigator.of(context).pushReplacement<void, void>(
+      MaterialPageRoute<void>(
+        builder: (_) => GameView(
+          campaignStage: widget.campaignStage!,
+          character: widget.character,
+          playMode: widget.playMode,
+          onContinueCampaign: widget.onContinueCampaign,
+          onReturnToCampaign: widget.onReturnToCampaign,
+        ),
+      ),
+    );
+  }
+
+  void _returnToCampaign() {
+    final callback = widget.onReturnToCampaign;
+    if (callback != null) {
+      callback();
+    } else if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override

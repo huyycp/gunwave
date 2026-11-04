@@ -86,5 +86,28 @@
   "exitStage": "Exit stage",
   "exitStageConfirmation": "Leave this stage? Current progress will be lost.",
   "keepPlaying": "Keep playing",
-  "settings": "Settings"
+  "settings": "Settings",
+  "roundLabel": "Round {round} / {total}",
+  "@roundLabel": {
+    "placeholders": {
+      "round": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "boss": "Boss",
+  "paused": "Paused",
+  "resume": "Resume",
+  "abilityReady": "Ready",
+  "abilityCooldownHud": "CD {seconds}s",
+  "@abilityCooldownHud": {
+    "placeholders": { "seconds": { "type": "int" } }
+  },
+  "abilityActiveHud": "Active {seconds}s",
+  "@abilityActiveHud": {
+    "placeholders": { "seconds": { "type": "int" } }
+  },
+  "campaign": "Campaign",
+  "continueCampaign": "Continue",
+  "pauseExitPrompt": "Leave stage? Progress is lost.",
+  "gestureInputUnavailable": "Gesture input unavailable"
 }

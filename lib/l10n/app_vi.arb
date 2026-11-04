@@ -80,5 +80,28 @@
   "exitStage": "Thoát màn chơi",
   "exitStageConfirmation": "Thoát màn chơi này? Tiến trình hiện tại sẽ bị mất.",
   "keepPlaying": "Chơi tiếp",
-  "settings": "Cài đặt"
+  "settings": "Cài đặt",
+  "roundLabel": "Vòng {round} / {total}",
+  "@roundLabel": {
+    "placeholders": {
+      "round": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "boss": "Trùm",
+  "paused": "Đã tạm dừng",
+  "resume": "Tiếp tục",
+  "abilityReady": "Sẵn sàng",
+  "abilityCooldownHud": "CD {seconds}s",
+  "@abilityCooldownHud": {
+    "placeholders": { "seconds": { "type": "int" } }
+  },
+  "abilityActiveHud": "Còn {seconds}s",
+  "@abilityActiveHud": {
+    "placeholders": { "seconds": { "type": "int" } }
+  },
+  "campaign": "Chiến dịch",
+  "continueCampaign": "Tiếp tục",
+  "pauseExitPrompt": "Thoát màn? Mất tiến trình.",
+  "gestureInputUnavailable": "Không dùng được cử chỉ"
 }

@@ -12,7 +12,7 @@ import 'asset_panel_component.dart';
 
 /// A nine-slice button with an independent minimum touch target.
 class AssetButtonComponent extends PositionComponent
-    with TapCallbacks, HoverCallbacks {
+    with TapCallbacks, HoverCallbacks, HasVisibility {
   AssetButtonComponent({
     required Sprite normalSprite,
     Sprite? hoveredSprite,

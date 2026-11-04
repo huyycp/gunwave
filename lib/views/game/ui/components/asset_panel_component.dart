@@ -19,7 +19,7 @@ class NineSliceBorders {
 }
 
 /// A resizable panel backed by the Tiny Swords carved panel sprite.
-class AssetPanelComponent extends NineTileBoxComponent {
+class AssetPanelComponent extends NineTileBoxComponent with HasVisibility {
   AssetPanelComponent({
     required Sprite sprite,
     required Vector2 size,

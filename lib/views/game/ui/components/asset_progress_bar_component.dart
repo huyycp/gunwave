@@ -7,7 +7,7 @@ import 'package:gunwave/data/constants/game/game_hud_style.dart';
 import 'asset_panel_component.dart';
 
 /// A resizable progress bar made from three nine-slice sprites.
-class AssetProgressBarComponent extends PositionComponent {
+class AssetProgressBarComponent extends PositionComponent with HasVisibility {
   AssetProgressBarComponent({
     required Sprite frameSprite,
     required Sprite backgroundSprite,
