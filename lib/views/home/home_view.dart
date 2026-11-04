@@ -3,17 +3,16 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
-import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
-import 'package:gunwave/data/constants/game/game_ui.dart';
 import 'package:gunwave/routes.dart';
 import 'package:gunwave/localization/build_context_l10n.dart';
 import 'package:gunwave/gen/assets.gen.dart';
 import 'package:gunwave/views/home/widgets/background.dart';
 import 'package:gunwave/views/home/home_view_model.dart';
 import 'package:gunwave/views/home/widgets/login_widget.dart';
+import 'package:gunwave/views/rpg_ui/rpg_menu_host.dart';
+import 'package:gunwave/views/rpg_ui/rpg_menu_models.dart';
 import 'package:gunwave/widgets/base/base_view.dart';
 import 'package:gunwave/widgets/game/game_button.dart';
 
@@ -44,31 +43,18 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
   @override
   Widget getView() {
     ref.watch(homeViewModel);
+    if (model.userRepo.appUser != null) {
+      return const RpgMenuHost(initialPage: RpgMenuPage.homeHub);
+    }
     return Scaffold(
       body: Stack(
         children: [
           _background,
-          if (model.userRepo.appUser != null) ...[
-            Positioned(top: 16, left: 48, child: _buildUserInfo()),
-            Positioned(bottom: 16, left: 48, child: _buildShopBtn()),
-            Positioned(bottom: 16, left: 116, child: _buildCharacterBtn()),
-            Positioned(bottom: 16, left: 184, child: _buildMyRoomBtn()),
-            Positioned(bottom: 16, right: 32, child: _buildPlayBtn()),
-          ] else if (model.isLoginFormVisible)
+          if (model.isLoginFormVisible)
             Center(child: _buildLoginForm())
           else
             Center(child: _buildAuthOptions()),
-          Positioned(
-            top: 8,
-            right: 32,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildSettingsBtn(),
-                if (model.userRepo.appUser != null) _buildUserGold(),
-              ],
-            ),
-          ),
+          Positioned(top: 8, right: 32, child: _buildSettingsBtn()),
         ],
       ),
     );
@@ -88,80 +74,6 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
       ),
     ),
   );
-
-  Widget _buildUserInfo() {
-    return Text(
-      model.userRepo.appUser?.name ?? context.l10n.guest,
-      style: GoogleFonts.pressStart2p(color: GameColors.primary, fontSize: 20),
-    );
-  }
-
-  Widget _buildUserGold() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage(GameBanners.carvedSlide.path),
-          fit: BoxFit.cover,
-        ),
-        // color: Colors.red,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.monetization_on, color: Colors.amber, size: 24),
-          const SizedBox(width: 8),
-          Text(
-            '${model.userRepo.appUser?.gold ?? 0}',
-            style: GoogleFonts.pressStart2p(
-              color: GameColors.primary,
-              fontSize: 18,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCharacterBtn() {
-    return GameButton(
-      onPressed: () {
-        context.push(Routes.character);
-      },
-      size: GameButtonSize.small,
-      child: const Icon(Icons.people, color: GameColors.primary),
-    );
-  }
-
-  Widget _buildShopBtn() {
-    return GameButton(
-      onPressed: () {
-        context.push(Routes.shop);
-      },
-      size: GameButtonSize.small,
-      child: const Icon(Icons.store, color: GameColors.primary),
-    );
-  }
-
-  Widget _buildMyRoomBtn() {
-    return GameButton(
-      onPressed: () {
-        context.push(Routes.myRoom);
-      },
-      size: GameButtonSize.small,
-      child: const Icon(Icons.apps, color: GameColors.primary),
-    );
-  }
-
-  Widget _buildPlayBtn() {
-    return GameButton(
-      onPressed: () {
-        context.push(Routes.map);
-      },
-      child: Text(context.l10n.play),
-    );
-  }
 
   Widget _buildLoginForm() {
     return LoginWidget((isDone) {

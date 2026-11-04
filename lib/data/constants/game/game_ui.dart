@@ -77,4 +77,5 @@ abstract final class GameUiAssets {
   static final progressBackground =
       Assets.images.ui.buttons.buttonSquareDisabled;
   static final progressFill = Assets.images.ui.buttons.buttonSquareHover;
+  static final stageRoutePointer = Assets.images.ui.pointers.indicator;
 }

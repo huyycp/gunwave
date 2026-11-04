@@ -103,5 +103,19 @@
   "campaign": "Chiến dịch",
   "continueCampaign": "Tiếp tục",
   "pauseExitPrompt": "Thoát màn? Mất tiến trình.",
-  "gestureInputUnavailable": "Không dùng được cử chỉ"
+  "gestureInputUnavailable": "Không dùng được cử chỉ",
+  "stageBriefing": "Thông tin màn chơi",
+  "heroLoadout": "Trang bị nhân vật",
+  "stageNumber": "Màn {number}",
+  "roundNumber": "Vòng {number}",
+  "forestOutskirts": "Rìa rừng",
+  "available": "Có thể chơi",
+  "locked": "Đã khóa",
+  "cleared": "Đã hoàn thành",
+  "startStage": "Bắt đầu màn",
+  "selectHero": "Chọn nhân vật",
+  "gold": "Vàng",
+  "loading": "Đang tải",
+  "noCampaignStages": "Chưa có màn chiến dịch",
+  "roundsCount": "{count} vòng"
 }

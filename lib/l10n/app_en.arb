@@ -109,5 +109,22 @@
   "campaign": "Campaign",
   "continueCampaign": "Continue",
   "pauseExitPrompt": "Leave stage? Progress is lost.",
-  "gestureInputUnavailable": "Gesture input unavailable"
+  "gestureInputUnavailable": "Gesture input unavailable",
+  "stageBriefing": "Stage Briefing",
+  "heroLoadout": "Hero Loadout",
+  "stageNumber": "Stage {number}",
+  "@stageNumber": {"placeholders": {"number": {"type": "int"}}},
+  "roundNumber": "Round {number}",
+  "@roundNumber": {"placeholders": {"number": {"type": "int"}}},
+  "forestOutskirts": "Forest Outskirts",
+  "available": "Available",
+  "locked": "Locked",
+  "cleared": "Cleared",
+  "startStage": "Start Stage",
+  "selectHero": "Select Hero",
+  "gold": "Gold",
+  "loading": "Loading",
+  "noCampaignStages": "No campaign stages available",
+  "roundsCount": "{count} rounds",
+  "@roundsCount": {"placeholders": {"count": {"type": "int"}}}
 }
