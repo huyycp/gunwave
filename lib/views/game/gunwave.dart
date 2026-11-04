@@ -8,6 +8,7 @@ import 'package:gunwave/data/constants/app_gesture.dart';
 import 'package:gunwave/data/constants/game/game_constants.dart';
 import 'package:gunwave/data/constants/game/game_hud_style.dart';
 import 'package:gunwave/data/constants/game/game_play_mode.dart';
+import 'package:gunwave/data/models/campaign_stage_model.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/data/models/map_model.dart';
 import 'package:gunwave/utils/enum_utils.dart';
@@ -26,20 +27,22 @@ class Gunwave extends FlameGame
     with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection {
   Gunwave(
     this.ref, {
-    required this.map,
+    this.map,
+    this.campaignStage,
     required this.gameCharacters,
     required this.playMode,
     required this.onStageCompleted,
     this.safeAreaInsets = EdgeInsets.zero,
     this.onCharacterReachCheckpoint,
     this.onExitRequested,
-  });
+  }) : assert((map != null) != (campaignStage != null));
 
   @override
   bool get pauseWhenBackgrounded => false;
 
   WidgetRef ref;
-  MapModel map;
+  final MapModel? map;
+  final CampaignStageModel? campaignStage;
   final CharacterModel gameCharacters;
   final GamePlayMode playMode;
   final void Function(bool) onStageCompleted;
@@ -86,6 +89,7 @@ class Gunwave extends FlameGame
 
     stage = Stage(
       world: map,
+      campaignStage: campaignStage,
       character: character,
       onStageCompleted: onStageCompleted,
     );
