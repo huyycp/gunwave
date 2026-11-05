@@ -1,6 +1,6 @@
 # Character abilities
 
-Each character's `ability_id` points to a Supabase `abilities` row. The game reads the joined `abilities` definition; it does not infer abilities from a character's color. Missing/unknown/invalid definitions disable the Special control and emit a structured warning.
+Each character's optional `abilityId` points to an `Abilities` row in the local Drift catalog. The game reads the joined ability definition; it does not infer abilities from a character's color. Missing, unknown, or invalid definitions disable the Special control and emit a structured warning. The full character/ability JSON export is still pending, so the bundled starter currently has no special ability.
 
 ## Controls
 
@@ -11,13 +11,13 @@ Each character's `ability_id` points to a Supabase `abilities` row. The game rea
 - The smaller keyboard guide sits near the safe bottom edge.
 - Top-right Exit, Escape and system back open an exit confirmation. Combat and the stage timer pause; cancel resumes the stage.
 - First Aid does not spend cooldown at full HP. Hex Seal does not spend cooldown without a living target in range.
-- Casting is blocked before loading, during quizzes, after completion, when paused, and after death.
+- Casting is blocked before loading, after completion, when paused, and after death.
 
 ## Runtime
 
 `AbilityRegistry` maps stable database keys to concrete `Ability` implementations. `AbilityController` owns cooldown and activation; `AbilityContext` supplies targeting/dash/projectile operations. `GameAbilityContext` connects these to Flame. `Combatant` provides shared damage and healing, while `StatusEffectController` tracks temporary modifiers without changing permanent stats.
 
-The eight concrete abilities are immutable Freezed value classes with `copyWith` and value equality. Use `fromDefinition` to validate Supabase tuning values; serialization stays in `AbilityModel`. Mutable cooldown and status controllers remain separate. Regenerate ignored sources with `fvm dart run build_runner build` (Freezed 4 and Dart 3.13+, matching the FVM SDK).
+The eight concrete abilities are immutable Freezed value classes with `copyWith` and value equality. Use `fromDefinition` to validate local catalog tuning values; serialization stays in `AbilityModel`. Mutable cooldown and status controllers remain separate. Regenerate ignored sources with `fvm dart run build_runner build` (Freezed 4 and Dart 3.13+, matching the FVM SDK).
 
 All durations advance with simulation `dt`; no additional timers, network calls, or JSON parsing occur per frame. HUD listeners update when displayed seconds, charge count, or readiness changes. Same-key effects refresh instead of stacking. Death and stage exit remove effects.
 
@@ -61,12 +61,12 @@ Implementation reference: [Flame movement effects](https://docs.flame-engine.org
 
 1. Add an `Ability` implementation under `lib/views/game/abilities/implementations/` and validate its parameters in the constructor.
 2. Register its database key in `AbilityRegistry`.
-3. Add its Supabase row and character link. Balance data changes use existing `cooldown_ms`, `duration_ms`, and JSONB `parameters` columns.
+3. Add its entry to the local ability catalog JSON and link the character through `abilityId`. The Drift row stores the stable ID/key, display strings, cooldown, duration, and JSON parameters.
 4. Test activation success/failure, cooldown, effect expiry, and any new targeting rule.
 
 Parameter validation bounds damage multipliers to 10 and ranges to 50 tiles as safety limits for malformed configuration. Keep new mechanics within shared combat/status hooks where possible. Temporary buffs never alter the database's character stats.
 
-`supabase/migrations/202610180002_allow_ability_catalog_reads.sql` grants authenticated players, including anonymous Auth users, read access to the ability catalog. It was applied to the development project through the Management API; rerunning the migration is safe. The CLI migration-history table was not modified by that API call.
+The app reads ability definitions from local Drift rows seeded from the sanitized catalog export. Do not add account identifiers or ownership to the static catalog files.
 
 ## Verification
 

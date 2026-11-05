@@ -18,6 +18,7 @@
 - Use one local gold balance for campaign rewards and Shop purchases; initialize it to zero.
 - Do not invent missing character/ability catalog rows. Add the user's sanitized JSON export before completing the Shop catalog.
 - Do not modify/delete hosted Supabase data; remove only this app's local integration and obsolete checked-in artifacts.
+- Preserve ignored developer-local `dev.env`, `prod.env`, and Supabase CLI cache files; startup and asset manifests no longer read or bundle them.
 - Preserve the saved locale where available; do not import old game progress/account data.
 - Keep repositories as the database boundary and preserve existing Freezed domain models and Riverpod conventions.
 
@@ -69,7 +70,7 @@
 - [x] Implement normalized seed writes from `stages.json`, plus starter seed and database repository methods; leave catalog JSON import ready for the user's export without fabricating rows.
 - [x] Preserve model validation and use transactions/constraints for atomic behavior.
 - [x] Run focused data/repository tests (25 passed), formatting, and targeted analysis (clean).
-- [ ] Commit `feat: persist RPG content and progress locally`.
+- [x] Commit `feat: persist RPG content and progress locally` (`88d93ed`).
 
 ### Task 3: Move app settings and startup to Drift
 
@@ -78,12 +79,12 @@
 - Remove: `lib/build_config.dart` once all references are gone.
 - Modify tests: locale persistence, startup/bootstrap tests.
 
-- [ ] Add failing tests for locale read/write through Drift and import of a legacy locale once; verify invalid values fall back to system locale.
-- [ ] Initialize database and idempotent seeds before `runApp`; inject the opened DB into Riverpod and close it with provider disposal.
-- [ ] Stop loading `.env` and stop requiring Supabase values at app launch; keep dev/prod entrypoints equivalent.
-- [ ] Remove ongoing `shared_preferences` reads/writes; keep its dependency only if needed for one-time locale import, otherwise remove it after migration.
-- [ ] Run focused startup/locale tests and targeted analysis.
-- [ ] Commit `refactor: bootstrap the app from local storage`.
+- [x] Add tests for locale read/write through Drift, one-time legacy locale import, and invalid values falling back to system locale.
+- [x] Initialize the database, bundled seeds, legacy settings migration, and locale before `runApp`; inject the opened DB into Riverpod and close it with provider disposal.
+- [x] Stop loading `.env` and requiring Supabase values at app launch; dev/prod entrypoints now share local startup.
+- [x] Remove ongoing `shared_preferences` reads/writes; retain the package only for one-time import and removal of legacy preference keys.
+- [x] Run focused startup/locale tests (23 passed across startup, locale, Home, and RPG UI) and full library/test analysis (clean).
+- [x] Commit `refactor: bootstrap the app from local storage` (`d421f24`).
 
 ### Task 4: Remove auth and convert RPG screens to local repositories
 
@@ -92,24 +93,24 @@
 - Remove: Supabase user/character data sources, user repository/model, login widget, account-specific localization keys, and obsolete auth tests.
 - Test: Home, menu host, shop, character/loadout, and database repository interaction.
 
-- [ ] Add failing UI tests proving Home opens the RPG hub directly, no auth/guest controls render, and no user/account dependency is read.
-- [ ] Route Shop reads, purchase, upgrade, reset, and hero selection through local repositories with no user ID.
-- [ ] Remove sign-in-only Shop copy and account checks; keep the starter usable while an external catalog export is pending.
-- [ ] Run focused UI and repository suites, then targeted analysis.
-- [ ] Commit `feat: remove account requirement from RPG flows`.
+- [x] Add UI tests proving Home opens the RPG hub directly and auth/guest controls are absent.
+- [x] Route Shop reads, purchase, upgrade, reset, and hero selection through local repositories with no user ID.
+- [x] Remove account-only Shop copy and checks; keep the bundled starter available while the external catalog export is pending.
+- [x] Run focused UI and repository suites; targeted analysis is clean.
+- [x] Commit `feat: remove account requirement from RPG flows` (`075bc12`).
 
 ### Task 5: Remove Supabase dependencies and obsolete references
 
 **Files:**
 - Modify: `pubspec.yaml`, `README.md`, `docs/architecture.md`, `docs/technology-stack.md`, `docs/project-structure.md`, feature docs, and relevant tests.
-- Remove: `lib/data/data_sources/remote/`, `supabase/`, Supabase smoke test, `dev.env`, `prod.env`, and any dead auth/account files once `rg` confirms no runtime references.
+- Remove: tracked files under `lib/data/data_sources/remote/` and `supabase/`, the Supabase smoke test, tracked env template, and dead auth/account files once `rg` confirms no runtime references. Keep ignored local credential/cache files untouched.
 
-- [ ] Run `rg -n "supabase|Supabase|signInAsGuest|auth_id|SUPABASE_URL|SUPABASE_ANON_KEY" lib test pubspec.yaml README.md docs` and inspect every remaining hit.
-- [ ] Remove `supabase_flutter`, `flutter_dotenv`, and dead dependencies; update assets and lockfile.
-- [ ] Remove obsolete local Supabase migrations/function/config artifacts without calling hosted Supabase or touching remote data.
-- [ ] Update docs with Drift schema, startup/seed flow, local-only behavior, and map/art asset boundary.
-- [ ] Run full `fvm flutter test`, `fvm dart analyze lib test`, `git diff --check`, and a final diff review.
-- [ ] Commit `refactor: remove Supabase from the app`.
+- [x] Run the Supabase/auth reference search across code, tests, package files, README, and docs; inspect the remaining historical statements.
+- [x] Remove `supabase_flutter`, `flutter_dotenv`, and unused auth/room dependencies; update the asset manifest and lockfile.
+- [x] Remove tracked local Supabase migrations, function/config files, and the opt-in connection test without calling hosted Supabase or touching remote data. Existing ignored local credentials and CLI cache remain unmodified and are not loaded or bundled.
+- [x] Update docs with Drift schema, startup/seed flow, local-only behavior, and map/art asset boundary.
+- [x] Run full `fvm flutter test --no-pub --reporter expanded` (142 passed), `fvm dart analyze lib test` (clean), `git diff --check` (clean), and review the final diff.
+- [x] Commit `refactor: remove Supabase from the app`.
 
 ### Task 6: Integrate the supplied character and ability catalog
 

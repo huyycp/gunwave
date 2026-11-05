@@ -1,6 +1,5 @@
 import 'package:flutter/services.dart';
 import 'package:gunwave/utils/extensions/object_ex.dart';
-import 'package:string_validator/string_validator.dart' as validator;
 import 'package:intl/intl.dart';
 
 extension StringEx on String? {
@@ -42,8 +41,6 @@ extension StringEx on String? {
   }
 
   String? get isEmpty => isNullOrEmpty ? 'Cannot be empty' : null;
-  String? get isEmail => isNullOrEmpty || !validator.isEmail(this!) ? 'Email is invalid' : null;
-  String? get isUrl => isNullOrEmpty || !validator.isURL(this!) ? 'This is not a valid URL' : null;
   String? get isValidTime => isNullOrEmpty || !DateFormat('MM/dd/yyyy HH:mm').parse(this!).isAfter(DateTime.now().add(const Duration(minutes: 5))) ? 'Invalid duetime' : null;
 }
 

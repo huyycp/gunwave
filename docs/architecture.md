@@ -1,38 +1,35 @@
 # Architecture and data flow
 
 Gunwave uses a feature-oriented Flutter structure with presentation,
-repository, and data-source responsibilities. App state uses Riverpod providers
-and `ChangeNotifier` view models.
+repository, and data-source responsibilities. Riverpod provides dependencies
+and `ChangeNotifier` view state. SQLite through Drift is the persistence layer
+for structured game content, player progress, and app settings.
 
-## Flutter application flow
+## Startup
 
 ```text
-Flutter host/view
-    ↓ reads and watches
-Riverpod provider + ChangeNotifier view model
-    ↓ calls
-Feature repository
-    ↓ delegates to
-Local or remote data source
+main_dev.dart / main_prod.dart
     ↓
-Platform API or Supabase
+AppDatabase opens and migrates the Drift schema
+    ↓
+LocalAppInitializer seeds bundled campaign data and migrates the old locale
+    ↓
+ProviderScope injects the database
+    ↓
+Flutter routes → Flame RPG menus and game
 ```
 
-- Views in `lib/views/` host a screen and forward user actions.
-- View models own screen state and coordinate asynchronous operations.
-- Repositories expose feature operations and delegate persistence or platform
-  access to data sources.
-- Data sources connect to local storage, Supabase, or native gesture
-  recognition.
-
-Repositories are intentionally thin in several features; the data layer is
-not a separate Dart package.
+The bundled content and settings migration finish before `runApp`, so screens
+never need a network session or account bootstrap. Both Dart entrypoints use
+the same startup path.
 
 ## RPG menus and campaign data flow
 
 ```text
-Local stages.json
-    ↓ CampaignContentDataSource / CampaignRepository
+assets/data/campaign/stages.json
+    ↓ LocalGameDataSeeder
+Drift campaign/catalog tables
+    ↓ CampaignRepository / CharacterRepository
 RpgMenuHost snapshots + callbacks
     ↓ GameWidget host
 Flame menu scenes → selected stage and hero
@@ -41,26 +38,56 @@ GameView → Gunwave → Stage + RoundDirector
     ↓
 Tiled map + local enemy catalog → Flame combat HUD and results
     ↓
-CampaignProgressRepository → SharedPreferencesAsync
+CampaignProgressRepository → Drift player state and stage clears
 ```
 
 - `assets/data/campaign/stages.json` is the source for stage order, rounds,
   encounter groups, enemy stats, unlock rules, and rewards.
-- `CampaignRepository` validates campaign references without Supabase room or
-  remote map data.
+- `LocalGameDataSeeder` validates and transactionally refreshes static campaign
+  rows. Re-running it preserves balances, owned heroes, upgrades, and stage
+  clears.
+- `CampaignRepository` reads normalized stages, monsters, encounters, and
+  rewards from Drift and validates references to bundled maps and sprites.
 - `Stage` resolves the stage map key to the local `GameMaps` catalog, loads the
-  Tiled map once, validates named spawn markers, and creates the world
-  components.
+  Tiled map once, validates named spawn markers, and creates world components.
 - `RoundDirector` advances configured encounters and emits one stage result.
-- `CampaignProgressRepository` stores completed stages, selected hero, and
-  campaign-earned balances locally. Completion mutations are serialized and
-  first-clear rewards are idempotent.
+- `CampaignProgressRepository` writes stage clears and first-clear rewards in
+  a transaction. A unique clear row prevents replaying a stage from awarding
+  gold or status points twice.
+- `PlayerStates.gold` is the single local wallet used by campaign rewards and
+  Shop purchases. Owned hero stats and per-hero points are stored separately in
+  `PlayerCharacters`.
 - The visible Home Hub, Campaign Map, Stage Briefing, Loadout, Shop, Settings,
   combat HUD, pause menu, and results are Flame components using local sprites
   and the shared bitmap font. Flutter hosts Flame through `GameWidget` and
   provides non-visual application state and callbacks.
-- Input mode selection is rendered in Flame Settings and held by
-  `RpgMenuHost` for its current lifetime. A new menu host defaults to joystick.
+- Input mode selection is rendered in Flame Settings and held by `RpgMenuHost`
+  for its current lifetime. A new menu host defaults to joystick.
+
+## Local database
+
+`lib/data/database/app_database.dart` owns the versioned Drift schema. Static
+definitions are normalized into `Abilities`, `Characters`, `Stages`,
+`Monsters`, `StageMonsters`, `StageRounds`, `RoundEncounters`, and `StageRewards`.
+Mutable local state uses `PlayerStates`, `PlayerCharacters`, and
+`CampaignStageClears`. The `Settings` table stores the app language mode, while
+`AppMetadata` records one-time migrations.
+
+The current schema is version 1. Future schema changes must increment
+`schemaVersion`, add a Drift migration, update the schema snapshot, and exercise
+the migration with an in-memory database test. Table definitions and snapshots
+live under `lib/data/database/` and `drift_schemas/`.
+
+The old `app_locale_mode` SharedPreferences key is imported once into `Settings`
+and then removed. The old serialized `campaign_progress_v1` value is discarded
+so the requested local save starts empty. The `shared_preferences` package is
+used only for this one-time compatibility migration; new settings and all game
+progress use Drift.
+
+The current character catalog has only the bundled Blue Warrior starter. The
+sanitized character/ability JSON export needed for the full Shop catalog has
+not yet been supplied. Do not fabricate character stats, prices, abilities, or
+ownership rows.
 
 ## Typography
 
@@ -134,27 +161,6 @@ which would require crossing the platform boundary with image data.
   archives in the app, and document each addition's source, revision, and
   license in the project asset audit.
 
-## Supabase backend
-
-`SupabaseApi` initializes the client from `SUPABASE_URL` and
-`SUPABASE_ANON_KEY` loaded by `BuildConfig` from the selected environment file.
-The current app still uses Supabase Auth and account-backed character/shop
-operations. Solo campaign content and progress are local, but Home currently
-requires Supabase guest sign-in before it opens the RPG menus; cold-start
-offline access is not guaranteed.
-
-Room creation, quiz gameplay, and ranking entry points have been retired from
-the client. The checked-in Supabase files do not provide a complete base
-schema, so room/rank database objects and the `update-ranks` Edge Function are
-preserved pending review of the deployed schema, old-client compatibility, and
-data retention needs. A backend intended for a fresh install still needs its
-base schema and content provisioned separately. Keep privileged service-role
-credentials on trusted backend infrastructure; the Flutter app should use
-only a client-safe anon/publishable key.
-
-## Environment selection
-
-`lib/main_dev.dart` calls `startApp(BuildEnv.dev)` and loads `dev.env`;
-`lib/main_prod.dart` selects `prod.env`. These are Dart entrypoints, not
-Android product flavors. The selected file must exist because both environment
-files are declared as Flutter assets in `pubspec.yaml`.
+Tiled `.tmx` maps, tilesets, and image assets stay packaged files. Drift stores
+their stable IDs, map keys, and gameplay relationships; it does not store image
+or map bytes.

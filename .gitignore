@@ -67,6 +67,9 @@ AGENTS.md
 # Local Codex task state.
 .codex/
 
+# Preserve an existing developer-local Supabase CLI cache without tracking it.
+supabase/.temp/
+
 # FVM Version Cache
 .fvm/
 
