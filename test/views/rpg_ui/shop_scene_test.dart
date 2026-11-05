@@ -140,4 +140,23 @@ void main() {
       );
     },
   );
+
+  testWithGame(
+    'Shop marks the remote starter sprite as owned by a solo starter',
+    () => testRpgMenuGame(
+      initialPage: RpgMenuPage.shop,
+      snapshot: testRpgMenuSnapshot(
+        ownedHeroes: [CampaignHeroCatalog.starter],
+        shopHeroes: [testHero(id: 'remote_blue')],
+      ),
+    ),
+    (game) async {
+      await game.ready();
+      final button = activeRpgMenuScene(game).children
+          .whereType<AssetButtonComponent>()
+          .singleWhere((button) => button.label == 'Owned');
+      expect(button.label, 'Owned');
+      expect(button.enabled, isFalse);
+    },
+  );
 }

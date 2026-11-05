@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flame/components.dart';
 import 'package:flame/text.dart';
 import 'package:gunwave/data/constants/game/game_menu_style.dart';
+import 'package:gunwave/data/data_sources/local/campaign_hero_catalog.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/views/game/ui/components/asset_button_component.dart';
 import 'package:gunwave/views/game/ui/components/asset_panel_component.dart';
@@ -53,7 +54,10 @@ class ShopScene extends RpgMenuScene {
       final preview = await loadHeroPreview(character, size: Vector2.all(92));
       final name = addText(character.name, scale: 0.52);
       final isOwned = snapshot.ownedHeroes.any(
-        (hero) => hero.id == character.id,
+        (hero) =>
+            hero.id == character.id ||
+            (hero.id == CampaignHeroCatalog.starter.id &&
+                character.filename == CampaignHeroCatalog.starter.filename),
       );
       final button = await addButton(
         isOwned ? labels.owned : '${character.price}',
