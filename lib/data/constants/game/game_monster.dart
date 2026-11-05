@@ -5,7 +5,15 @@ class GameMonsters {
 
   final String name;
   final String path;
-  
+
+  bool get isBarrel => name.startsWith('barrel_');
+
+  static const double barrelFrameSize = 128;
+  static const int barrelIdleRow = 2;
+  static const int barrelRunRow = 4;
+  static const int barrelFiredRow = 5;
+  static const int barrelActionFrameCount = 3;
+
   static const className = 'monster';
   static final basePath = Assets.images.factions.monsters;
 
@@ -33,12 +41,12 @@ class GameMonsters {
     'barrel_red',
     basePath.barrel.red.barrelRedPng.path,
   );
-  
+
   static final yellowBarrel = GameMonsters._(
     'barrel_yellow',
     basePath.barrel.yellow.barrelYellowPng.path,
   );
-  
+
   static final purpleBarrel = GameMonsters._(
     'barrel_purple',
     basePath.barrel.purple.barrelPurplePng.path,
@@ -48,17 +56,17 @@ class GameMonsters {
     'tnt_blue',
     basePath.tnt.blue.tntBluePng.path,
   );
-  
+
   static final redTnt = GameMonsters._(
     'tnt_red',
     basePath.tnt.red.tntRedPng.path,
   );
-  
+
   static final yellowTnt = GameMonsters._(
     'tnt_yellow',
     basePath.tnt.yellow.tntYellowPng.path,
   );
-  
+
   static final purpleTnt = GameMonsters._(
     'tnt_purple',
     basePath.tnt.purple.tntPurplePng.path,
@@ -68,17 +76,17 @@ class GameMonsters {
     'torch_blue',
     basePath.torch.blue.torchBluePng.path,
   );
-  
+
   static final redTorch = GameMonsters._(
     'torch_red',
     basePath.torch.red.torchRedPng.path,
   );
-  
+
   static final yellowTorch = GameMonsters._(
     'torch_yellow',
     basePath.torch.yellow.torchYellowPng.path,
   );
-  
+
   static final purpleTorch = GameMonsters._(
     'torch_purple',
     basePath.torch.purple.torchPurplePng.path,

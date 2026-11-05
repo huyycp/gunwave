@@ -2,6 +2,7 @@ import 'package:flame/components.dart';
 import 'package:flame_test/flame_test.dart';
 import 'package:flame/text.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gunwave/data/models/campaign_stage_model.dart';
 import 'package:gunwave/views/game/ui/components/asset_button_component.dart';
 import 'package:gunwave/views/rpg_ui/rpg_menu_models.dart';
 import 'package:gunwave/views/rpg_ui/scenes/stage_briefing_scene.dart';
@@ -57,5 +58,31 @@ void main() {
         }
       }
     },
+  );
+
+  testWithGame(
+    'Stage Briefing uses the barrel idle cell at its native frame size',
+    () => testRpgMenuGame(
+      initialPage: RpgMenuPage.stageBriefing,
+      snapshot: testRpgMenuSnapshot(stages: [_testBarrelStage()]),
+    ),
+    (game) async {
+      await game.ready();
+      final briefing = activeRpgMenuScene(game) as StageBriefingScene;
+      final preview = briefing.children
+          .whereType<SpriteAnimationComponent>()
+          .single;
+      final frame = preview.animation!.frames.single.sprite;
+
+      expect(frame.srcPosition, Vector2(0, 256));
+      expect(frame.srcSize, Vector2.all(128));
+    },
+  );
+}
+
+CampaignStageModel _testBarrelStage() {
+  final stage = testCampaignStage();
+  return stage.copyWith(
+    enemies: [stage.enemies.single.copyWith(filename: 'barrel_blue')],
   );
 }

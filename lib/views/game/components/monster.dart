@@ -7,6 +7,7 @@ import 'package:gunwave/views/game/components/hit_impact.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:gunwave/data/constants/game/game_constants.dart';
+import 'package:gunwave/data/constants/game/game_monster.dart';
 import 'package:gunwave/data/models/monster_model.dart';
 import 'package:gunwave/views/game/combat/combatant.dart';
 import 'package:gunwave/views/game/combat/status_effect.dart';
@@ -154,24 +155,61 @@ class Monster extends SpriteAnimationGroupComponent
   }
 
   void onLoadAnimation() {
-    idleAni = _createAnimation(frameAmount: 7, texturePosition: Vector2(0, 0));
+    if (monster.monster?.isBarrel ?? false) {
+      idleAni = _createAnimation(
+        frameAmount: 1,
+        texturePosition: Vector2(
+          0,
+          GameMonsters.barrelFrameSize * GameMonsters.barrelIdleRow,
+        ),
+        frameSize: GameMonsters.barrelFrameSize,
+      );
+      runAni = _createAnimation(
+        frameAmount: GameMonsters.barrelActionFrameCount,
+        framePerRow: GameMonsters.barrelActionFrameCount,
+        texturePosition: Vector2(
+          0,
+          GameMonsters.barrelFrameSize * GameMonsters.barrelRunRow,
+        ),
+        frameSize: GameMonsters.barrelFrameSize,
+      );
+      attack1Ani = _createAnimation(
+        frameAmount: GameMonsters.barrelActionFrameCount,
+        framePerRow: GameMonsters.barrelActionFrameCount,
+        texturePosition: Vector2(
+          0,
+          GameMonsters.barrelFrameSize * GameMonsters.barrelFiredRow,
+        ),
+        frameSize: GameMonsters.barrelFrameSize,
+      );
+      attack2Ani = attack1Ani;
+      attack3Ani = attack1Ani;
+    } else {
+      idleAni = _createAnimation(
+        frameAmount: 7,
+        texturePosition: Vector2(0, 0),
+      );
 
-    runAni = _createAnimation(frameAmount: 6, texturePosition: Vector2(0, 192));
+      runAni = _createAnimation(
+        frameAmount: 6,
+        texturePosition: Vector2(0, 192),
+      );
 
-    attack1Ani = _createAnimation(
-      frameAmount: 6,
-      texturePosition: Vector2(0, 192 * 2),
-    );
+      attack1Ani = _createAnimation(
+        frameAmount: 6,
+        texturePosition: Vector2(0, 192 * 2),
+      );
 
-    attack2Ani = _createAnimation(
-      frameAmount: 6,
-      texturePosition: Vector2(0, 192 * 3),
-    );
+      attack2Ani = _createAnimation(
+        frameAmount: 6,
+        texturePosition: Vector2(0, 192 * 3),
+      );
 
-    attack3Ani = _createAnimation(
-      frameAmount: 6,
-      texturePosition: Vector2(0, 192 * 4),
-    );
+      attack3Ani = _createAnimation(
+        frameAmount: 6,
+        texturePosition: Vector2(0, 192 * 4),
+      );
+    }
 
     animations = {
       MonsterState.idle: idleAni,
@@ -188,6 +226,7 @@ class Monster extends SpriteAnimationGroupComponent
     required int frameAmount,
     required Vector2 texturePosition,
     int? framePerRow,
+    double frameSize = 192,
     bool loop = true,
   }) {
     if (monster.monster == null) {
@@ -199,7 +238,7 @@ class Monster extends SpriteAnimationGroupComponent
         amount: frameAmount,
         amountPerRow: framePerRow,
         stepTime: stepTime,
-        textureSize: Vector2(192, 192),
+        textureSize: Vector2.all(frameSize),
         texturePosition: texturePosition,
         loop: loop,
       ),

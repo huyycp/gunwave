@@ -12,6 +12,7 @@ import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_hud_style.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
 import 'package:gunwave/data/constants/game/game_menu_style.dart';
+import 'package:gunwave/data/constants/game/game_monster.dart';
 import 'package:gunwave/data/constants/game/game_ui.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/data/models/monster_model.dart';
@@ -243,13 +244,24 @@ abstract class RpgMenuScene extends PositionComponent
     final asset = monster?.monster;
     if (asset == null) return null;
     final image = await game.images.load(_cachePath(game.images, asset.path));
+    final isBarrel = asset.isBarrel;
     final preview = SpriteAnimationComponent(
       animation: SpriteAnimation.fromFrameData(
         image,
         SpriteAnimationData.sequenced(
-          amount: GameMenuStyle.monsterIdleFrameCount,
+          amount: isBarrel ? 1 : GameMenuStyle.monsterIdleFrameCount,
           stepTime: GameMenuStyle.previewFrameDuration,
-          textureSize: Vector2.all(GameMenuStyle.spriteFrameSize),
+          textureSize: Vector2.all(
+            isBarrel
+                ? GameMonsters.barrelFrameSize
+                : GameMenuStyle.spriteFrameSize,
+          ),
+          texturePosition: isBarrel
+              ? Vector2(
+                  0,
+                  GameMonsters.barrelFrameSize * GameMonsters.barrelIdleRow,
+                )
+              : Vector2.zero(),
           loop: true,
         ),
       ),
