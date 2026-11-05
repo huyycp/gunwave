@@ -41,10 +41,14 @@ abstract final class AppTypography {
   static const double minimumBitmapFontSize = bodySmallSize;
 
   /// Converts a Material text size to the project's bitmap-atlas scale.
-  static double bitmapScale(double fontSize, {double responsiveScale = 1}) {
+  static double bitmapScale(
+    double fontSize, {
+    double responsiveScale = 1,
+    double minimumFontSize = minimumBitmapFontSize,
+  }) {
     final responsiveFontSize = math.max(
       fontSize * responsiveScale,
-      minimumBitmapFontSize,
+      minimumFontSize,
     );
     return responsiveFontSize / bitmapFontBaseSize;
   }

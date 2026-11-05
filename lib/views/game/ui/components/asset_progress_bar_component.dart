@@ -2,39 +2,40 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flame/components.dart';
-import 'package:gunwave/data/constants/game/game_hud_style.dart';
 
-import 'asset_panel_component.dart';
-
-/// A resizable progress bar made from three nine-slice sprites.
+/// A responsive progress bar that keeps its end caps at their source ratio.
 class AssetProgressBarComponent extends PositionComponent with HasVisibility {
   AssetProgressBarComponent({
     required Sprite frameSprite,
-    required Sprite backgroundSprite,
     required Sprite fillSprite,
+    required double capWidth,
     required Vector2 size,
     double value = 1,
-    this.inset = GameHudStyle.progressBarInset,
-    NineSliceBorders borders = const NineSliceBorders(
-      left: GameHudStyle.progressBarBorderInset,
-      top: GameHudStyle.progressBarBorderInset,
-      right: GameHudStyle.progressBarBorderInset,
-      bottom: GameHudStyle.progressBarBorderInset,
-    ),
+    Color? fillTint,
     super.position,
     super.anchor,
     super.priority,
-  }) : _frame = _nineSlice(frameSprite, borders),
-       _background = _nineSlice(backgroundSprite, borders),
-       _fill = _nineSlice(fillSprite, borders),
+  }) : _sourceCapWidth = capWidth,
+       _frameLeft = _slice(frameSprite, 0, capWidth),
+       _frameCenter = _slice(
+         frameSprite,
+         capWidth,
+         frameSprite.srcSize.x - capWidth * 2,
+       ),
+       _frameRight = _slice(
+         frameSprite,
+         frameSprite.srcSize.x - capWidth,
+         capWidth,
+       ),
+       _fill = _prepareFill(fillSprite, fillTint),
        _value = normalizedValue(value),
        super(size: size);
 
-  final NineTileBox _frame;
-  final NineTileBox _background;
-  final NineTileBox _fill;
-  final double inset;
-
+  final double _sourceCapWidth;
+  final Sprite _frameLeft;
+  final Sprite _frameCenter;
+  final Sprite _frameRight;
+  final Sprite _fill;
   double _value;
 
   double get value => _value;
@@ -48,31 +49,58 @@ class AssetProgressBarComponent extends PositionComponent with HasVisibility {
 
   @override
   void render(Canvas canvas) {
-    final outer = size.toRect();
-    final inner = Rect.fromLTRB(
-      inset,
-      inset,
-      math.max(inset, width - inset),
-      math.max(inset, height - inset),
+    final frameHeight = _frameCenter.srcSize.y;
+    if (width <= 0 || height <= 0 || frameHeight <= 0) return;
+
+    final capWidth = math.min(
+      _sourceCapWidth * height / frameHeight,
+      width / 2,
     );
-    _background.drawRect(canvas, inner);
-    if (value > 0 && inner.width > 0 && inner.height > 0) {
-      canvas.save();
-      canvas.clipRect(
-        Rect.fromLTWH(inner.left, inner.top, inner.width * value, inner.height),
+    final centerWidth = math.max(0.0, width - capWidth * 2);
+    _frameLeft.render(canvas, size: Vector2(capWidth, height));
+    _frameRight.render(
+      canvas,
+      position: Vector2(width - capWidth, 0),
+      size: Vector2(capWidth, height),
+    );
+    if (centerWidth > 0) {
+      _frameCenter.render(
+        canvas,
+        position: Vector2(capWidth, 0),
+        size: Vector2(centerWidth, height),
       );
-      _fill.drawRect(canvas, inner);
-      canvas.restore();
     }
-    _frame.drawRect(canvas, outer);
+
+    if (_value == 0 || centerWidth == 0) return;
+    final fillHeight = math.min(height, height * _fill.srcSize.y / frameHeight);
+    final fillWidth = centerWidth * _value;
+    final fillTop = (height - fillHeight) / 2;
+    canvas.save();
+    canvas.clipRect(Rect.fromLTWH(capWidth, 0, fillWidth, height));
+    _fill.render(
+      canvas,
+      position: Vector2(capWidth, fillTop),
+      size: Vector2(centerWidth, fillHeight),
+    );
+    canvas.restore();
   }
 
-  static NineTileBox _nineSlice(Sprite sprite, NineSliceBorders borders) =>
-      NineTileBox.withGrid(
-        sprite,
-        leftWidth: borders.left,
-        topHeight: borders.top,
-        rightWidth: borders.right,
-        bottomHeight: borders.bottom,
-      );
+  static Sprite _slice(Sprite sprite, double offsetX, double width) {
+    final slice = Sprite(
+      sprite.image,
+      srcPosition: Vector2(sprite.src.left + offsetX, sprite.src.top),
+      srcSize: Vector2(width, sprite.src.height),
+    );
+    slice.paint = Paint()..filterQuality = FilterQuality.none;
+    return slice;
+  }
+
+  static Sprite _prepareFill(Sprite sprite, Color? tint) {
+    sprite.paint = Paint()
+      ..filterQuality = FilterQuality.none
+      ..colorFilter = tint == null
+          ? null
+          : ColorFilter.mode(tint, BlendMode.srcIn);
+    return sprite;
+  }
 }

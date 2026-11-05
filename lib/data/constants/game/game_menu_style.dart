@@ -1,17 +1,16 @@
 import 'package:gunwave/data/constants/game/game_color.dart';
-import 'package:gunwave/data/constants/game/game_hud_style.dart';
 
 /// Asset and animation measurements shared by the Flame menu scenes.
 abstract final class GameMenuStyle {
-  static const panelBorderInset = GameHudStyle.panelBorderInset;
   static const homeHubMaxWidth = 1600.0;
   static const homeHubMaxHeight = 900.0;
   static const homeHubWidthRatio = 0.94;
   static const homeHubHeightRatio = 0.88;
   static const homeHubPanelHeightRatio = 0.84;
   static const homeHubHeroWidthRatio = 0.98;
-  static const homeHubHeroHeightRatio = 0.84;
-  static const homeHubHeroCenterYRatio = 0.46;
+  static const homeHubHeroHeightRatio = 0.88;
+  static const homeHubHeroCenterYRatio = 0.45;
+  static const homeHubHeroNameCenterYRatio = 0.90;
   static const loadoutMaxWidth = 1600.0;
   static const loadoutMaxHeight = 900.0;
   static const loadoutWidthRatio = 0.94;
@@ -36,6 +35,8 @@ abstract final class GameMenuStyle {
   static const briefingWidthRatio = 0.96;
   static const briefingHeightRatio = 0.92;
   static const backgroundZoomScale = 1.45;
+  // forest.png's visible island is centered at x=1312 of its 3200px canvas.
+  static const backgroundMapContentCenterXRatio = 0.41;
   static const spriteFrameSize = 192.0;
   static const heroIdleFrameCount = 6;
   static const monsterIdleFrameCount = 7;

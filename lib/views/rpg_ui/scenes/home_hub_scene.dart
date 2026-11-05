@@ -54,8 +54,9 @@ class HomeHubScene extends RpgMenuScene {
     _heroName = addText(
       snapshot.selectedHero?.name ??
           (snapshot.isLoading ? labels.loading : labels.noCharacters),
-      fontSize: AppTypography.titleMediumSize,
-    );
+      fontSize: AppTypography.titleLargeSize,
+      minimumFontSize: AppTypography.titleMediumSize,
+    )..priority = 2;
     final stage = snapshot.selectedStage;
     _stageName = addText(
       stage == null
@@ -101,7 +102,7 @@ class HomeHubScene extends RpgMenuScene {
       labels.continueCampaign,
       () => onNavigate(RpgMenuPage.campaignMap),
       buttonSize: Vector2(236, 68),
-      assetSize: GameButtonSize.large,
+      assetSize: GameButtonSize.medium,
     );
     _loadoutButton = await addButton(
       labels.heroLoadout,
@@ -161,7 +162,7 @@ class HomeHubScene extends RpgMenuScene {
     );
     _heroName.position = Vector2(
       left + leftWidth / 2,
-      panelTop + heroPanelHeight - 18 * scale,
+      panelTop + heroPanelHeight * GameMenuStyle.homeHubHeroNameCenterYRatio,
     );
     _stageNumber.position = Vector2(
       left + leftWidth + gap + rightWidth / 2,

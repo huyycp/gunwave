@@ -3,6 +3,7 @@ import 'package:flame/text.dart';
 import 'package:flame_test/flame_test.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gunwave/data/constants/game/game_hud_style.dart';
 import 'package:gunwave/theme/app_typography.dart';
 import 'package:gunwave/views/game/ui/components/asset_button_component.dart';
 import 'package:gunwave/views/game/ui/components/asset_panel_component.dart';
@@ -59,14 +60,17 @@ void main() {
         ),
         isTrue,
       );
+      final preferredScale = AppTypography.bitmapScale(
+        abilityButton.labelFontSize,
+        responsiveScale: abilityButton.responsiveTextScale,
+        minimumFontSize: GameHudStyle.minimumButtonLabelSize,
+      );
+      expect(abilityLabel.scale.x, lessThanOrEqualTo(preferredScale + 0.001));
       expect(
         abilityLabel.scale.x,
-        closeTo(
-          AppTypography.bitmapScale(
-            abilityButton.labelFontSize,
-            responsiveScale: abilityButton.responsiveTextScale,
-          ),
-          0.001,
+        greaterThanOrEqualTo(
+          GameHudStyle.minimumButtonLabelSize /
+              AppTypography.bitmapFontBaseSize,
         ),
       );
       if (previousAbilityLabelScale != null) {
@@ -104,6 +108,6 @@ void main() {
       closeTo(AppTypography.bitmapScale(AppTypography.bodyLargeSize), 0.001),
     );
     expect(abilityButton.size, Vector2(120, 68));
-    expect(abilityButton.labelFontSize, AppTypography.titleMediumSize);
+    expect(abilityButton.labelFontSize, AppTypography.headlineSmallSize);
   });
 }

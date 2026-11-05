@@ -46,7 +46,8 @@ abstract class RpgMenuScene extends PositionComponent
   late final RectangleComponent shade;
   late final Sprite panelSprite;
   late ResponsiveUiLayout responsiveLayout;
-  final Map<TextComponent<SpriteFontRenderer>, double> _textFontSizes = {};
+  final Map<TextComponent<SpriteFontRenderer>, (double, double)>
+  _textFontSizes = {};
   bool _sceneArtLoaded = false;
   bool _contentLoaded = false;
 
@@ -116,7 +117,10 @@ abstract class RpgMenuScene extends PositionComponent
     background.size = imageSize;
     background.scale = Vector2.all(scale);
     background.position = Vector2(
-      (size.x - imageSize.x * scale) / 2,
+      (size.x - imageSize.x * scale) / 2 +
+          imageSize.x *
+              (0.5 - GameMenuStyle.backgroundMapContentCenterXRatio) *
+              scale,
       (size.y - imageSize.y * scale) / 2,
     );
     shade.size = size;
@@ -131,12 +135,7 @@ abstract class RpgMenuScene extends PositionComponent
       sprite: panelSprite,
       size: panelSize,
       position: position,
-      borders: const NineSliceBorders(
-        left: GameMenuStyle.panelBorderInset,
-        top: GameMenuStyle.panelBorderInset,
-        right: GameMenuStyle.panelBorderInset,
-        bottom: GameMenuStyle.panelBorderInset,
-      ),
+      borders: NineSliceBorders.carvedPanel,
     );
     add(panel);
     return panel;
@@ -145,6 +144,7 @@ abstract class RpgMenuScene extends PositionComponent
   TextComponent<SpriteFontRenderer> addText(
     String text, {
     double fontSize = AppTypography.bodyLargeSize,
+    double minimumFontSize = AppTypography.minimumBitmapFontSize,
     Anchor anchor = Anchor.center,
     Vector2? position,
     bool light = false,
@@ -155,10 +155,14 @@ abstract class RpgMenuScene extends PositionComponent
       anchor: anchor,
       position: position,
       scale: Vector2.all(
-        AppTypography.bitmapScale(fontSize, responsiveScale: uiScale),
+        AppTypography.bitmapScale(
+          fontSize,
+          responsiveScale: uiScale,
+          minimumFontSize: minimumFontSize,
+        ),
       ),
     );
-    _textFontSizes[component] = fontSize;
+    _textFontSizes[component] = (fontSize, minimumFontSize);
     add(component);
     return component;
   }
@@ -194,8 +198,9 @@ abstract class RpgMenuScene extends PositionComponent
   void _applyResponsiveTextScale() {
     for (final entry in _textFontSizes.entries) {
       final scale = AppTypography.bitmapScale(
-        entry.value,
+        entry.value.$1,
         responsiveScale: uiScale,
+        minimumFontSize: entry.value.$2,
       );
       entry.key.scale.setValues(scale, scale);
     }

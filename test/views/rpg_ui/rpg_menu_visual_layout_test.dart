@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flame/text.dart';
 import 'package:flame_test/flame_test.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gunwave/data/constants/game/game_menu_style.dart';
 import 'package:gunwave/theme/app_typography.dart';
 import 'package:gunwave/views/game/ui/components/asset_button_component.dart';
 import 'package:gunwave/views/game/ui/components/asset_panel_component.dart';
@@ -78,6 +79,14 @@ void main() {
         ]) {
           game.onGameResize(viewport);
           expectRpgMenuLayoutWithinViewport(scene, viewport);
+          final backgroundImageSize = scene.background.sprite!.srcSize;
+          expect(
+            scene.background.position.x +
+                backgroundImageSize.x *
+                    GameMenuStyle.backgroundMapContentCenterXRatio *
+                    scene.background.scale.x,
+            closeTo(viewport.x / 2, 0.001),
+          );
           if (previousTitleScale != null) {
             expect(title.scale.x, greaterThan(previousTitleScale));
             expect(
@@ -118,8 +127,20 @@ void _expectHomeHubArtAndHeaderFit(HomeHubScene scene) {
   final campaignPanelBounds = panels[1].toAbsoluteRect();
   final preview = scene.children.whereType<SpriteAnimationComponent>().single;
   final previewBounds = preview.toAbsoluteRect();
+  final heroName = scene.children
+      .whereType<TextComponent<SpriteFontRenderer>>()
+      .singleWhere((text) => text.text == 'Blue Warrior');
+  final heroNameBounds = heroName.toAbsoluteRect();
   expect(heroPanelBounds.contains(previewBounds.topLeft), isTrue);
   expect(heroPanelBounds.contains(previewBounds.bottomRight), isTrue);
+  expect(heroName.priority, greaterThan(preview.priority));
+  expect(heroNameBounds.left, greaterThanOrEqualTo(heroPanelBounds.left));
+  expect(heroNameBounds.right, lessThanOrEqualTo(heroPanelBounds.right));
+  expect(heroNameBounds.bottom, lessThanOrEqualTo(heroPanelBounds.bottom));
+  expect(
+    heroName.scale.x * AppTypography.bitmapFontBaseSize,
+    greaterThanOrEqualTo(AppTypography.titleMediumSize - 0.001),
+  );
   expect(heroPanelBounds.height / scene.size.y, greaterThanOrEqualTo(0.72));
   expect(preview.height / heroPanelBounds.height, greaterThanOrEqualTo(0.82));
 
@@ -137,6 +158,23 @@ void _expectHomeHubArtAndHeaderFit(HomeHubScene scene) {
       .whereType<AssetButtonComponent>()
       .singleWhere((button) => button.label == 'Settings')
       .toAbsoluteRect();
+  final continueButton = scene.children
+      .whereType<AssetButtonComponent>()
+      .singleWhere((button) => button.label == 'Continue');
+  final loadoutButton = scene.children
+      .whereType<AssetButtonComponent>()
+      .singleWhere((button) => button.label == 'Hero Loadout');
+  final continueLabel = continueButton.children
+      .whereType<TextComponent<SpriteFontRenderer>>()
+      .single;
+  final loadoutLabel = loadoutButton.children
+      .whereType<TextComponent<SpriteFontRenderer>>()
+      .single;
+  expect(
+    continueButton.labelFontSize,
+    greaterThan(loadoutButton.labelFontSize),
+  );
+  expect(continueLabel.scale.x, greaterThan(loadoutLabel.scale.x));
   final titleBounds = textBounds('Campaign');
   final statusLabelBounds = textBounds('Status points');
   final statusValueBounds = textBounds('7');

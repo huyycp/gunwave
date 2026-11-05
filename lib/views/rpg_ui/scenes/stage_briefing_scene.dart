@@ -87,9 +87,7 @@ class StageBriefingScene extends RpgMenuScene {
           '${round.number}',
           () {},
           buttonSize: Vector2(68, 68),
-          assetSize: round.isBoss
-              ? GameButtonSize.large
-              : GameButtonSize.medium,
+          assetSize: GameButtonSize.large,
         );
         final detail = addText(
           round.isBoss ? labels.boss : labels.roundNumber(round.number),
@@ -107,7 +105,7 @@ class StageBriefingScene extends RpgMenuScene {
       labels.selectHero,
       () => onNavigate(RpgMenuPage.heroLoadout),
       buttonSize: Vector2(212, 64),
-      assetSize: GameButtonSize.large,
+      assetSize: GameButtonSize.medium,
       enabled: stage != null && snapshot.isStageUnlocked(stage),
     );
   }

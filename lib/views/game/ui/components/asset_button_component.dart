@@ -26,17 +26,13 @@ class AssetButtonComponent extends PositionComponent
     this.labelRenderer,
     double? labelFontSize,
     this.onPressed,
-    NineSliceBorders borders = const NineSliceBorders(
-      left: GameHudStyle.buttonBorderInset,
-      top: GameHudStyle.buttonBorderInset,
-      right: GameHudStyle.buttonBorderInset,
-      bottom: GameHudStyle.buttonBorderInset,
-    ),
+    NineSliceBorders borders = NineSliceBorders.squareButton,
     super.position,
     super.anchor,
     super.priority,
     super.key,
-  }) : _normal = _nineSlice(normalSprite, borders),
+  }) : _baseLabelFontSize = _labelSizeForHeight(size.y),
+       _normal = _nineSlice(normalSprite, borders),
        _hovered = _nineSlice(hoveredSprite ?? normalSprite, borders),
        _pressed = _nineSlice(pressedSprite, borders),
        _disabled = disabledSprite == null
@@ -56,6 +52,7 @@ class AssetButtonComponent extends PositionComponent
   final NineTileBox _pressed;
   final NineTileBox? _disabled;
   final Vector2 _hitAreaSize;
+  final double _baseLabelFontSize;
   final double? _labelFontSizeOverride;
   final SpriteFontRenderer? labelRenderer;
   final void Function()? onPressed;
@@ -68,8 +65,7 @@ class AssetButtonComponent extends PositionComponent
 
   bool get enabled => _buttonState != GameButtonState.disabled;
 
-  double get labelFontSize =>
-      _labelFontSizeOverride ?? _labelSizeForHeight(height);
+  double get labelFontSize => _labelFontSizeOverride ?? _baseLabelFontSize;
 
   set enabled(bool value) {
     _buttonState = value ? GameButtonState.enabled : GameButtonState.disabled;
@@ -86,7 +82,7 @@ class AssetButtonComponent extends PositionComponent
   double get responsiveTextScale => _responsiveTextScale;
 
   set responsiveTextScale(double value) {
-    _responsiveTextScale = value;
+    _responsiveTextScale = math.max(value, GameHudStyle.minimumButtonTextScale);
     _updateLabelScale();
   }
 
@@ -196,9 +192,10 @@ class AssetButtonComponent extends PositionComponent
     final preferredScale = AppTypography.bitmapScale(
       labelFontSize,
       responsiveScale: _responsiveTextScale,
+      minimumFontSize: GameHudStyle.minimumButtonLabelSize,
     );
     const minimumScale =
-        AppTypography.minimumBitmapFontSize / AppTypography.bitmapFontBaseSize;
+        GameHudStyle.minimumButtonLabelSize / AppTypography.bitmapFontBaseSize;
     final availableWidth = math.max(
       0,
       width - GameHudStyle.buttonLabelHorizontalInset * 2,
@@ -212,12 +209,12 @@ class AssetButtonComponent extends PositionComponent
 
   static double _labelSizeForHeight(double height) {
     if (height <= GameHudStyle.compactButtonLabelMaxHeight) {
-      return AppTypography.labelMediumSize;
-    }
-    if (height >= GameHudStyle.prominentButtonLabelMinHeight) {
       return AppTypography.titleMediumSize;
     }
-    return AppTypography.labelLargeSize;
+    if (height >= GameHudStyle.prominentButtonLabelMinHeight) {
+      return AppTypography.headlineSmallSize;
+    }
+    return AppTypography.titleLargeSize;
   }
 
   static NineTileBox _nineSlice(Sprite sprite, NineSliceBorders borders) =>
@@ -247,6 +244,7 @@ class AssetButtonComponent extends PositionComponent
     SpriteFontRenderer? labelRenderer,
     double? labelFontSize,
     double responsiveTextScale = 1,
+    NineSliceBorders? borders,
     void Function()? onPressed,
   }) async {
     final assets = GameButtonAssets.forSize(buttonSize);
@@ -277,9 +275,16 @@ class AssetButtonComponent extends PositionComponent
       label: label,
       labelRenderer: labelRenderer,
       labelFontSize: labelFontSize,
+      borders: borders ?? _bordersFor(buttonSize),
       onPressed: onPressed,
     );
     component.responsiveTextScale = responsiveTextScale;
     return component;
   }
+
+  static NineSliceBorders _bordersFor(GameButtonSize size) => switch (size) {
+    GameButtonSize.small => NineSliceBorders.smallButton,
+    GameButtonSize.medium => NineSliceBorders.slideButton,
+    GameButtonSize.large => NineSliceBorders.squareButton,
+  };
 }

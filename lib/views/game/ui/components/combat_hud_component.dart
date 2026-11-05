@@ -140,18 +140,16 @@ class CombatHudComponent extends PositionComponent {
   }) async {
     final font = await UiBitmapFont.load(images);
     final panelSprite = await _loadSprite(images, GameUiAssets.panel.path);
-    final frameSprite = await _loadSprite(
+    final smallBarBase = await _loadSprite(
       images,
-      GameUiAssets.progressFrame.path,
+      GameUiAssets.smallBarBase.path,
     );
-    final backgroundSprite = await _loadSprite(
+    final smallBarFill = await _loadSprite(
       images,
-      GameUiAssets.progressBackground.path,
+      GameUiAssets.smallBarFill.path,
     );
-    final fillSprite = await _loadSprite(
-      images,
-      GameUiAssets.progressFill.path,
-    );
+    final bigBarBase = await _loadSprite(images, GameUiAssets.bigBarBase.path);
+    final bigBarFill = await _loadSprite(images, GameUiAssets.bigBarFill.path);
 
     final healthPanel = AssetPanelComponent(
       sprite: panelSprite,
@@ -174,9 +172,10 @@ class CombatHudComponent extends PositionComponent {
       textRenderer: font,
     );
     final healthBar = AssetProgressBarComponent(
-      frameSprite: frameSprite,
-      backgroundSprite: backgroundSprite,
-      fillSprite: fillSprite,
+      frameSprite: _cropSprite(smallBarBase, GameUiAssets.smallBarFrameCrop),
+      fillSprite: _cropSprite(smallBarFill, GameUiAssets.smallBarFillCrop),
+      capWidth: GameUiAssets.smallBarCapWidth,
+      fillTint: GameHudStyle.healthFill,
       size: Vector2(_healthPanelWidth - 28, 20),
     );
     final roundText = TextComponent<SpriteFontRenderer>(
@@ -193,9 +192,10 @@ class CombatHudComponent extends PositionComponent {
       anchor: Anchor.center,
     );
     final bossBar = AssetProgressBarComponent(
-      frameSprite: frameSprite,
-      backgroundSprite: backgroundSprite,
-      fillSprite: fillSprite,
+      frameSprite: _cropSprite(bigBarBase, GameUiAssets.bigBarFrameCrop),
+      fillSprite: _cropSprite(bigBarFill, GameUiAssets.bigBarFillCrop),
+      capWidth: GameUiAssets.bigBarCapWidth,
+      fillTint: GameHudStyle.healthCriticalFill,
       size: Vector2(_bossPanelWidth - 28, 17),
     );
     final pauseButton = await AssetButtonComponent.load(
@@ -492,4 +492,10 @@ class CombatHudComponent extends PositionComponent {
         : path;
     return Sprite(await images.load(cachePath));
   }
+
+  static Sprite _cropSprite(Sprite sprite, Rect crop) => Sprite(
+    sprite.image,
+    srcPosition: Vector2(crop.left, crop.top),
+    srcSize: Vector2(crop.width, crop.height),
+  );
 }

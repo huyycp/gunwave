@@ -125,9 +125,9 @@ void main() {
     await game.ensureAdd(standard);
     await game.ensureAdd(prominent);
 
-    expect(compact.labelFontSize, 12);
-    expect(standard.labelFontSize, 14);
-    expect(prominent.labelFontSize, 16);
+    expect(compact.labelFontSize, 16);
+    expect(standard.labelFontSize, 22);
+    expect(prominent.labelFontSize, 24);
 
     final prominentLabel = prominent.children
         .whereType<TextComponent<SpriteFontRenderer>>()
@@ -140,14 +140,14 @@ void main() {
     );
 
     standard.size = Vector2(180, 64);
-    expect(standard.labelFontSize, 16);
+    expect(standard.labelFontSize, 22);
     standard.responsiveTextScale = 0.85;
     final standardLabel = standard.children
         .whereType<TextComponent<SpriteFontRenderer>>()
         .single;
     expect(
       standardLabel.scale.x,
-      closeTo(AppTypography.titleMediumSize * 0.85 / 14, 0.001),
+      closeTo(AppTypography.titleLargeSize * 0.85 / 14, 0.001),
     );
   });
 }

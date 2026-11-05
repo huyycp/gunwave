@@ -230,12 +230,12 @@ void expectRpgMenuLayoutWithinViewport(
         );
         expect(
           label.width * label.scale.x,
-          lessThanOrEqualTo(component.width - 8),
+          lessThanOrEqualTo(component.width - 8 + 0.01),
         );
         expect(
           label.scale.x,
           greaterThanOrEqualTo(
-            AppTypography.minimumBitmapFontSize /
+            GameHudStyle.minimumButtonLabelSize /
                 AppTypography.bitmapFontBaseSize,
           ),
         );

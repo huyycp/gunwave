@@ -113,7 +113,7 @@ class HeroLoadoutScene extends RpgMenuScene {
         }
       },
       buttonSize: Vector2(186, 62),
-      assetSize: GameButtonSize.large,
+      assetSize: GameButtonSize.medium,
       enabled:
           _hero != null && stage != null && snapshot.isStageUnlocked(stage),
     );

@@ -48,6 +48,7 @@ flutter:
     - assets/data/catalog/
     - assets/images/
     - assets/images/hub/joystick/
+    - assets/images/ui/bars/
     - assets/images/ui/banners/
     - assets/images/ui/buttons/
     - assets/images/ui/icons/
