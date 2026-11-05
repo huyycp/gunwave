@@ -18,11 +18,11 @@ controls, dialogs, and results.
   status points, owned heroes, and upgrades on the device. Replaying a cleared
   stage does not award its first-clear rewards again.
 - **New save:** starts with zero gold, zero status points, no cleared stages,
-  and the bundled Blue Warrior as the playable starter. Clearing Stage 1 adds
+  and the exported Adept Warrior as the playable starter. Clearing Stage 1 adds
   gold to the same wallet used by the Shop.
-- **Shop catalog:** only the bundled starter is present until the sanitized
-  character/ability JSON export is supplied. No hero stats, prices, or abilities
-  are fabricated.
+- **Shop catalog:** eight exported heroes and their eight linked abilities are
+  seeded locally from the bundled catalog. Updates refresh static definitions
+  without resetting owned hero upgrades or player progress.
 - **Control modes:** choose joystick, keyboard, or gesture controls in the
   asset-rendered Settings scene. Joystick is the default for a new menu session.
 - **Settings:** choose the app language and the input mode for campaign runs.

@@ -1,6 +1,6 @@
 # Character abilities
 
-Each character's optional `abilityId` points to an `Abilities` row in the local Drift catalog. The game reads the joined ability definition; it does not infer abilities from a character's color. Missing, unknown, or invalid definitions disable the Special control and emit a structured warning. The full character/ability JSON export is still pending, so the bundled starter currently has no special ability.
+Each character's optional `abilityId` points to an `Abilities` row in the local Drift catalog. The game reads the joined ability definition; it does not infer abilities from a character's color. Missing, unknown, or invalid definitions disable the Special control and emit a structured warning. The current bundled catalog contains eight heroes and eight supported abilities. The Adept Warrior starter has Bulwark.
 
 ## Controls
 
@@ -61,12 +61,12 @@ Implementation reference: [Flame movement effects](https://docs.flame-engine.org
 
 1. Add an `Ability` implementation under `lib/views/game/abilities/implementations/` and validate its parameters in the constructor.
 2. Register its database key in `AbilityRegistry`.
-3. Add its entry to the local ability catalog JSON and link the character through `abilityId`. The Drift row stores the stable ID/key, display strings, cooldown, duration, and JSON parameters.
+3. Add its entry to `assets/data/catalog/abilities.json` and link the character through `abilityId` in `characters.json`. The Drift row stores the stable ID/key, display strings, cooldown, duration, and JSON parameters.
 4. Test activation success/failure, cooldown, effect expiry, and any new targeting rule.
 
 Parameter validation bounds damage multipliers to 10 and ranges to 50 tiles as safety limits for malformed configuration. Keep new mechanics within shared combat/status hooks where possible. Temporary buffs never alter the database's character stats.
 
-The app reads ability definitions from local Drift rows seeded from the sanitized catalog export. Do not add account identifiers or ownership to the static catalog files.
+The app reads ability definitions from local Drift rows seeded from `assets/data/catalog/`. The original static CSV exports are kept under `seeds/`. Do not add account identifiers or ownership to either catalog source.
 
 ## Verification
 

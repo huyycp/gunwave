@@ -1,0 +1,9 @@
+id,key,name,description,cooldown_ms,duration_ms,parameters
+1e0cbca4-6bba-4dbc-b2ac-5328f04d36ce,bulwark,Bulwark,Reduce incoming damage by 40%,14000,3000,"{""damage_reduction"":0.4}"
+37903ea7-3a67-4d81-a507-a0df9a830bf5,first_aid,First Aid,Restore 20% of maximum HP,20000,,"{""heal_max_hp_fraction"":0.2}"
+45a2c3e0-a6e4-4c9f-87b9-0bb2134601e8,flame_brand,Flame Brand,Fire a projectile that deals increased damage,10000,,"{""range_tiles"":4,""damage_multiplier"":1.25}"
+8e83462c-728c-4bde-bff9-23cd596a09f9,power_break,Power Break,The next 3 attacks deal 50% more damage,14000,,"{""attack_count"":3,""damage_multiplier"":1.5}"
+9f0eb2ac-0f4c-4679-bb12-914c88f8c823,thunder_crash,Thunder Crash,Damage nearby monsters and stun them briefly,16000,,"{""stun_ms"":800,""radius_tiles"":2,""damage_multiplier"":1.25}"
+ae793186-66c5-4565-9dc5-de8ef9336fc9,rift_slash,Rift Slash,Deal piercing damage at range,13000,,"{""pierces"":true,""range_tiles"":2,""damage_multiplier"":1.5}"
+b955f537-62d9-4475-b270-d53ea042e98b,quickstep,Quickstep,Dash and avoid damage during the dash,10000,350,"{""dash_tiles"":1.5}"
+f1bf4fbd-f9b6-4034-83d1-b1f72b4233e6,hex_seal,Hex Seal,Reduce a monster's movement and attack speed,16000,3000,"{""move_speed_reduction"":0.4,""attack_speed_reduction"":0.4}"

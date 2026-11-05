@@ -1,5 +1,6 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gunwave/data/data_sources/local/campaign_hero_catalog.dart';
 import 'package:gunwave/data/data_sources/local/local_app_initializer.dart';
 import 'package:gunwave/data/database/app_database.dart';
 import 'package:gunwave/localization/app_locale_mode.dart';
@@ -25,8 +26,10 @@ void main() {
     expect(await database.select(database.stageRounds).get(), hasLength(5));
     expect(player.gold, 0);
     expect(player.statusPoints, 0);
-    expect(player.selectedHeroId, 'local_starter_warrior_blue');
+    expect(player.selectedHeroId, CampaignHeroCatalog.starter.id);
     expect(owned, hasLength(1));
+    expect(await database.select(database.characters).get(), hasLength(8));
+    expect(await database.select(database.abilities).get(), hasLength(8));
     expect(await database.select(database.campaignStageClears).get(), isEmpty);
     expect(localeController.mode, AppLocaleMode.system);
   });

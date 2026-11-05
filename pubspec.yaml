@@ -45,6 +45,7 @@ flutter:
   assets:
     - assets/tiles/
     - assets/data/campaign/
+    - assets/data/catalog/
     - assets/images/
     - assets/images/hub/joystick/
     - assets/images/ui/banners/

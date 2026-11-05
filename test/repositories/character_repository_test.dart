@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gunwave/data/data_sources/local/campaign_content_data_source.dart';
+import 'package:gunwave/data/data_sources/local/campaign_hero_catalog.dart';
 import 'package:gunwave/data/data_sources/local/character_local_data_source.dart';
 import 'package:gunwave/data/data_sources/local/local_game_data_seeder.dart';
 import 'package:gunwave/data/database/app_database.dart';
@@ -36,8 +37,8 @@ void main() {
           .into(database.abilities)
           .insert(
             AbilitiesCompanion.insert(
-              id: 'quickstep',
-              key: 'quickstep',
+              id: 'test_quickstep',
+              key: 'test_quickstep',
               name: 'Quickstep',
               description: 'Dash forward.',
               cooldownMs: 2500,
@@ -46,17 +47,18 @@ void main() {
           );
       await (database.update(database.characters)
             ..where((row) => row.id.equals('hero_red')))
-          .write(const CharactersCompanion(abilityId: Value('quickstep')));
+          .write(const CharactersCompanion(abilityId: Value('test_quickstep')));
 
       final catalog = await repository.getCharacters();
       final starter = await repository.getOwnedCharacter(
-        'local_starter_warrior_blue',
+        CampaignHeroCatalog.starter.id,
       );
 
-      expect(catalog.map((hero) => hero.price), [0, 40, 40]);
-      expect(catalog[1].ability?.key, 'quickstep');
-      expect(catalog[1].ability?.parameters, {'dashTiles': 3});
-      expect(starter?.hp, 100);
+      final customHero = catalog.singleWhere((hero) => hero.id == 'hero_red');
+      expect(catalog, hasLength(10));
+      expect(customHero.ability?.key, 'test_quickstep');
+      expect(customHero.ability?.parameters, {'dashTiles': 3});
+      expect(starter?.hp, 220);
       expect(starter?.filename, 'warrior_blue');
     },
   );
@@ -92,46 +94,46 @@ void main() {
   });
 
   test('stat upgrade spends one point and reset restores base stats', () async {
-    await (database.update(
-          database.playerCharacters,
-        )..where((row) => row.characterId.equals('local_starter_warrior_blue')))
+    await (database.update(database.playerCharacters)..where(
+          (row) => row.characterId.equals(CampaignHeroCatalog.starter.id),
+        ))
         .write(const PlayerCharactersCompanion(statusPoints: Value(2)));
 
     expect(
       await repository.updateAttr(
-        'local_starter_warrior_blue',
+        CampaignHeroCatalog.starter.id,
         CharacterAttr.hp,
       ),
       isTrue,
     );
     expect(
       await repository.updateAttr(
-        'local_starter_warrior_blue',
+        CampaignHeroCatalog.starter.id,
         CharacterAttr.str,
       ),
       isTrue,
     );
     expect(
       await repository.updateAttr(
-        'local_starter_warrior_blue',
+        CampaignHeroCatalog.starter.id,
         CharacterAttr.str,
       ),
       isFalse,
     );
 
     final upgraded = await repository.getOwnedCharacter(
-      'local_starter_warrior_blue',
+      CampaignHeroCatalog.starter.id,
     );
-    expect(upgraded?.hp, 101);
-    expect(upgraded?.str, 11);
+    expect(upgraded?.hp, 221);
+    expect(upgraded?.str, 21);
     expect(upgraded?.sp, 0);
 
-    expect(await repository.resetAttr('local_starter_warrior_blue'), isTrue);
+    expect(await repository.resetAttr(CampaignHeroCatalog.starter.id), isTrue);
     final reset = await repository.getOwnedCharacter(
-      'local_starter_warrior_blue',
+      CampaignHeroCatalog.starter.id,
     );
-    expect(reset?.hp, 100);
-    expect(reset?.str, 10);
+    expect(reset?.hp, 220);
+    expect(reset?.str, 20);
     expect(reset?.sp, 2);
   });
 }

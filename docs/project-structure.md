@@ -42,16 +42,16 @@ Flutter method channel named `gesture_recognizer`.
 
 - `assets/data/campaign/stages.json` defines the bundled campaign and combat
   encounters. The app seeds it into Drift before showing the first screen.
+- `assets/data/catalog/characters.json` and `abilities.json` hold the bundled
+  Shop catalog. Their sanitized CSV source exports live in `seeds/`; startup
+  validates references and refreshes static rows without replacing player data.
 - `lib/data/database/app_database.dart` owns the SQLite database and schema
   version. Update its migration and `drift_schemas/` snapshot when the schema
   changes.
 - `lib/data/data_sources/local/local_game_data_seeder.dart` imports static
-  campaign/monster content and grants the bundled starter without overwriting
-  local progress.
+  campaign, monster, hero, and ability content and grants the catalog starter
+  without overwriting local progress.
 - `lib/data/data_sources/local/legacy_preferences_migrator.dart` imports only
   the old app language choice and removes the old serialized campaign save.
-- Character and ability catalog rows will be loaded from the sanitized JSON
-  export once it is supplied. Until then, only the local starter is seeded.
-
 Tiled maps and image assets remain files under `assets/`; SQLite contains only
 their keys and structured gameplay data.

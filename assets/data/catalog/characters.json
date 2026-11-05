@@ -1,0 +1,92 @@
+{
+  "characters": [
+    {
+      "id": "1fa1b093-073d-42a3-b238-658ff5fbb169",
+      "name": "Elite Warrior",
+      "filename": "warrior_red",
+      "hp": 200,
+      "str": 24,
+      "vit": 18,
+      "agi": 145,
+      "price": 500,
+      "ability_id": "8e83462c-728c-4bde-bff9-23cd596a09f9"
+    },
+    {
+      "id": "5603f854-37bb-42b9-9e98-b3be616d1b89",
+      "name": "Holy Warrior",
+      "filename": "warrior_yellow",
+      "hp": 180,
+      "str": 22,
+      "vit": 14,
+      "agi": 135,
+      "price": 600,
+      "ability_id": "9f0eb2ac-0f4c-4679-bb12-914c88f8c823"
+    },
+    {
+      "id": "8f793e1f-7d76-4bb5-8175-e2d0e3510cfb",
+      "name": "Adept Warrior",
+      "filename": "warrior_blue",
+      "hp": 220,
+      "str": 20,
+      "vit": 10,
+      "agi": 120,
+      "price": 0,
+      "ability_id": "1e0cbca4-6bba-4dbc-b2ac-5328f04d36ce"
+    },
+    {
+      "id": "9b22ce7f-65c7-41de-8628-e70f0d9a73be",
+      "name": "Elite Pawn",
+      "filename": "pawn_red",
+      "hp": 180,
+      "str": 22,
+      "vit": 14,
+      "agi": 155,
+      "price": 500,
+      "ability_id": "45a2c3e0-a6e4-4c9f-87b9-0bb2134601e8"
+    },
+    {
+      "id": "b9eb71bd-ae6e-4630-94d6-6d52510518a5",
+      "name": "Master Warrior",
+      "filename": "warrior_purple",
+      "hp": 195,
+      "str": 24,
+      "vit": 18,
+      "agi": 145,
+      "price": 550,
+      "ability_id": "ae793186-66c5-4565-9dc5-de8ef9336fc9"
+    },
+    {
+      "id": "dde6f7af-03c8-448b-bfd9-d28fe8cceeb0",
+      "name": "Adept Pawn",
+      "filename": "pawn_blue",
+      "hp": 190,
+      "str": 18,
+      "vit": 18,
+      "agi": 170,
+      "price": 450,
+      "ability_id": "37903ea7-3a67-4d81-a507-a0df9a830bf5"
+    },
+    {
+      "id": "e35cf0b4-ad42-4619-88d7-8add111f21ec",
+      "name": "Holy Pawn",
+      "filename": "pawn_yellow",
+      "hp": 175,
+      "str": 20,
+      "vit": 14,
+      "agi": 180,
+      "price": 550,
+      "ability_id": "b955f537-62d9-4475-b270-d53ea042e98b"
+    },
+    {
+      "id": "ed68d655-38e1-4a15-8951-769320544b74",
+      "name": "Master Pawn",
+      "filename": "pawn_purple",
+      "hp": 190,
+      "str": 18,
+      "vit": 20,
+      "agi": 160,
+      "price": 500,
+      "ability_id": "f1bf4fbd-f9b6-4034-83d1-b1f72b4233e6"
+    }
+  ]
+}

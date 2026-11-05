@@ -84,10 +84,13 @@ so the requested local save starts empty. The `shared_preferences` package is
 used only for this one-time compatibility migration; new settings and all game
 progress use Drift.
 
-The current character catalog has only the bundled Blue Warrior starter. The
-sanitized character/ability JSON export needed for the full Shop catalog has
-not yet been supplied. Do not fabricate character stats, prices, abilities, or
-ownership rows.
+The eight-character and eight-ability catalog is bundled as normalized JSON in
+`assets/data/catalog/`; the source CSV exports are in `seeds/`. Startup
+validates sprite filenames and ability references, then upserts static catalog
+rows before ensuring the local starter is owned. Catalog-only updates do not
+change the Drift schema version. Existing saves migrate the temporary starter
+ID to the exported Adept Warrior and retain invested stat upgrades, balances,
+and campaign clears.
 
 ## Typography
 

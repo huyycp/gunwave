@@ -1,0 +1,9 @@
+id,name,filename,hp,str,vit,agi,price,ability_id
+1fa1b093-073d-42a3-b238-658ff5fbb169,Elite Warrior,warrior_red,200,24,18,145,500,8e83462c-728c-4bde-bff9-23cd596a09f9
+5603f854-37bb-42b9-9e98-b3be616d1b89,Holy Warrior,warrior_yellow,180,22,14,135,600,9f0eb2ac-0f4c-4679-bb12-914c88f8c823
+8f793e1f-7d76-4bb5-8175-e2d0e3510cfb,Adept Warrior,warrior_blue,220,20,10,120,0,1e0cbca4-6bba-4dbc-b2ac-5328f04d36ce
+9b22ce7f-65c7-41de-8628-e70f0d9a73be,Elite Pawn,pawn_red,180,22,14,155,500,45a2c3e0-a6e4-4c9f-87b9-0bb2134601e8
+b9eb71bd-ae6e-4630-94d6-6d52510518a5,Master Warrior,warrior_purple,195,24,18,145,550,ae793186-66c5-4565-9dc5-de8ef9336fc9
+dde6f7af-03c8-448b-bfd9-d28fe8cceeb0,Adept Pawn,pawn_blue,190,18,18,170,450,37903ea7-3a67-4d81-a507-a0df9a830bf5
+e35cf0b4-ad42-4619-88d7-8add111f21ec,Holy Pawn,pawn_yellow,175,20,14,180,550,b955f537-62d9-4475-b270-d53ea042e98b
+ed68d655-38e1-4a15-8951-769320544b74,Master Pawn,pawn_purple,190,18,20,160,500,f1bf4fbd-f9b6-4034-83d1-b1f72b4233e6

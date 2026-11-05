@@ -1,0 +1,99 @@
+{
+  "abilities": [
+    {
+      "id": "1e0cbca4-6bba-4dbc-b2ac-5328f04d36ce",
+      "key": "bulwark",
+      "name": "Bulwark",
+      "description": "Reduce incoming damage by 40%",
+      "cooldown_ms": 14000,
+      "duration_ms": 3000,
+      "parameters": {
+        "damage_reduction": 0.4
+      }
+    },
+    {
+      "id": "37903ea7-3a67-4d81-a507-a0df9a830bf5",
+      "key": "first_aid",
+      "name": "First Aid",
+      "description": "Restore 20% of maximum HP",
+      "cooldown_ms": 20000,
+      "duration_ms": null,
+      "parameters": {
+        "heal_max_hp_fraction": 0.2
+      }
+    },
+    {
+      "id": "45a2c3e0-a6e4-4c9f-87b9-0bb2134601e8",
+      "key": "flame_brand",
+      "name": "Flame Brand",
+      "description": "Fire a projectile that deals increased damage",
+      "cooldown_ms": 10000,
+      "duration_ms": null,
+      "parameters": {
+        "range_tiles": 4,
+        "damage_multiplier": 1.25
+      }
+    },
+    {
+      "id": "8e83462c-728c-4bde-bff9-23cd596a09f9",
+      "key": "power_break",
+      "name": "Power Break",
+      "description": "The next 3 attacks deal 50% more damage",
+      "cooldown_ms": 14000,
+      "duration_ms": null,
+      "parameters": {
+        "attack_count": 3,
+        "damage_multiplier": 1.5
+      }
+    },
+    {
+      "id": "9f0eb2ac-0f4c-4679-bb12-914c88f8c823",
+      "key": "thunder_crash",
+      "name": "Thunder Crash",
+      "description": "Damage nearby monsters and stun them briefly",
+      "cooldown_ms": 16000,
+      "duration_ms": null,
+      "parameters": {
+        "stun_ms": 800,
+        "radius_tiles": 2,
+        "damage_multiplier": 1.25
+      }
+    },
+    {
+      "id": "ae793186-66c5-4565-9dc5-de8ef9336fc9",
+      "key": "rift_slash",
+      "name": "Rift Slash",
+      "description": "Deal piercing damage at range",
+      "cooldown_ms": 13000,
+      "duration_ms": null,
+      "parameters": {
+        "pierces": true,
+        "range_tiles": 2,
+        "damage_multiplier": 1.5
+      }
+    },
+    {
+      "id": "b955f537-62d9-4475-b270-d53ea042e98b",
+      "key": "quickstep",
+      "name": "Quickstep",
+      "description": "Dash and avoid damage during the dash",
+      "cooldown_ms": 10000,
+      "duration_ms": 350,
+      "parameters": {
+        "dash_tiles": 1.5
+      }
+    },
+    {
+      "id": "f1bf4fbd-f9b6-4034-83d1-b1f72b4233e6",
+      "key": "hex_seal",
+      "name": "Hex Seal",
+      "description": "Reduce a monster's movement and attack speed",
+      "cooldown_ms": 16000,
+      "duration_ms": 3000,
+      "parameters": {
+        "move_speed_reduction": 0.4,
+        "attack_speed_reduction": 0.4
+      }
+    }
+  ]
+}

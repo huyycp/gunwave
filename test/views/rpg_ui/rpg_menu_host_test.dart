@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gunwave/data/constants/game/game_play_mode.dart';
 import 'package:gunwave/data/data_sources/local/campaign_content_data_source.dart';
+import 'package:gunwave/data/data_sources/local/character_catalog_data_source.dart';
+import 'package:gunwave/data/data_sources/local/campaign_hero_catalog.dart';
 import 'package:gunwave/data/data_sources/local/campaign_progress_local_data_source.dart';
 import 'package:gunwave/data/data_sources/local/local_game_data_seeder.dart';
 import 'package:gunwave/data/database/app_database.dart';
@@ -26,9 +28,11 @@ import 'rpg_menu_test_support.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late List<CampaignStageModel> bundledStages;
+  late CharacterCatalogContent characterCatalog;
 
   setUpAll(() async {
     bundledStages = await AssetCampaignContentDataSource().loadStages();
+    characterCatalog = await AssetCharacterCatalogDataSource().loadCatalog();
   });
 
   Future<AppDatabase> createDatabase() async {
@@ -36,6 +40,9 @@ void main() {
     await LocalGameDataSeeder(
       database,
       contentDataSource: _StaticCampaignContentDataSource(bundledStages),
+      characterCatalogDataSource: _StaticCharacterCatalogDataSource(
+        characterCatalog,
+      ),
     ).seed();
     return database;
   }
@@ -145,8 +152,8 @@ void main() {
     }
     expect(game.snapshot.isLoading, isFalse);
     expect(game.snapshot.ownedHeroes, hasLength(1));
-    expect(game.snapshot.selectedHero?.id, 'local_starter_warrior_blue');
-    expect(game.snapshot.shopHeroes, hasLength(1));
+    expect(game.snapshot.selectedHero?.id, CampaignHeroCatalog.starter.id);
+    expect(game.snapshot.shopHeroes, hasLength(8));
 
     game.actions.onSelectHero(0);
     await tester.pump();
@@ -155,7 +162,7 @@ void main() {
         .widget<GameWidget<RpgMenuGame>>(find.byType(GameWidget<RpgMenuGame>))
         .game!;
     expect(game.snapshot.ownedHeroes, hasLength(1));
-    expect(game.snapshot.selectedHero?.id, 'local_starter_warrior_blue');
+    expect(game.snapshot.selectedHero?.id, CampaignHeroCatalog.starter.id);
   });
 
   testWidgets('Selected input mode is used when launching a campaign stage', (
@@ -211,4 +218,13 @@ class _StaticCampaignContentDataSource implements CampaignContentDataSource {
 
   @override
   Future<List<CampaignStageModel>> loadStages() async => _stages;
+}
+
+class _StaticCharacterCatalogDataSource implements CharacterCatalogDataSource {
+  const _StaticCharacterCatalogDataSource(this._catalog);
+
+  final CharacterCatalogContent _catalog;
+
+  @override
+  Future<CharacterCatalogContent> loadCatalog() async => _catalog;
 }

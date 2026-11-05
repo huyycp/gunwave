@@ -67,15 +67,19 @@ when prompted by the operating system.
 
 Game definitions and player state are stored on the device in SQLite through
 Drift. A new local save starts with zero gold, no cleared stages, and the
-bundled Blue Warrior so the campaign is playable immediately. Stage 1, its
-monsters, five rounds, and boss are seeded from `assets/data/campaign/`.
-Tiled maps, sprites, and other binary art remain packaged assets.
+Adept Warrior starter so the campaign is playable immediately. Stage 1, its
+monsters, five rounds, and boss are seeded from `assets/data/campaign/`. The
+eight-hero and ability catalog is bundled under `assets/data/catalog/`; its
+normalized JSON is seeded into Drift at startup. The exported source CSVs are
+kept in `seeds/`. Tiled maps, sprites, and other binary art remain packaged
+assets.
 
 The previous Supabase account, inventory, upgrades, and campaign progress are
 not imported. The app does not connect to or modify any hosted Supabase project.
 The legacy saved language choice is imported once; the old serialized campaign
-progress is discarded. The shop's full hero and ability catalog is awaiting a
-sanitized JSON export, so only the bundled starter is currently available.
+progress is discarded. Existing local saves migrate the temporary starter ID
+to the exported Adept Warrior while preserving upgrades and balances. Bundled
+catalog updates are upserted on startup; the SQLite schema remains version 1.
 
 ## Verify and build
 

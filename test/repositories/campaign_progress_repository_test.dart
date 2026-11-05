@@ -1,6 +1,7 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gunwave/data/data_sources/local/campaign_content_data_source.dart';
+import 'package:gunwave/data/data_sources/local/campaign_hero_catalog.dart';
 import 'package:gunwave/data/data_sources/local/campaign_progress_local_data_source.dart';
 import 'package:gunwave/data/data_sources/local/database_campaign_content_data_source.dart';
 import 'package:gunwave/data/data_sources/local/local_game_data_seeder.dart';
@@ -82,14 +83,14 @@ void main() {
     repository = CampaignProgressRepository(
       CampaignProgressLocalDataSource(database),
     );
-    await repository.selectHero('local_starter_warrior_blue');
+    await repository.selectHero(CampaignHeroCatalog.starter.id);
     repository = CampaignProgressRepository(
       CampaignProgressLocalDataSource(database),
     );
 
     expect(
       (await repository.getProgress()).selectedHeroId,
-      'local_starter_warrior_blue',
+      CampaignHeroCatalog.starter.id,
     );
   });
 

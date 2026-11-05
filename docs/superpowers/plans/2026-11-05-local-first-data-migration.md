@@ -16,7 +16,7 @@
 - New player balances, owned heroes, upgrades, and campaign clears start empty; bootstrap only grants the bundled starter needed to play.
 - Keep static campaign and monster content, Tiled maps, sprites, and assets local and usable offline.
 - Use one local gold balance for campaign rewards and Shop purchases; initialize it to zero.
-- Do not invent missing character/ability catalog rows. Add the user's sanitized JSON export before completing the Shop catalog.
+- Use the supplied sanitized CSV exports in `seeds/` as the catalog source and normalize them into bundled JSON assets. Do not add account-owned data.
 - Do not modify/delete hosted Supabase data; remove only this app's local integration and obsolete checked-in artifacts.
 - Preserve ignored developer-local `dev.env`, `prod.env`, and Supabase CLI cache files; startup and asset manifests no longer read or bundle them.
 - Preserve the saved locale where available; do not import old game progress/account data.
@@ -115,16 +115,16 @@
 ### Task 6: Integrate the supplied character and ability catalog
 
 **Files:**
-- Create/update: `assets/data/catalog/characters.json`, `assets/data/catalog/abilities.json`, seeder parser, and seed tests.
+- Create/update: `assets/data/catalog/characters.json`, `assets/data/catalog/abilities.json`, `CharacterCatalogDataSource`, the starter identity migration, and seed tests.
 - Test: full catalog round-trip, asset references, relationships, idempotent update.
 
-- [ ] Validate the user's export is sanitized and contains all required fields; reject missing IDs/asset filenames and broken ability links with a readable seed error.
-- [ ] Add the supplied catalog assets and seed them on first install while preserving local player ownership/progress.
-- [ ] Add assertions that each sprite filename maps to an existing local character asset and ability parameters parse as JSON objects.
-- [ ] Run catalog tests, full suite, analysis, and final diff review.
-- [ ] Commit `feat: seed the local hero and ability catalog`.
+- [x] Validate the supplied exports contain only static character/ability fields, all 8 sprite names map to local character assets, and all 8 keys are supported by the game.
+- [x] Normalize the CSV exports to bundled JSON and seed them on startup with upserts; migrate the temporary starter ID while preserving balances, clears, unspent points, and upgrades.
+- [x] Add assertions for sprite mappings, ability links, runtime ability parameters, catalog idempotency, and a readable broken-link failure.
+- [x] Run catalog/seeder/repository tests, full suite (145 passed), `fvm dart analyze lib test` (clean), `git diff --check` (clean), and final diff review.
+- [x] Commit `feat: seed the local hero and ability catalog`.
 
 ## Pre-flight
 
 - Shared interfaces: Task 1 defines `AppDatabase`/tables consumed by Tasks 2–6; Task 2 defines repository methods consumed by Tasks 3–4; Task 6 supplies the seed assets consumed by Task 2's importer. Keep interfaces stable and reconcile if codegen requires naming changes.
-- Missing external input: sanitized character/ability catalog JSON selected by the user but not yet attached. Tasks 1–5 can progress with the existing Blue Warrior; Task 6 cannot complete without the export.
+- The user supplied sanitized `characters_rows.csv` and `abilities_rows.csv` in `seeds/`. JSON catalog assets are derived from those source exports. The Drift schema remains version 1 because the existing tables already match the export fields.

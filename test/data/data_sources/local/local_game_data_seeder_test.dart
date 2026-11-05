@@ -34,6 +34,17 @@ void main() {
     await seeder.seed();
     await seeder.seed();
 
+    expect(await database.select(database.characters).get(), hasLength(8));
+    expect(await database.select(database.abilities).get(), hasLength(8));
+    expect(
+      (await database.select(database.characters).get())
+          .singleWhere(
+            (character) => character.id == CampaignHeroCatalog.starter.id,
+          )
+          .abilityId,
+      CampaignHeroCatalog.starter.abilityId,
+    );
+
     final stage = (await content.loadStages()).single;
     expect(stage.id, 'stage_1');
     expect(stage.mapKey, 'forest');
@@ -93,6 +104,81 @@ void main() {
       expect(
         await database.select(database.campaignStageClears).get(),
         hasLength(1),
+      );
+    },
+  );
+
+  test(
+    'migrates starter ownership to the exported hero and keeps upgrades',
+    () async {
+      final seeder = LocalGameDataSeeder(
+        database,
+        contentDataSource: AssetCampaignContentDataSource(),
+      );
+      await seeder.seed();
+
+      await (database.delete(database.playerCharacters)..where(
+            (row) => row.characterId.equals(CampaignHeroCatalog.starter.id),
+          ))
+          .go();
+      await database
+          .into(database.characters)
+          .insert(
+            CharactersCompanion.insert(
+              id: CampaignHeroCatalog.legacyStarterId,
+              name: 'Blue Warrior',
+              filename: 'warrior_blue',
+              price: 0,
+              baseHp: 100,
+              baseStr: 10,
+              baseVit: 3,
+              baseAgi: 4,
+            ),
+          );
+      await database
+          .into(database.playerCharacters)
+          .insert(
+            PlayerCharactersCompanion.insert(
+              characterId: CampaignHeroCatalog.legacyStarterId,
+              hp: 106,
+              strength: 11,
+              vitality: 3,
+              agility: 6,
+              statusPoints: 5,
+              acquiredAt: 10,
+            ),
+          );
+      await (database.update(
+        database.playerStates,
+      )..where((row) => row.id.equals(1))).write(
+        const PlayerStatesCompanion(
+          gold: Value(75),
+          statusPoints: Value(3),
+          selectedHeroId: Value(CampaignHeroCatalog.legacyStarterId),
+        ),
+      );
+
+      await seeder.seed();
+
+      final owned = await database
+          .select(database.playerCharacters)
+          .getSingle();
+      final player = await database.select(database.playerStates).getSingle();
+      expect(owned.characterId, CampaignHeroCatalog.starter.id);
+      expect(owned.hp, 226);
+      expect(owned.strength, 21);
+      expect(owned.vitality, 10);
+      expect(owned.agility, 122);
+      expect(owned.statusPoints, 5);
+      expect(player.gold, 75);
+      expect(player.statusPoints, 3);
+      expect(player.selectedHeroId, CampaignHeroCatalog.starter.id);
+      expect(
+        await (database.select(database.characters)..where(
+              (row) => row.id.equals(CampaignHeroCatalog.legacyStarterId),
+            ))
+            .get(),
+        isEmpty,
       );
     },
   );

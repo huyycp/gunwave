@@ -11,7 +11,7 @@ content available offline and preserve the existing RPG campaign.
 - The app has no sign-in, guest account, remote profile, or account identifier.
 - New local player state starts with zero gold, zero campaign clears, and no
   imported cloud inventory or upgrades. First database setup grants the
-  bundled Blue Warrior so the player can start a stage.
+  bundled Adept Warrior so the player can start a stage.
 - Static game data that does not belong to a player is retained: stages,
   monsters, rounds, encounters, rewards, map references, and bundled visual
   assets.
@@ -24,10 +24,10 @@ content available offline and preserve the existing RPG campaign.
 - Preserve a saved locale preference when migrating it from legacy
   SharedPreferences. Do not import campaign clears, balances, inventory, or
   upgrades from the old serialized progress or Supabase account.
-- The repository's `supabase/seed.sql` is empty and no character/ability catalog
-  export is checked in. The user will provide sanitized JSON for those two
-  static catalogs. Until then, the bundled Blue Warrior is the only available
-  hero; no other stats, abilities, or prices are to be invented.
+- The repository's `supabase/seed.sql` was empty. The user supplied sanitized
+  static `characters_rows.csv` and `abilities_rows.csv` exports under `seeds/`;
+  the app bundles normalized JSON derived from those exports. Do not add
+  account-owned data to the catalog.
 - Remove local Supabase client, auth UI, SDK/config, Edge Function artifacts,
   connection smoke test, and obsolete documentation. Do not delete or alter
   the hosted Supabase project or its remote data.
@@ -75,12 +75,12 @@ singleton rows, and one ownership/clear row per key.
 
 On startup, open the app database and apply Drift schema migrations before
 rendering the app. Seed or refresh bundled Stage 1 content from
-`assets/data/campaign/stages.json` transactionally, preserving any player
-state. Seed the starter hero if its catalog row is absent, create the
-zero-balance local state, and grant that starter only when ownership is empty.
-When the user-provided character and ability JSON is added, seed those catalogs
-as stable content data. Seed operations must be idempotent; static rows are
-upserted without replacing player-owned rows.
+`assets/data/campaign/stages.json` and the hero/ability catalog from
+`assets/data/catalog/` transactionally, preserving any player state. Create
+the zero-balance local state and grant the Adept Warrior only when ownership
+is empty. Catalog updates upsert static definitions without replacing
+player-owned rows. Existing local saves migrate the temporary starter ID to
+the catalog ID while retaining invested upgrades.
 
 The campaign repository reads stage/monster/round/reward models from Drift;
 the Tiled map loader continues resolving `mapKey` through the existing local
@@ -109,10 +109,10 @@ and one-time reward persistence, locale persistence/legacy migration, and
 startup without environment files or authentication. Run focused tests, the
 full Flutter test suite, static analysis, and a final diff review.
 
-## Open external input
+## Catalog export
 
-The user selected a JSON export but has not attached/pasted it yet. The export
-must include character IDs, names, asset filenames, prices and base stats,
-ability IDs/links, plus ability keys, labels/descriptions, cooldown/duration,
-and parameter objects. It must not contain user IDs, account balances,
-ownership, or other personal data.
+The sanitized CSV exports are kept under `seeds/`; normalized runtime assets
+are `assets/data/catalog/characters.json` and `abilities.json`. They contain
+static identifiers, names, sprite filenames, prices, stats, ability links,
+cooldowns, durations, and parameter objects. They contain no user IDs,
+account balances, or ownership.
