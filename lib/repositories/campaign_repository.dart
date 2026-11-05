@@ -1,14 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gunwave/data/database/app_database.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
 import 'package:gunwave/data/constants/game/game_monster.dart';
 import 'package:gunwave/data/data_sources/local/campaign_content_data_source.dart';
+import 'package:gunwave/data/data_sources/local/database_campaign_content_data_source.dart';
 import 'package:gunwave/data/models/campaign_stage_model.dart';
 import 'package:gunwave/data/models/monster_model.dart';
 import 'package:gunwave/data/models/reward_model.dart';
 import 'package:gunwave/data/models/stage_round_model.dart';
 
 final campaignRepositoryProvider = Provider<CampaignRepository>((ref) {
-  return CampaignRepository(ref.read(campaignContentDataSourceProvider));
+  return CampaignRepository(
+    DriftCampaignContentDataSource(ref.read(appDatabaseProvider)),
+  );
 });
 
 /// Loads and validates local campaign definitions for game and menu flows.

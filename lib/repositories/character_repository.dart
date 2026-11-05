@@ -1,78 +1,61 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gunwave/data/data_sources/remote/character_remote_data_source.dart';
+import 'package:gunwave/data/data_sources/local/character_local_data_source.dart';
 import 'package:gunwave/data/models/character_model.dart';
 
 final characterRepoProvider = Provider<CharacterRepository>((ref) {
-  return CharacterRepository(ref.read(characterRemoteProvider));
+  return CharacterRepository(ref.read(characterLocalDataSourceProvider));
 });
 
+/// Exposes the local hero catalog, ownership, and stat mutations.
 class CharacterRepository {
-  CharacterRepository(this._characterRemote);
+  CharacterRepository(this._localDataSource);
 
-  final CharacterRemoteDataSource _characterRemote;
+  final CharacterLocalDataSource _localDataSource;
 
   List<CharacterModel> characters = [];
   List<CharacterModel> ownedCharacters = [];
 
   Future<List<CharacterModel>> getCharacters() async {
-    characters = await _characterRemote.getCharacters();
+    characters = await _localDataSource.getCharacters();
     return characters;
   }
 
-  Future<List<CharacterModel>> getOwnedCharacters(String userId) async {
-    ownedCharacters = await _characterRemote.getOwnedCharacters(userId);
+  Future<List<CharacterModel>> getOwnedCharacters() async {
+    ownedCharacters = await _localDataSource.getOwnedCharacters();
     return ownedCharacters;
   }
 
-  Future<List<CharacterModel>> getUnownedCharacters(String userId) async {
-    return await _characterRemote.getUnownedCharacters(userId);
-  }
+  Future<List<CharacterModel>> getUnownedCharacters() =>
+      _localDataSource.getUnownedCharacters();
 
-  /// Fetches one owned character and replaces its cached immutable snapshot.
-  Future<CharacterModel?> getOwnedCharacter(
-    String userId,
-    String characterId,
-  ) async {
-    final character = await _characterRemote.getOwnedCharacter(
-      userId,
-      characterId,
-    );
+  Future<CharacterModel?> getOwnedCharacter(String characterId) async {
+    final character = await _localDataSource.getOwnedCharacter(characterId);
     if (character != null) {
       final index = ownedCharacters.indexWhere(
-        (char) => char.id == character.id,
+        (item) => item.id == characterId,
       );
-      if (index >= 0) {
-        ownedCharacters[index] = character;
-      }
+      if (index >= 0) ownedCharacters[index] = character;
     }
     return character;
   }
 
+  Future<int> getGoldBalance() => _localDataSource.getGoldBalance();
+
   Future<bool> updateAttr(String id, CharacterAttr attr) async {
-    final updated = await _characterRemote.updateAttr(id, attr);
-    if (updated) {
-      final index = ownedCharacters.indexWhere(
-        (character) => character.id == id,
-      );
-      if (index >= 0) {
-        final current = ownedCharacters[index];
-        final next = switch (attr) {
-          CharacterAttr.hp => current.copyWith(hp: current.hp + 1),
-          CharacterAttr.str => current.copyWith(str: current.str + 1),
-          CharacterAttr.vit => current.copyWith(vit: current.vit + 1),
-          CharacterAttr.agi => current.copyWith(agi: current.agi + 1),
-        };
-        ownedCharacters[index] = next.copyWith(sp: current.sp - 1);
-      }
-    }
+    final updated = await _localDataSource.updateAttr(id, attr);
+    if (updated) await getOwnedCharacters();
     return updated;
   }
 
   Future<bool> resetAttr(String id) async {
-    return await _characterRemote.resetAttr(id);
+    final reset = await _localDataSource.resetAttr(id);
+    if (reset) await getOwnedCharacters();
+    return reset;
   }
 
   Future<bool> buyCharacter(String characterId) async {
-    return await _characterRemote.buyCharacter(characterId);
+    final bought = await _localDataSource.buyCharacter(characterId);
+    if (bought) await getOwnedCharacters();
+    return bought;
   }
 }

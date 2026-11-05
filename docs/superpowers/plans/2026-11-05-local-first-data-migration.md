@@ -50,7 +50,7 @@
 - [x] Add `drift: ^2.35.3`, `drift_flutter: ^0.3.1`, and `drift_dev: ^2.35.2`, define schema version 1 and test constructor, and generate Drift code with `fvm dart run build_runner build`.
 - [x] Configure `build.yaml` for `app_database.dart`, `drift_schemas/`, and `test/data/database/migrations/`; run `fvm dart run drift_dev make-migrations` to generate the v1 schema snapshot. Future schema versions will generate step-by-step migrations and migration tests.
 - [x] Run focused database tests, `fvm dart format`, and `fvm dart analyze lib/data/database test/data/database`.
-- [ ] Commit `feat: add local Drift database schema`.
+- [x] Commit `feat: add local Drift database schema` (`992d020`).
 
 ### Task 2: Seed bundled content and create local repositories
 
@@ -64,11 +64,11 @@
 - Character repository exposes catalog/owned/unowned reads, transactional buy, stat upgrade, and reset without a user ID.
 - Campaign completion and Shop purchase share the local gold field and are transaction-safe/idempotent.
 
-- [ ] Add failing tests for seeding the five-round Stage 1 catalog twice, starter ownership on a fresh DB, catalog reads, and first-clear reward uniqueness.
-- [ ] Add failing CRUD/transaction tests for buy, insufficient gold, duplicate buy, upgrade with no points, reset, and campaign persistence after reopening the in-memory store.
-- [ ] Implement normalized seed writes from `stages.json`, plus starter seed and database repository methods; leave catalog JSON import ready for the user's export without fabricating rows.
-- [ ] Preserve model validation and use transactions/constraints for atomic behavior.
-- [ ] Run focused data/repository tests, generation, format, and targeted analysis.
+- [x] Add failing tests for seeding the five-round Stage 1 catalog twice, starter ownership on a fresh DB, catalog reads, and first-clear reward uniqueness.
+- [x] Add failing CRUD/transaction tests for buy, insufficient gold, duplicate buy, upgrade with no points, reset, and campaign persistence after reopening the in-memory store.
+- [x] Implement normalized seed writes from `stages.json`, plus starter seed and database repository methods; leave catalog JSON import ready for the user's export without fabricating rows.
+- [x] Preserve model validation and use transactions/constraints for atomic behavior.
+- [x] Run focused data/repository tests (25 passed), formatting, and targeted analysis (clean).
 - [ ] Commit `feat: persist RPG content and progress locally`.
 
 ### Task 3: Move app settings and startup to Drift

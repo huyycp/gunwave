@@ -10,75 +10,27 @@ final campaignProgressRepositoryProvider = Provider<CampaignProgressRepository>(
   ),
 );
 
-/// Owns serialized local campaign progress and first-completion rewards.
+/// Owns device-local campaign clears and first-clear rewards.
 class CampaignProgressRepository {
   CampaignProgressRepository(this._localDataSource);
 
   final CampaignProgressLocalDataSource _localDataSource;
-  Future<void> _pendingOperation = Future<void>.value();
 
-  /// Loads the latest committed progress after any queued mutations finish.
-  Future<CampaignProgressModel> getProgress() =>
-      _serialize(_localDataSource.load);
+  Future<CampaignProgressModel> getProgress() => _localDataSource.load();
 
-  /// Saves the selected hero ID in the same record as clears and rewards.
   Future<CampaignProgressModel> selectHero(String heroId) {
     if (heroId.trim().isEmpty) {
       throw ArgumentError.value(heroId, 'heroId', 'Hero ID must not be empty.');
     }
-    return _serialize(() async {
-      final progress = await _localDataSource.load();
-      final updated = progress.copyWith(selectedHeroId: heroId);
-      await _localDataSource.save(updated);
-      return updated;
-    });
+    return _localDataSource.selectHero(heroId);
   }
 
-  /// Clears [stage] and applies its rewards once, in the same stored record.
   Future<CampaignStageCompletion> completeStage(CampaignStageModel stage) {
     if (stage.id.trim().isEmpty) {
       throw ArgumentError.value(stage.id, 'stage.id', 'Stage ID is required.');
     }
     _validateRewards(stage.rewards);
-
-    return _serialize(() async {
-      final progress = await _localDataSource.load();
-      if (progress.completedStageIds.contains(stage.id)) {
-        return CampaignStageCompletion(
-          progress: progress,
-          wasFirstCompletion: false,
-        );
-      }
-
-      final balances = Map<String, int>.of(progress.rewardBalances);
-      for (final reward in stage.rewards) {
-        if (reward.amount == 0) continue;
-        final key = reward.type.name;
-        balances.update(
-          key,
-          (balance) => balance + reward.amount,
-          ifAbsent: () => reward.amount,
-        );
-      }
-      final updated = progress.copyWith(
-        completedStageIds: {...progress.completedStageIds, stage.id},
-        rewardBalances: balances,
-      );
-      await _localDataSource.save(updated);
-      return CampaignStageCompletion(
-        progress: updated,
-        wasFirstCompletion: true,
-      );
-    });
-  }
-
-  Future<T> _serialize<T>(Future<T> Function() operation) {
-    final result = _pendingOperation.then((_) => operation());
-    _pendingOperation = result.then<void>(
-      (_) {},
-      onError: (Object error, StackTrace stackTrace) {},
-    );
-    return result;
+    return _localDataSource.completeStage(stage);
   }
 
   void _validateRewards(List<RewardModel> rewards) {

@@ -1,14 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gunwave/data/models/campaign_stage_model.dart';
-
-final campaignContentDataSourceProvider = Provider<CampaignContentDataSource>((
-  ref,
-) {
-  return AssetCampaignContentDataSource();
-});
 
 /// Provides campaign content stored in the app's bundled local assets.
 abstract interface class CampaignContentDataSource {

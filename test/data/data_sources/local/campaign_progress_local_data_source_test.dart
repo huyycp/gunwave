@@ -1,68 +1,89 @@
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gunwave/data/data_sources/local/campaign_content_data_source.dart';
+import 'package:gunwave/data/data_sources/local/campaign_hero_catalog.dart';
 import 'package:gunwave/data/data_sources/local/campaign_progress_local_data_source.dart';
-import 'package:gunwave/data/models/campaign_progress_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gunwave/data/data_sources/local/local_game_data_seeder.dart';
+import 'package:gunwave/data/database/app_database.dart';
+import 'package:gunwave/repositories/campaign_repository.dart';
+import 'package:gunwave/data/data_sources/local/database_campaign_content_data_source.dart';
 
 void main() {
-  group('CampaignProgressLocalDataSource', () {
-    late _MemoryPreferences preferences;
-    late CampaignProgressLocalDataSource dataSource;
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-    setUp(() {
-      preferences = _MemoryPreferences();
-      dataSource = CampaignProgressLocalDataSource(preferences: preferences);
-    });
+  late AppDatabase database;
+  late CampaignProgressLocalDataSource dataSource;
 
-    test('returns empty progress when nothing has been saved', () async {
+  setUp(() async {
+    database = AppDatabase.forTesting(NativeDatabase.memory());
+    await LocalGameDataSeeder(
+      database,
+      contentDataSource: AssetCampaignContentDataSource(),
+    ).seed();
+    dataSource = CampaignProgressLocalDataSource(database);
+  });
+
+  tearDown(() async {
+    await database.close();
+  });
+
+  test(
+    'starts with empty progress, zero balances, and the starter selected',
+    () async {
       final progress = await dataSource.load();
 
       expect(progress.completedStageIds, isEmpty);
-      expect(progress.selectedHeroId, isNull);
-      expect(progress.rewardBalances, isEmpty);
-    });
+      expect(progress.selectedHeroId, CampaignHeroCatalog.starter.id);
+      expect(progress.goldBalance, 0);
+      expect(progress.statusPointBalance, 0);
+    },
+  );
 
-    test(
-      'restores progress from its single serialized preference value',
-      () async {
-        final progress = CampaignProgressModel(
-          completedStageIds: const {'stage_1'},
-          selectedHeroId: 'hero_blue',
-          rewardBalances: const {'gold': 100, 'sp': 25},
-        );
+  test('clears a stage and updates local balances atomically', () async {
+    final stage = await CampaignRepository(
+      DriftCampaignContentDataSource(database),
+    ).getStage('stage_1');
 
-        await dataSource.save(progress);
-        final restored = await dataSource.load();
+    final result = await dataSource.completeStage(stage);
+    final restored = await dataSource.load();
 
-        expect(preferences.values, hasLength(1));
-        expect(restored.completedStageIds, {'stage_1'});
-        expect(restored.selectedHeroId, 'hero_blue');
-        expect(restored.goldBalance, 100);
-        expect(restored.statusPointBalance, 25);
-      },
+    expect(result.wasFirstCompletion, isTrue);
+    expect(restored.completedStageIds, {'stage_1'});
+    expect(restored.goldBalance, 100);
+    expect(restored.statusPointBalance, 25);
+    expect(
+      (await database.select(database.playerStates).getSingle()).gold,
+      100,
     );
-
-    test(
-      'surfaces malformed persisted JSON instead of erasing progress',
-      () async {
-        preferences.values[CampaignProgressLocalDataSource.storageKey] = '{';
-
-        expect(dataSource.load(), throwsFormatException);
-      },
+    expect(
+      await database.select(database.campaignStageClears).get(),
+      hasLength(1),
     );
   });
-}
 
-class _MemoryPreferences implements SharedPreferencesAsync {
-  final Map<String, Object> values = {};
+  test('repeated stage clear does not issue the reward twice', () async {
+    final stage = await CampaignRepository(
+      DriftCampaignContentDataSource(database),
+    ).getStage('stage_1');
+    await dataSource.completeStage(stage);
 
-  @override
-  Future<String?> getString(String key) async => values[key] as String?;
+    final replay = await dataSource.completeStage(stage);
+    final restored = await dataSource.load();
 
-  @override
-  Future<void> setString(String key, String value) async {
-    values[key] = value;
-  }
+    expect(replay.wasFirstCompletion, isFalse);
+    expect(restored.goldBalance, 100);
+    expect(restored.statusPointBalance, 25);
+  });
 
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+  test('only an owned hero can become the selected hero', () async {
+    await expectLater(
+      dataSource.selectHero('missing_hero'),
+      throwsArgumentError,
+    );
+
+    final selected = await dataSource.selectHero(
+      CampaignHeroCatalog.starter.id,
+    );
+    expect(selected.selectedHeroId, CampaignHeroCatalog.starter.id);
+  });
 }
