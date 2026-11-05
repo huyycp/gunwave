@@ -31,19 +31,19 @@ class ShopScene extends RpgMenuScene {
   @override
   Future<void> loadScene() async {
     _panel = addPanel(Vector2.all(1));
-    _title = addText(labels.shop, fontSize: AppTypography.rpgTitleSize);
+    _title = addText(labels.shop, fontSize: AppTypography.headlineMediumSize);
     _balance = addText(
       '${labels.gold}: ${snapshot.gold}',
-      fontSize: AppTypography.rpgBodySmallSize,
+      fontSize: AppTypography.titleMediumSize,
     );
-    _emptyText = addText(_emptyMessage, fontSize: AppTypography.rpgBodySize);
+    _emptyText = addText(_emptyMessage, fontSize: AppTypography.bodyLargeSize);
     final status = snapshot.isLoading
         ? labels.loading
         : snapshot.shopDataUnavailable
         ? labels.shopUnavailable
         : null;
     if (status != null) {
-      _statusText = addText(status, fontSize: AppTypography.rpgCaptionSize);
+      _statusText = addText(status, fontSize: AppTypography.bodyLargeSize);
     }
     _backButton = await addButton(
       labels.back,
@@ -56,7 +56,7 @@ class ShopScene extends RpgMenuScene {
       final preview = await loadHeroPreview(character, size: Vector2.all(92));
       final name = addText(
         character.name,
-        fontSize: AppTypography.rpgBodySmallSize,
+        fontSize: AppTypography.titleMediumSize,
       );
       final isOwned = snapshot.ownedHeroes.any(
         (hero) =>
@@ -137,12 +137,12 @@ class ShopScene extends RpgMenuScene {
       );
       final maxNameWidth = cardWidth - 12 * scale;
       final fittedNameScale = math.min(
-        AppTypography.bitmapScale(AppTypography.rpgBodySmallSize),
+        AppTypography.bitmapScale(AppTypography.titleMediumSize),
         maxNameWidth / card.name.width,
       );
       card.name.scale = Vector2.all(
         math.max(
-          AppTypography.bitmapScale(AppTypography.rpgCaptionSize),
+          AppTypography.bitmapScale(AppTypography.titleMediumSize),
           fittedNameScale,
         ),
       );

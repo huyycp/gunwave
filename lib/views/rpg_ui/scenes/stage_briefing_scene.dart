@@ -43,15 +43,15 @@ class StageBriefingScene extends RpgMenuScene {
     _panel = addPanel(Vector2.all(1));
     _stageTitle = addText(
       stage == null ? labels.loading : labels.stageNumber(stage.order),
-      fontSize: AppTypography.rpgCaptionSize,
+      fontSize: AppTypography.titleMediumSize,
     );
     _stageName = addText(
       stage == null ? '' : _stageNameFor(stage),
-      fontSize: AppTypography.rpgTitleSize,
+      fontSize: AppTypography.headlineMediumSize,
     );
     _mapName = addText(
       stage?.mapKey.toUpperCase() ?? '',
-      fontSize: AppTypography.rpgBodySmallSize,
+      fontSize: AppTypography.titleMediumSize,
     );
     StageRoundModel? bossRound;
     for (final round in stage?.rounds ?? const <StageRoundModel>[]) {
@@ -71,15 +71,15 @@ class StageBriefingScene extends RpgMenuScene {
     }
     _bossName = addText(
       boss == null ? labels.boss : '${labels.boss}: $boss',
-      fontSize: AppTypography.rpgBodySmallSize,
+      fontSize: AppTypography.titleMediumSize,
     );
     _rewardsTitle = addText(
       labels.rewards,
-      fontSize: AppTypography.rpgBodySize,
+      fontSize: AppTypography.titleLargeSize,
     );
     _rewardLines = [
       for (final reward in stage?.rewards ?? const <RewardModel>[])
-        addText(_rewardLabel(reward), fontSize: AppTypography.rpgBodySmallSize),
+        addText(_rewardLabel(reward), fontSize: AppTypography.bodyLargeSize),
     ];
     if (stage != null) {
       for (final round in stage.rounds) {
@@ -93,7 +93,7 @@ class StageBriefingScene extends RpgMenuScene {
         );
         final detail = addText(
           round.isBoss ? labels.boss : labels.roundNumber(round.number),
-          fontSize: AppTypography.rpgCaptionSize,
+          fontSize: AppTypography.titleMediumSize,
         );
         _roundMarkers.add(_RoundMarker(round, marker, detail));
       }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gunwave/theme/app_colors.dart';
 import 'package:gunwave/theme/theme_provider.dart';
-import 'package:gunwave/theme/text_theme.dart';
 
 class SnackBarService {
   static final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -49,7 +48,7 @@ class SnackBarService {
         ),
         child: Text(
           message,
-          style: BaseTextTheme.TITLE_SMALL.copyWith(
+          style: ThemeProvider.instance.textStyles.titleSmall?.copyWith(
             color: color,
           ),
           softWrap: true,

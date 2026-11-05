@@ -56,7 +56,7 @@ V extends BaseWidgetModel<dynamic>> extends ConsumerState<T>
   bool shouldKeepState() => false;
 
   AppColors get colors => ref.read(themeProvider).colors;
-  TextTheme get textStyles => ref.read(themeProvider).textStyles;
+  TextTheme get textStyles => Theme.of(context).textTheme;
 
   void showFullScreenLoading() {
     if (isFullscreenLoading) return;

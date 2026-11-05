@@ -31,14 +31,17 @@ class SettingsScene extends RpgMenuScene {
   @override
   Future<void> loadScene() async {
     _panel = addPanel(Vector2.all(1));
-    _title = addText(labels.settings, fontSize: AppTypography.rpgTitleSize);
+    _title = addText(
+      labels.settings,
+      fontSize: AppTypography.headlineMediumSize,
+    );
     _languageLabel = addText(
       labels.language,
-      fontSize: AppTypography.rpgBodySize,
+      fontSize: AppTypography.bodyLargeSize,
     );
     _gameControlsLabel = addText(
       labels.gameControls,
-      fontSize: AppTypography.rpgBodySize,
+      fontSize: AppTypography.bodyLargeSize,
     );
     _backButton = await addButton(
       labels.back,

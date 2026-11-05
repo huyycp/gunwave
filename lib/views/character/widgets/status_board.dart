@@ -73,14 +73,16 @@ class StatusBoardState
         Text(
           context.l10n.statusPoint,
           style: AppTypography.pixelStyle(
-            fontSize: AppTypography.captionSize,
+            fontSize: AppTypography.labelMediumSize,
+            height: AppTypography.labelMediumLineHeight,
             color: GameColors.primary,
           ),
         ),
         Text(
           model.character.sp.toString(),
           style: AppTypography.pixelStyle(
-            fontSize: AppTypography.captionSize,
+            fontSize: AppTypography.labelMediumSize,
+            height: AppTypography.labelMediumLineHeight,
             color: GameColors.primary,
           ),
         ),
@@ -102,7 +104,8 @@ class StatusBoardState
           child: Text(
             label,
             style: AppTypography.pixelStyle(
-              fontSize: AppTypography.bodySize,
+              fontSize: AppTypography.bodyLargeSize,
+              height: AppTypography.bodyLargeLineHeight,
               color: GameColors.primary,
             ),
           ),
@@ -111,7 +114,8 @@ class StatusBoardState
           child: Text(
             value.toString(),
             style: AppTypography.pixelStyle(
-              fontSize: AppTypography.bodySize,
+              fontSize: AppTypography.bodyLargeSize,
+              height: AppTypography.bodyLargeLineHeight,
               color: GameColors.primary,
             ),
           ),
@@ -135,7 +139,8 @@ class StatusBoardState
     return Text(
       context.l10n.statusBoard,
       style: AppTypography.pixelStyle(
-        fontSize: AppTypography.titleSize,
+        fontSize: AppTypography.headlineSmallSize,
+        height: AppTypography.headlineSmallLineHeight,
         color: GameColors.primary,
       ),
     );

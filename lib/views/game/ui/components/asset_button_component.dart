@@ -24,7 +24,7 @@ class AssetButtonComponent extends PositionComponent
     bool enabled = true,
     String label = '',
     this.labelRenderer,
-    this.labelFontSize = AppTypography.bodySmallSize,
+    this.labelFontSize = AppTypography.labelLargeSize,
     this.onPressed,
     NineSliceBorders borders = const NineSliceBorders(
       left: GameHudStyle.buttonBorderInset,
@@ -200,7 +200,7 @@ class AssetButtonComponent extends PositionComponent
     bool enabled = true,
     String label = '',
     SpriteFontRenderer? labelRenderer,
-    double labelFontSize = AppTypography.bodySmallSize,
+    double labelFontSize = AppTypography.labelLargeSize,
     void Function()? onPressed,
   }) async {
     final assets = GameButtonAssets.forSize(buttonSize);

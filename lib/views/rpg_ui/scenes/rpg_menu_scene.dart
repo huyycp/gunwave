@@ -134,7 +134,7 @@ abstract class RpgMenuScene extends PositionComponent
 
   TextComponent<SpriteFontRenderer> addText(
     String text, {
-    double fontSize = AppTypography.rpgBodySize,
+    double fontSize = AppTypography.bodyLargeSize,
     Anchor anchor = Anchor.center,
     Vector2? position,
     bool light = false,
@@ -157,7 +157,7 @@ abstract class RpgMenuScene extends PositionComponent
     Vector2? position,
     Anchor anchor = Anchor.center,
     GameButtonSize assetSize = GameButtonSize.medium,
-    double labelFontSize = AppTypography.rpgButtonSize,
+    double labelFontSize = AppTypography.labelLargeSize,
     bool enabled = true,
   }) async {
     final component = await AssetButtonComponent.load(

@@ -155,7 +155,8 @@ class AppBanner extends PositionComponent with HasGameRef<FlameGame> {
       size: Vector2(size.x - 48, size.y - 32),
       textRenderer: TextPaint(
         style: AppTypography.pixelStyle(
-          fontSize: AppTypography.bodySize,
+          fontSize: AppTypography.bodyLargeSize,
+          height: AppTypography.bodyLargeLineHeight,
           color: GameColors.primary,
         ),
       ),

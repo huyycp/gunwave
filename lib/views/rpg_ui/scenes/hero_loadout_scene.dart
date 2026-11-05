@@ -47,25 +47,28 @@ class HeroLoadoutScene extends RpgMenuScene {
   Future<void> loadScene() async {
     _heroPanel = addPanel(Vector2.all(1));
     _statsPanel = addPanel(Vector2.all(1));
-    _title = addText(labels.heroLoadout, fontSize: AppTypography.rpgTitleSize);
+    _title = addText(
+      labels.heroLoadout,
+      fontSize: AppTypography.headlineMediumSize,
+    );
     _heroName = addText(
       _hero?.name ??
           (snapshot.isLoading ? labels.loading : labels.noCharacters),
-      fontSize: AppTypography.rpgBodyLargeSize,
+      fontSize: AppTypography.titleLargeSize,
     );
     _abilityName = addText(
       _hero?.ability?.name ?? labels.selectHero,
-      fontSize: AppTypography.rpgBodySmallSize,
+      fontSize: AppTypography.titleMediumSize,
     );
     _statusPoints = addText(
       '${labels.statusPoints}: ${_hero?.sp ?? 0}',
-      fontSize: AppTypography.rpgBodySmallSize,
+      fontSize: AppTypography.titleMediumSize,
     );
     _emptyState = addText(
       snapshot.ownedHeroes.isEmpty
           ? (snapshot.isLoading ? labels.loading : labels.noCharacters)
           : '',
-      fontSize: AppTypography.rpgBodySmallSize,
+      fontSize: AppTypography.titleMediumSize,
     );
     _heroPreview = await loadHeroPreview(_hero, size: Vector2.all(180));
     _statRows.addAll(
@@ -123,12 +126,12 @@ class HeroLoadoutScene extends RpgMenuScene {
   ) async {
     final labelText = addText(
       label,
-      fontSize: AppTypography.rpgBodySmallSize,
+      fontSize: AppTypography.titleMediumSize,
       anchor: Anchor.centerLeft,
     );
     final valueText = addText(
       '$value',
-      fontSize: AppTypography.rpgBodySmallSize,
+      fontSize: AppTypography.titleMediumSize,
     );
     final plus = await addButton(
       '+',

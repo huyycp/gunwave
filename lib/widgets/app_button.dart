@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gradient_borders/gradient_borders.dart';
 import 'package:gunwave/theme/app_colors.dart';
 import 'package:gunwave/theme/button_theme.dart';
-import 'package:gunwave/theme/text_theme.dart';
 import 'package:gunwave/utils/extensions/build_context_ex.dart';
 import 'package:gunwave/widgets/app_image.dart';
 
@@ -62,7 +61,7 @@ class AppButton extends StatelessWidget{
       displayChild = icon;
       icon = null;
     }
-    final style = _resolveStyle(colors);
+    final style = _resolveStyle(colors, Theme.of(context).textTheme);
 
     final Widget button;
     switch (type) {
@@ -151,7 +150,7 @@ class AppButton extends StatelessWidget{
     );
   }
 
-  ButtonStyle _resolveStyle(ButtonColors colors) {
+  ButtonStyle _resolveStyle(ButtonColors colors, TextTheme textTheme) {
     final buttonFigures = BUTTON_SIZE[size];
     final buttonSize = Size(buttonFigures.width, buttonFigures.height);
     final padding = EdgeInsets.only(
@@ -165,7 +164,7 @@ class AppButton extends StatelessWidget{
     final disabledBackgroundColor = colors.disabledBackgroundColor;
     final disabledForegroundColor = colors.disabledForegroundColor;
     final shadowColor = colors.shadowColor ?? Colors.transparent;
-    final textStyle = BaseTextTheme.LABEL_BUTTON;
+    final textStyle = textTheme.labelLarge;
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(buttonFigures.borderRadius),
       side: BorderSide.none

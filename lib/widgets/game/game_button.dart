@@ -111,8 +111,16 @@ class _GameButtonState extends State<GameButton> {
                 child: DefaultTextStyle(
                   style: AppTypography.pixelStyle(
                     color: isEnabled ? GameColors.primary : Colors.brown.withOpacity(0.5),
-                    fontSize: widget.size == GameButtonSize.small ? AppTypography.bodySmallSize :
-                             widget.size == GameButtonSize.medium ? AppTypography.bodyLargeSize : AppTypography.titleSize,
+                    fontSize: switch (widget.size) {
+                      GameButtonSize.small => AppTypography.labelLargeSize,
+                      GameButtonSize.medium => AppTypography.titleMediumSize,
+                      GameButtonSize.large => AppTypography.titleLargeSize,
+                    },
+                    height: switch (widget.size) {
+                      GameButtonSize.small => AppTypography.labelLargeLineHeight,
+                      GameButtonSize.medium => AppTypography.titleMediumLineHeight,
+                      GameButtonSize.large => AppTypography.titleLargeLineHeight,
+                    },
                     fontWeight: FontWeight.bold,
                   ),
                   child: widget.child,

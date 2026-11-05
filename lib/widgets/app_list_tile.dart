@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:gunwave/theme/app_colors.dart';
-import 'package:gunwave/theme/text_theme.dart';
 import 'package:gunwave/utils/extensions/build_context_ex.dart';
 import 'package:gunwave/utils/extensions/list_widget_ex.dart';
 
@@ -150,7 +149,11 @@ class AppListTile extends StatelessWidget {
             maxLines: isTitleWrap ? null : 1,
             softWrap: isTitleWrap,
             overflow: isTitleWrap ? null : TextOverflow.ellipsis,
-            style: titleStyle ?? BaseTextTheme.textTheme.titleMedium?.copyWith(color: context.appColors.primaryText),
+            style:
+                titleStyle ??
+                context.textStyles.titleMedium?.copyWith(
+                  color: context.appColors.primaryText,
+                ),
           ),
         ),
         if (tags.isNotEmpty) _buildTags(context),
@@ -171,7 +174,11 @@ class AppListTile extends StatelessWidget {
             maxLines: isSubTitleWrap ? null : 1,
             softWrap: isSubTitleWrap,
             overflow: isSubTitleWrap ? null : TextOverflow.ellipsis,
-            style: subTitleStyle ?? BaseTextTheme.textTheme.bodySmall?.copyWith(color: context.appColors.secondaryText),
+            style:
+                subTitleStyle ??
+                context.textStyles.bodySmall?.copyWith(
+                  color: context.appColors.secondaryText,
+                ),
           ),
         ),
         if (subTitleTrailing != null) subTitleTrailing!,

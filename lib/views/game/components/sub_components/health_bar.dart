@@ -31,7 +31,7 @@ class HealthBar extends PositionComponent {
     text: label,
     textRenderer: TextPaint(
       style: const TextStyle(
-        fontSize: AppTypography.captionSize,
+        fontSize: AppTypography.labelMediumSize,
         color: GameHudStyle.foreground,
         fontWeight: FontWeight.bold,
         shadows: [Shadow(blurRadius: 2, color: Colors.black)],

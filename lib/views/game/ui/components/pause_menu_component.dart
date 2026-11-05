@@ -149,11 +149,11 @@ class PauseMenuComponent extends PositionComponent {
       )
       ..scale.setValues(
         AppTypography.bitmapScale(
-          AppTypography.titleSize,
+          AppTypography.headlineSmallSize,
           responsiveScale: scale,
         ),
         AppTypography.bitmapScale(
-          AppTypography.titleSize,
+          AppTypography.headlineSmallSize,
           responsiveScale: scale,
         ),
       );
@@ -164,11 +164,11 @@ class PauseMenuComponent extends PositionComponent {
       )
       ..scale.setValues(
         AppTypography.bitmapScale(
-          AppTypography.bodySize,
+          AppTypography.bodyLargeSize,
           responsiveScale: scale,
         ),
         AppTypography.bitmapScale(
-          AppTypography.bodySize,
+          AppTypography.bodyLargeSize,
           responsiveScale: scale,
         ),
       );

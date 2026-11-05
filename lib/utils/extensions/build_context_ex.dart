@@ -8,7 +8,7 @@ import 'package:gunwave/theme/theme_provider.dart';
 
 extension BuildContextEx on BuildContext {
   AppColors get appColors => ProviderScope.containerOf(this).read(themeProvider).colors;
-  TextTheme get textStyles => ProviderScope.containerOf(this).read(themeProvider).textStyles;
+  TextTheme get textStyles => Theme.of(this).textTheme;
 
   // Landscape layout = width > height
   bool get isLandscapeLayout {

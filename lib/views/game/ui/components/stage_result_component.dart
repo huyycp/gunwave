@@ -209,11 +209,11 @@ class StageResultComponent extends PositionComponent {
       )
       ..scale.setValues(
         AppTypography.bitmapScale(
-          AppTypography.titleSize,
+          AppTypography.headlineSmallSize,
           responsiveScale: scale,
         ),
         AppTypography.bitmapScale(
-          AppTypography.titleSize,
+          AppTypography.headlineSmallSize,
           responsiveScale: scale,
         ),
       );
@@ -224,11 +224,11 @@ class StageResultComponent extends PositionComponent {
       )
       ..scale.setValues(
         AppTypography.bitmapScale(
-          AppTypography.bodySmallSize,
+          AppTypography.bodyMediumSize,
           responsiveScale: scale,
         ),
         AppTypography.bitmapScale(
-          AppTypography.bodySmallSize,
+          AppTypography.bodyMediumSize,
           responsiveScale: scale,
         ),
       );
@@ -241,11 +241,11 @@ class StageResultComponent extends PositionComponent {
       )
       ..scale.setValues(
         AppTypography.bitmapScale(
-          AppTypography.bodySize,
+          AppTypography.bodyLargeSize,
           responsiveScale: scale,
         ),
         AppTypography.bitmapScale(
-          AppTypography.bodySize,
+          AppTypography.bodyLargeSize,
           responsiveScale: scale,
         ),
       );
@@ -257,11 +257,11 @@ class StageResultComponent extends PositionComponent {
         )
         ..scale.setValues(
           AppTypography.bitmapScale(
-            AppTypography.bodySmallSize,
+            AppTypography.bodyMediumSize,
             responsiveScale: scale,
           ),
           AppTypography.bitmapScale(
-            AppTypography.bodySmallSize,
+            AppTypography.bodyMediumSize,
             responsiveScale: scale,
           ),
         );

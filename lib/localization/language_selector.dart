@@ -15,7 +15,7 @@ class LanguageSelector extends ConsumerWidget {
   const LanguageSelector({super.key});
 
   static const _gap = 8.0;
-  static const _fontSize = AppTypography.captionSize;
+  static const _fontSize = AppTypography.labelLargeSize;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -56,6 +56,7 @@ class LanguageSelector extends ConsumerWidget {
                       label,
                       style: AppTypography.pixelStyle(
                         fontSize: _fontSize,
+                        height: AppTypography.labelLargeLineHeight,
                         color: GameColors.primary,
                       ),
                     ),

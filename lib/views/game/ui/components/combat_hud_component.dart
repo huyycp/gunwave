@@ -331,11 +331,11 @@ class CombatHudComponent extends PositionComponent {
       ..position.setValues(left + 12 * scale, top + 8 * scale)
       ..scale.setValues(
         AppTypography.bitmapScale(
-          AppTypography.bodySmallSize,
+          AppTypography.bodyMediumSize,
           responsiveScale: scale,
         ),
         AppTypography.bitmapScale(
-          AppTypography.bodySmallSize,
+          AppTypography.bodyMediumSize,
           responsiveScale: scale,
         ),
       );
@@ -351,11 +351,11 @@ class CombatHudComponent extends PositionComponent {
       ..position.setValues(right - roundWidth + 12 * scale, top + 22 * scale)
       ..scale.setValues(
         AppTypography.bitmapScale(
-          AppTypography.bodySmallSize,
+          AppTypography.bodyMediumSize,
           responsiveScale: scale,
         ),
         AppTypography.bitmapScale(
-          AppTypography.bodySmallSize,
+          AppTypography.bodyMediumSize,
           responsiveScale: scale,
         ),
       );
@@ -378,11 +378,11 @@ class CombatHudComponent extends PositionComponent {
       )
       ..scale.setValues(
         AppTypography.bitmapScale(
-          AppTypography.bodySmallSize,
+          AppTypography.bodyMediumSize,
           responsiveScale: scale,
         ),
         AppTypography.bitmapScale(
-          AppTypography.bodySmallSize,
+          AppTypography.bodyMediumSize,
           responsiveScale: scale,
         ),
       );
@@ -409,11 +409,11 @@ class CombatHudComponent extends PositionComponent {
       )
       ..scale.setValues(
         AppTypography.bitmapScale(
-          AppTypography.bodySize,
+          AppTypography.bodyLargeSize,
           responsiveScale: scale,
         ),
         AppTypography.bitmapScale(
-          AppTypography.bodySize,
+          AppTypography.bodyLargeSize,
           responsiveScale: scale,
         ),
       );
@@ -436,11 +436,11 @@ class CombatHudComponent extends PositionComponent {
       ..position.setValues(abilityX + abilityWidth / 2, abilityY - 4 * scale)
       ..scale.setValues(
         AppTypography.bitmapScale(
-          AppTypography.captionSize,
+          AppTypography.labelMediumSize,
           responsiveScale: scale,
         ),
         AppTypography.bitmapScale(
-          AppTypography.captionSize,
+          AppTypography.labelMediumSize,
           responsiveScale: scale,
         ),
       );
@@ -451,11 +451,11 @@ class CombatHudComponent extends PositionComponent {
       )
       ..scale.setValues(
         AppTypography.bitmapScale(
-          AppTypography.captionSize,
+          AppTypography.labelMediumSize,
           responsiveScale: scale,
         ),
         AppTypography.bitmapScale(
-          AppTypography.captionSize,
+          AppTypography.labelMediumSize,
           responsiveScale: scale,
         ),
       );

@@ -4,6 +4,7 @@ import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gunwave/data/constants/game/game_play_mode.dart';
 import 'package:gunwave/data/constants/game/game_hud_style.dart';
+import 'package:gunwave/theme/app_typography.dart';
 import 'package:gunwave/data/models/campaign_stage_model.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/data/models/monster_model.dart';
@@ -217,7 +218,12 @@ void expectRpgMenuLayoutWithinViewport(
           label.width * label.scale.x,
           lessThanOrEqualTo(component.width - 8),
         );
-        expect(label.scale.x, greaterThan(18 / 14 - 0.001));
+        expect(
+          label.scale.x,
+          greaterThanOrEqualTo(
+            AppTypography.labelLargeSize / AppTypography.bitmapFontBaseSize,
+          ),
+        );
       }
     }
   }

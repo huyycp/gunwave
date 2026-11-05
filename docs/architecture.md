@@ -94,29 +94,26 @@ and campaign clears.
 
 ## Typography
 
-`AppTypography` is the shared source for sizes and line-height rhythm. Use the
-12 / 14 / 16 / 18 / 24 / 32 logical-pixel scale: captions are 12, compact
-controls 14, supporting text 14, body text 16 or 18, screen titles 24, and
-display headings 32. Keep primary body and form text at 16 or larger with a
-1.5 line height; reserve 12 for short captions and secondary status labels.
-Headings use a 1.2 line height.
+Flutter uses the Material 3 `TextTheme` supplied by `ThemeData`; choose styles
+by their shared `display`, `headline`, `title`, `body`, and `label` roles rather
+than by screen or feature. This keeps forms, buttons, menus, and future
+features on one type scale and lets Material provide platform and locale
+geometry.
 
-Flutter's shared `BaseTextTheme` uses Roboto for readable body and form text.
-`AppTypography.pixelStyle` centralizes Press Start 2P for the few legacy
-Flutter surfaces that use pixel lettering. Flame RPG labels use the original
-5×7 bitmap atlas in `assets/images/ui/fonts/`, with a 14-pixel base and English
-and Vietnamese glyphs. `AppTypography.bitmapScale` maps semantic sizes to the
-atlas and keeps text at least 12 logical pixels tall when a compact viewport
-reduces surrounding UI. Buttons use 14-pixel labels by default.
+`AppTypography` mirrors the Material 3 size and line-height roles for Flame's
+bitmap text, where Flutter `TextStyle`s cannot render the atlas. Its bitmap
+scaler maps those roles to the original 5×7 font in
+`assets/images/ui/fonts/`, using a 14-pixel source and a 12-pixel minimum for
+compact layouts. `AppTypography.pixelStyle` centralizes Press Start 2P for the
+few Flutter surfaces that need pixel lettering; use it as an accent rather
+than as the app's body font.
 
-Font review: [UI/UX Pro Max typography guidance](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill/blob/main/src/ui-ux-pro-max/templates/base/quick-reference.md)
-recommends a consistent 12 / 14 / 16 / 18 / 24 / 32 scale, 16-pixel body text,
-and 1.5 body line height. [VT323](https://github.com/google/fonts/blob/main/ofl/vt323/METADATA.pb)
+Font review: [Material 3 typography roles and readability guidance](https://m3.material.io/styles/typography/applying-type)
+defines the shared type scale and its line-height guidance. [VT323](https://github.com/google/fonts/blob/main/ofl/vt323/METADATA.pb)
 is an OFL-licensed monospace pixel candidate with an explicit Vietnamese
 subset. [Pixelify Sans](https://github.com/google/fonts/blob/main/ofl/pixelifysans/METADATA.pb)
 is an OFL display face, but its metadata does not list Vietnamese. Keep the
-existing atlas: it already matches the game, covers the required languages,
-and avoids adding a font dependency or importing another visual style.
+existing atlas: it already matches the game and covers the required languages.
 
 ## Game runtime and inputs
 

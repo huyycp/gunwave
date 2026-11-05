@@ -37,7 +37,7 @@ class DamageNumber extends TextComponent {
   // A short rise stays readable without covering the next attack's number.
   static const duration = .7;
   static const rise = 32.0;
-  static const fontSize = AppTypography.bodySmallSize;
+  static const fontSize = AppTypography.bodyLargeSize;
   static const maxVisible = 32;
   static final _visible = Expando<int>();
   Component? _owner;

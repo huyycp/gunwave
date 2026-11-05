@@ -33,7 +33,10 @@ class CampaignMapScene extends RpgMenuScene {
   @override
   Future<void> loadScene() async {
     _headerPanel = addPanel(Vector2.all(1));
-    _title = addText(labels.campaign, fontSize: AppTypography.rpgTitleSize);
+    _title = addText(
+      labels.campaign,
+      fontSize: AppTypography.headlineMediumSize,
+    );
     _backButton = await addButton(
       labels.back,
       actions.onBack,
@@ -42,7 +45,7 @@ class CampaignMapScene extends RpgMenuScene {
     );
     _emptyText = addText(
       labels.loading,
-      fontSize: AppTypography.rpgBodySize,
+      fontSize: AppTypography.bodyLargeSize,
       light: true,
     );
 
@@ -60,11 +63,11 @@ class CampaignMapScene extends RpgMenuScene {
       );
       final title = addText(
         labels.stageNumber(stage.order),
-        fontSize: AppTypography.rpgBodySmallSize,
+        fontSize: AppTypography.titleMediumSize,
       );
       final status = addText(
         _stageStatus(stage),
-        fontSize: AppTypography.rpgCaptionSize,
+        fontSize: AppTypography.titleMediumSize,
       );
       _nodes.add(_StageNode(stage, button, title, status, labelPanel));
     }

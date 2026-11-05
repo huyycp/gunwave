@@ -57,7 +57,8 @@ class _SplashViewState extends BaseViewState<SplashView, SplashViewModel> {
                   Text(
                     AppConstant.appName,
                     style: AppTypography.pixelStyle(
-                      fontSize: AppTypography.displaySize,
+                      fontSize: AppTypography.headlineLargeSize,
+                      height: AppTypography.headlineLargeLineHeight,
                       color: GameColors.primary,
                     ),
                   ),
