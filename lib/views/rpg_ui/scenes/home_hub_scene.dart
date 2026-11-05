@@ -155,7 +155,10 @@ class HomeHubScene extends RpgMenuScene {
     _campaignPanel
       ..size = Vector2(rightWidth, heroPanelHeight)
       ..position = Vector2(left + leftWidth + gap, panelTop);
-    _title.position = Vector2(left + 12 * scale, top + 20 * scale);
+    _title.position = Vector2(
+      left + (showBackButton ? 160 : 12) * scale,
+      bounds.top + 28 * scale,
+    );
     _heroName.position = Vector2(
       left + leftWidth / 2,
       panelTop + heroPanelHeight - 18 * scale,
@@ -172,29 +175,65 @@ class HomeHubScene extends RpgMenuScene {
       left + leftWidth + gap + rightWidth / 2,
       panelTop + heroPanelHeight * 0.73,
     );
-    _goldLabel.position = Vector2(
-      bounds.right - 190 * scale,
-      bounds.top + 28 * scale,
-    );
-    _goldValue.position = Vector2(
-      bounds.right - 116 * scale,
-      bounds.top + 28 * scale,
-    );
+    final headerY = bounds.top + 28 * scale;
+    final counterGap = 8 * scale;
+    final sectionGap = 24 * scale;
+    final statusWidth =
+        _statusPointsLabel.width * _statusPointsLabel.scale.x +
+        _statusPointsValue.width * _statusPointsValue.scale.x +
+        counterGap;
+    final goldWidth =
+        _goldLabel.width * _goldLabel.scale.x +
+        _goldValue.width * _goldValue.scale.x +
+        counterGap;
+    final settingsWidth = 136 * scale;
+    final settingsCenterX = bounds.right - 12 * scale - settingsWidth / 2;
+    final counterLeft =
+        _title.position.x + _title.width * _title.scale.x + 16 * scale;
+    final counterRight = settingsCenterX - settingsWidth / 2 - 12 * scale;
+    final counterGroupWidth = statusWidth + sectionGap + goldWidth;
+    final counterGroupLeft =
+        (counterLeft + counterRight - counterGroupWidth) / 2;
     _statusPointsLabel.position = Vector2(
-      bounds.right - 364 * scale,
-      bounds.top + 28 * scale,
+      counterGroupLeft +
+          _statusPointsLabel.width * _statusPointsLabel.scale.x / 2,
+      headerY,
     );
     _statusPointsValue.position = Vector2(
-      bounds.right - 280 * scale,
-      bounds.top + 28 * scale,
+      counterGroupLeft +
+          _statusPointsLabel.width * _statusPointsLabel.scale.x +
+          counterGap +
+          _statusPointsValue.width * _statusPointsValue.scale.x / 2,
+      headerY,
+    );
+    _goldLabel.position = Vector2(
+      counterGroupLeft +
+          statusWidth +
+          sectionGap +
+          _goldLabel.width * _goldLabel.scale.x / 2,
+      headerY,
+    );
+    _goldValue.position = Vector2(
+      counterGroupLeft +
+          statusWidth +
+          sectionGap +
+          _goldLabel.width * _goldLabel.scale.x +
+          counterGap +
+          _goldValue.width * _goldValue.scale.x / 2,
+      headerY,
     );
     final hero = _heroPreview;
     if (hero != null) {
       hero
-        ..size = Vector2.all(math.min(leftWidth * 0.58, heroPanelHeight * 0.56))
+        ..size = Vector2.all(
+          math.min(
+            leftWidth * GameMenuStyle.homeHubHeroWidthRatio,
+            heroPanelHeight * GameMenuStyle.homeHubHeroHeightRatio,
+          ),
+        )
         ..position = Vector2(
           left + leftWidth / 2,
-          panelTop + heroPanelHeight * 0.5,
+          panelTop + heroPanelHeight * GameMenuStyle.homeHubHeroCenterYRatio,
         );
     }
     final actionY = bounds.bottom - 12 * scale;
@@ -212,10 +251,7 @@ class HomeHubScene extends RpgMenuScene {
       ..anchor = Anchor.bottomCenter;
     _settingsButton
       ..size = Vector2(136 * scale, 52 * scale)
-      ..position = Vector2(
-        bounds.right - 72 * scale,
-        bounds.top + 12 * scale + 26 * scale,
-      );
+      ..position = Vector2(settingsCenterX, headerY);
     final backButton = _backButton;
     if (backButton != null) {
       backButton

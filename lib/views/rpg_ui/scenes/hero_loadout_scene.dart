@@ -173,7 +173,7 @@ class HeroLoadoutScene extends RpgMenuScene {
     final left = bounds.center.dx - panelWidth / 2;
     final top = bounds.center.dy - panelHeight / 2;
     final gap = 16 * scale;
-    final heroWidth = panelWidth * 0.38;
+    final heroWidth = panelWidth * GameMenuStyle.loadoutHeroColumnRatio;
     final statsWidth = panelWidth - heroWidth - gap;
     final bodyTop = top + 64 * scale;
     final bodyHeight = panelHeight - 148 * scale;
@@ -196,8 +196,16 @@ class HeroLoadoutScene extends RpgMenuScene {
     final hero = _heroPreview;
     if (hero != null) {
       hero
-        ..size = Vector2.all(math.min(heroWidth * 0.58, bodyHeight * 0.52))
-        ..position = Vector2(left + heroWidth / 2, bodyTop + bodyHeight * 0.54);
+        ..size = Vector2.all(
+          math.min(
+            heroWidth * GameMenuStyle.loadoutPreviewWidthRatio,
+            bodyHeight * GameMenuStyle.loadoutPreviewHeightRatio,
+          ),
+        )
+        ..position = Vector2(
+          left + heroWidth / 2,
+          bodyTop + bodyHeight * GameMenuStyle.loadoutPreviewCenterYRatio,
+        );
     }
     _emptyState.position = Vector2(
       left + heroWidth / 2,

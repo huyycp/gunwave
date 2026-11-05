@@ -123,17 +123,20 @@ class ShopScene extends RpgMenuScene {
         ..panel.position = Vector2(cardLeft, cardTop);
       final preview = card.preview;
       if (preview != null) {
-        final previewSize = math.min(80 * scale, cardHeight * 0.36);
+        final previewSize = math.min(
+          cardWidth * GameMenuStyle.shopPreviewWidthRatio,
+          cardHeight * GameMenuStyle.shopPreviewHeightRatio,
+        );
         preview
           ..size = Vector2.all(previewSize)
           ..position = Vector2(
             cardLeft + cardWidth / 2,
-            cardTop + cardHeight * 0.24,
+            cardTop + cardHeight * GameMenuStyle.shopPreviewCenterYRatio,
           );
       }
       card.name.position = Vector2(
         cardLeft + cardWidth / 2,
-        cardTop + cardHeight * 0.52,
+        cardTop + cardHeight * GameMenuStyle.shopNameCenterYRatio,
       );
       final maxNameWidth = cardWidth - 12 * scale;
       final preferredNameScale = AppTypography.bitmapScale(
@@ -145,15 +148,22 @@ class ShopScene extends RpgMenuScene {
         maxNameWidth / card.name.width,
       );
       card.name.scale = Vector2.all(
-        math.max(preferredNameScale, fittedNameScale),
+        math.max(
+          AppTypography.minimumBitmapFontSize /
+              AppTypography.bitmapFontBaseSize,
+          fittedNameScale,
+        ),
       );
       final buttonWidth = math.min(150 * scale, cardWidth - 12 * scale);
-      final buttonHeight = math.min(50 * scale, cardHeight * 0.42);
+      final buttonHeight = math.min(
+        50 * scale,
+        cardHeight * GameMenuStyle.shopActionHeightRatio,
+      );
       card.button
         ..size = Vector2(buttonWidth, buttonHeight)
         ..position = Vector2(
           cardLeft + cardWidth / 2,
-          cardTop + cardHeight * 0.79,
+          cardTop + cardHeight * GameMenuStyle.shopActionCenterYRatio,
         )
         ..anchor = Anchor.center;
     }
