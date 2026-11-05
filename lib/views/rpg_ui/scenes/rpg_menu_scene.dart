@@ -46,6 +46,7 @@ abstract class RpgMenuScene extends PositionComponent
   late final RectangleComponent shade;
   late final Sprite panelSprite;
   late ResponsiveUiLayout responsiveLayout;
+  final Map<TextComponent<SpriteFontRenderer>, double> _textFontSizes = {};
   bool _sceneArtLoaded = false;
   bool _contentLoaded = false;
 
@@ -56,6 +57,10 @@ abstract class RpgMenuScene extends PositionComponent
   Future<void> onLoad() async {
     await super.onLoad();
     size = game.size;
+    responsiveLayout = ResponsiveUiLayout(
+      viewportSize: size,
+      safeAreaInsets: safeAreaInsets,
+    );
     font = await UiBitmapFont.load(game.images, color: GameMenuStyle.inkColor);
     lightFont = await UiBitmapFont.load(
       game.images,
@@ -113,7 +118,10 @@ abstract class RpgMenuScene extends PositionComponent
       (size.y - imageSize.y * scale) / 2,
     );
     shade.size = size;
-    if (_contentLoaded) layoutScene();
+    if (_contentLoaded) {
+      _applyResponsiveTextScale();
+      layoutScene();
+    }
   }
 
   AssetPanelComponent addPanel(Vector2 panelSize, {Vector2? position}) {
@@ -144,8 +152,11 @@ abstract class RpgMenuScene extends PositionComponent
       textRenderer: light ? lightFont : font,
       anchor: anchor,
       position: position,
-      scale: Vector2.all(AppTypography.bitmapScale(fontSize)),
+      scale: Vector2.all(
+        AppTypography.bitmapScale(fontSize, responsiveScale: uiScale),
+      ),
     );
+    _textFontSizes[component] = fontSize;
     add(component);
     return component;
   }
@@ -171,10 +182,24 @@ abstract class RpgMenuScene extends PositionComponent
       label: text,
       labelRenderer: font,
       labelFontSize: labelFontSize,
+      responsiveTextScale: uiScale,
       onPressed: onPressed,
     );
     add(component);
     return component;
+  }
+
+  void _applyResponsiveTextScale() {
+    for (final entry in _textFontSizes.entries) {
+      final scale = AppTypography.bitmapScale(
+        entry.value,
+        responsiveScale: uiScale,
+      );
+      entry.key.scale.setValues(scale, scale);
+    }
+    for (final button in children.whereType<AssetButtonComponent>()) {
+      button.responsiveTextScale = uiScale;
+    }
   }
 
   Future<SpriteAnimationComponent?> loadHeroPreview(

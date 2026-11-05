@@ -1,4 +1,6 @@
+import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flame/text.dart';
 import 'package:flame_test/flame_test.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/painting.dart';
@@ -31,6 +33,13 @@ void main() {
 
     expect(result.canContinue, isTrue);
     expect(result.rewardLines, ['100 GOLD']);
+    result.onGameResize(Vector2(640, 360));
+    final title = result.children
+        .whereType<TextComponent<SpriteFontRenderer>>()
+        .first;
+    final compactTitleScale = title.scale.x;
+    result.onGameResize(Vector2(900, 506));
+    expect(title.scale.x, greaterThan(compactTitleScale));
     final buttons = result.children.whereType<AssetButtonComponent>().toList();
     expect(buttons, hasLength(3));
     for (var index = 0; index < buttons.length; index++) {

@@ -58,6 +58,7 @@ class AssetButtonComponent extends PositionComponent
   final SpriteFontRenderer? labelRenderer;
   final double labelFontSize;
   final void Function()? onPressed;
+  double _responsiveTextScale = 1;
 
   GameButtonState _buttonState;
   bool _isPressed = false;
@@ -77,6 +78,17 @@ class AssetButtonComponent extends PositionComponent
   String get label => _label?.text ?? '';
 
   set label(String value) => _setLabel(value);
+
+  double get responsiveTextScale => _responsiveTextScale;
+
+  set responsiveTextScale(double value) {
+    _responsiveTextScale = value;
+    final labelScale = AppTypography.bitmapScale(
+      labelFontSize,
+      responsiveScale: value,
+    );
+    _label?.scale.setValues(labelScale, labelScale);
+  }
 
   /// Returns the drawn sprite state; the caller may resize [size] freely.
   GameButtonState get visualState {
@@ -170,7 +182,12 @@ class AssetButtonComponent extends PositionComponent
         width / 2,
         height / 2 + GameHudStyle.buttonLabelOpticalYOffset,
       ),
-      scale: Vector2.all(AppTypography.bitmapScale(labelFontSize)),
+      scale: Vector2.all(
+        AppTypography.bitmapScale(
+          labelFontSize,
+          responsiveScale: _responsiveTextScale,
+        ),
+      ),
     );
     add(_label!);
   }
@@ -201,6 +218,7 @@ class AssetButtonComponent extends PositionComponent
     String label = '',
     SpriteFontRenderer? labelRenderer,
     double labelFontSize = AppTypography.labelLargeSize,
+    double responsiveTextScale = 1,
     void Function()? onPressed,
   }) async {
     final assets = GameButtonAssets.forSize(buttonSize);
@@ -218,7 +236,7 @@ class AssetButtonComponent extends PositionComponent
         return Sprite(await images.load(key));
       }),
     );
-    return AssetButtonComponent(
+    final component = AssetButtonComponent(
       normalSprite: sprites[0],
       hoveredSprite: sprites[1],
       pressedSprite: sprites[2],
@@ -233,5 +251,7 @@ class AssetButtonComponent extends PositionComponent
       labelFontSize: labelFontSize,
       onPressed: onPressed,
     );
+    component.responsiveTextScale = responsiveTextScale;
+    return component;
   }
 }

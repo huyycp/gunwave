@@ -198,7 +198,13 @@ void expectRpgMenuLayoutWithinViewport(
 
     if (component is TextComponent<SpriteFontRenderer> &&
         component.text.isNotEmpty) {
-      expect(component.scale.x, greaterThanOrEqualTo(16 / 14));
+      expect(
+        component.scale.x,
+        greaterThanOrEqualTo(
+          AppTypography.minimumBitmapFontSize /
+              AppTypography.bitmapFontBaseSize,
+        ),
+      );
       expect(component.textRenderer.paint.colorFilter, isNotNull);
     }
 
@@ -221,7 +227,8 @@ void expectRpgMenuLayoutWithinViewport(
         expect(
           label.scale.x,
           greaterThanOrEqualTo(
-            AppTypography.labelLargeSize / AppTypography.bitmapFontBaseSize,
+            AppTypography.minimumBitmapFontSize /
+                AppTypography.bitmapFontBaseSize,
           ),
         );
       }

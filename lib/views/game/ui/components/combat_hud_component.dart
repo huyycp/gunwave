@@ -319,6 +319,8 @@ class CombatHudComponent extends PositionComponent {
         GameHudStyle.edge * 2;
     final widthScale = bounds.width / requiredWidth;
     final scale = math.min(layout.scale, widthScale);
+    _pauseButton.responsiveTextScale = scale;
+    _abilityButton.responsiveTextScale = scale;
     final edge = GameHudStyle.edge * scale;
     final top = bounds.top + edge;
     final left = bounds.left + edge;

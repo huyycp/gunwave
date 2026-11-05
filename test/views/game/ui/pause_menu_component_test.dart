@@ -1,5 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flame/text.dart';
 import 'package:flame_test/flame_test.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/painting.dart';
@@ -29,8 +30,14 @@ void main() {
     await game.ensureAdd(menu);
     menu.onGameResize(Vector2(640, 360));
     final panel = menu.children.whereType<AssetPanelComponent>().single;
+    final title = menu.children
+        .whereType<TextComponent<SpriteFontRenderer>>()
+        .first;
+    final compactTitleScale = title.scale.x;
     expect(panel.x, greaterThanOrEqualTo(insets.left));
     expect(panel.x + panel.width, lessThanOrEqualTo(640 - insets.right));
+    menu.onGameResize(Vector2(900, 506));
+    expect(title.scale.x, greaterThan(compactTitleScale));
 
     final buttons = menu.children.whereType<AssetButtonComponent>().toList();
     expect(buttons, hasLength(2));

@@ -136,15 +136,16 @@ class ShopScene extends RpgMenuScene {
         cardTop + cardHeight * 0.52,
       );
       final maxNameWidth = cardWidth - 12 * scale;
+      final preferredNameScale = AppTypography.bitmapScale(
+        AppTypography.titleMediumSize,
+        responsiveScale: scale,
+      );
       final fittedNameScale = math.min(
-        AppTypography.bitmapScale(AppTypography.titleMediumSize),
+        preferredNameScale,
         maxNameWidth / card.name.width,
       );
       card.name.scale = Vector2.all(
-        math.max(
-          AppTypography.bitmapScale(AppTypography.titleMediumSize),
-          fittedNameScale,
-        ),
+        math.max(preferredNameScale, fittedNameScale),
       );
       final buttonWidth = math.min(150 * scale, cardWidth - 12 * scale);
       final buttonHeight = math.min(50 * scale, cardHeight * 0.42);

@@ -1,7 +1,9 @@
 import 'package:flame/components.dart';
+import 'package:flame/text.dart';
 import 'package:flame_test/flame_test.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gunwave/theme/app_typography.dart';
 import 'package:gunwave/views/game/ui/components/asset_button_component.dart';
 import 'package:gunwave/views/game/ui/components/asset_panel_component.dart';
 import 'package:gunwave/views/game/ui/components/combat_hud_component.dart';
@@ -25,6 +27,7 @@ void main() {
     );
     await game.ensureAdd(hud);
 
+    double? previousAbilityLabelScale;
     for (final size in [
       Vector2(360, 320),
       Vector2(640, 360),
@@ -37,6 +40,9 @@ void main() {
           .whereType<AssetPanelComponent>()
           .elementAt(1);
       final abilityButton = hud.children.whereType<AssetButtonComponent>().last;
+      final abilityLabel = abilityButton.children
+          .whereType<TextComponent<SpriteFontRenderer>>()
+          .single;
       expect(healthPanel.x, greaterThanOrEqualTo(24));
       expect(healthPanel.y, greaterThanOrEqualTo(12));
       expect(
@@ -53,6 +59,23 @@ void main() {
         ),
         isTrue,
       );
+      expect(
+        abilityLabel.scale.x,
+        closeTo(
+          AppTypography.bitmapScale(
+            AppTypography.labelLargeSize,
+            responsiveScale: abilityButton.responsiveTextScale,
+          ),
+          0.001,
+        ),
+      );
+      if (previousAbilityLabelScale != null) {
+        expect(
+          abilityLabel.scale.x,
+          greaterThanOrEqualTo(previousAbilityLabelScale),
+        );
+      }
+      previousAbilityLabelScale = abilityLabel.scale.x;
     }
   });
 }

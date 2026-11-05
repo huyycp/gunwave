@@ -131,6 +131,8 @@ class PauseMenuComponent extends PositionComponent {
     );
     final bounds = layout.contentBounds;
     final scale = layout.scale;
+    _resumeButton.responsiveTextScale = scale;
+    _exitButton.responsiveTextScale = scale;
     final panelWidth = (bounds.width - GameHudStyle.edge * 4)
         .clamp(0.0, _panelWidth * scale)
         .toDouble();
