@@ -6,7 +6,7 @@
 
 **Architecture:** Drift is the single store for mutable player state, catalog rows, structured campaign content, and app settings. A local content seeder imports the bundled campaign JSON and catalog assets; repositories keep models and business transactions out of Flame scenes. Existing Tiled maps and image assets remain packaged files. Startup opens/migrates/seeds SQLite before `runApp`.
 
-**Tech Stack:** Flutter 3.47.4, Dart 3.13, Drift, `drift_flutter`, Riverpod, `flutter_test`, `NativeDatabase.memory()`.
+**Tech Stack:** Flutter 3.47.4, Dart 3.13, `drift` 2.35.3, `drift_dev` 2.35.2, `drift_flutter` 0.3.1, Riverpod, `flutter_test`, `NativeDatabase.memory()`.
 
 **Spec:** `docs/superpowers/specs/2026-11-05-local-first-data-design.md`
 
@@ -45,11 +45,11 @@
 - Produces `AppDatabase()`, `AppDatabase.forTesting(QueryExecutor)`, `appDatabaseProvider`, and schema version 1.
 - `catalog_tables.dart` defines abilities and characters; `campaign_tables.dart` defines stages, monsters, stage-monster links, rounds, encounters, and rewards; `player_tables.dart` defines singleton player state, owned characters, stage clears, settings, and app metadata.
 
-- [ ] Add tests for in-memory open, CRUD on representative catalog/state/settings tables, foreign-key constraints, and singleton/unique constraints.
-- [ ] Run `fvm flutter test test/data/database/app_database_test.dart --reporter expanded`; verify tests fail before schema implementation.
-- [ ] Add `drift`, `drift_flutter`, and `drift_dev`, define schema version 1 and test constructor, generate Drift code with `dart run build_runner build --delete-conflicting-outputs`.
-- [ ] Generate checked-in schema snapshots in `drift_schemas/` and configure Drift's migration test output so future database versions have a testable schema history.
-- [ ] Run focused database tests, `fvm dart format`, and `fvm dart analyze lib/data/database test/data/database`.
+- [x] Add tests for in-memory open, CRUD on representative catalog/state/settings tables, foreign-key constraints, and singleton/unique constraints.
+- [x] Run `fvm flutter test --no-pub test/data/database/app_database_test.dart --reporter expanded`; the new tests failed to compile before the schema implementation.
+- [x] Add `drift: ^2.35.3`, `drift_flutter: ^0.3.1`, and `drift_dev: ^2.35.2`, define schema version 1 and test constructor, and generate Drift code with `fvm dart run build_runner build`.
+- [x] Configure `build.yaml` for `app_database.dart`, `drift_schemas/`, and `test/data/database/migrations/`; run `fvm dart run drift_dev make-migrations` to generate the v1 schema snapshot. Future schema versions will generate step-by-step migrations and migration tests.
+- [x] Run focused database tests, `fvm dart format`, and `fvm dart analyze lib/data/database test/data/database`.
 - [ ] Commit `feat: add local Drift database schema`.
 
 ### Task 2: Seed bundled content and create local repositories
