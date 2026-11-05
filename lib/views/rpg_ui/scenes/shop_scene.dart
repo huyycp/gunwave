@@ -5,6 +5,7 @@ import 'package:flame/text.dart';
 import 'package:gunwave/data/constants/game/game_menu_style.dart';
 import 'package:gunwave/data/data_sources/local/campaign_hero_catalog.dart';
 import 'package:gunwave/data/models/character_model.dart';
+import 'package:gunwave/theme/app_typography.dart';
 import 'package:gunwave/views/game/ui/components/asset_button_component.dart';
 import 'package:gunwave/views/game/ui/components/asset_panel_component.dart';
 import 'package:gunwave/views/rpg_ui/scenes/rpg_menu_scene.dart';
@@ -30,9 +31,12 @@ class ShopScene extends RpgMenuScene {
   @override
   Future<void> loadScene() async {
     _panel = addPanel(Vector2.all(1));
-    _title = addText(labels.shop, scale: 1.12);
-    _balance = addText('${labels.gold}: ${snapshot.gold}', scale: 0.72);
-    _emptyText = addText(_emptyMessage, scale: 0.78);
+    _title = addText(labels.shop, fontSize: AppTypography.titleSize);
+    _balance = addText(
+      '${labels.gold}: ${snapshot.gold}',
+      fontSize: AppTypography.bodySmallSize,
+    );
+    _emptyText = addText(_emptyMessage, fontSize: AppTypography.bodySize);
     final status = snapshot.isLoading
         ? labels.loading
         : !snapshot.isAccountSignedIn
@@ -41,7 +45,7 @@ class ShopScene extends RpgMenuScene {
         ? labels.shopUnavailable
         : null;
     if (status != null) {
-      _statusText = addText(status, scale: 0.55);
+      _statusText = addText(status, fontSize: AppTypography.captionSize);
     }
     _backButton = await addButton(
       labels.back,
@@ -52,7 +56,10 @@ class ShopScene extends RpgMenuScene {
     for (final character in snapshot.shopHeroes.take(8)) {
       final panel = addPanel(Vector2.all(1));
       final preview = await loadHeroPreview(character, size: Vector2.all(92));
-      final name = addText(character.name, scale: 0.52);
+      final name = addText(
+        character.name,
+        fontSize: AppTypography.bodySmallSize,
+      );
       final isOwned = snapshot.ownedHeroes.any(
         (hero) =>
             hero.id == character.id ||

@@ -7,6 +7,7 @@ import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_hud_style.dart';
 import 'package:gunwave/data/constants/game/game_ui.dart';
 import 'package:gunwave/data/models/campaign_stage_model.dart';
+import 'package:gunwave/theme/app_typography.dart';
 import 'package:gunwave/views/game/ui/components/asset_button_component.dart';
 import 'package:gunwave/views/game/ui/components/asset_panel_component.dart';
 import 'package:gunwave/views/rpg_ui/rpg_menu_models.dart';
@@ -32,14 +33,14 @@ class CampaignMapScene extends RpgMenuScene {
   @override
   Future<void> loadScene() async {
     _headerPanel = addPanel(Vector2.all(1));
-    _title = addText(labels.campaign, scale: 1.25);
+    _title = addText(labels.campaign, fontSize: AppTypography.titleSize);
     _backButton = await addButton(
       labels.back,
       actions.onBack,
       buttonSize: Vector2(150, 58),
       anchor: Anchor.topLeft,
     );
-    _emptyText = addText(labels.loading, scale: 0.9);
+    _emptyText = addText(labels.loading, fontSize: AppTypography.bodySize);
 
     for (final stage in snapshot.stages) {
       final button = await addButton(
@@ -52,8 +53,14 @@ class CampaignMapScene extends RpgMenuScene {
         assetSize: GameButtonSize.large,
         enabled: snapshot.isStageUnlocked(stage),
       );
-      final title = addText(labels.stageNumber(stage.order), scale: 0.72);
-      final status = addText(_stageStatus(stage), scale: 0.58);
+      final title = addText(
+        labels.stageNumber(stage.order),
+        fontSize: AppTypography.bodySmallSize,
+      );
+      final status = addText(
+        _stageStatus(stage),
+        fontSize: AppTypography.captionSize,
+      );
       _nodes.add(_StageNode(stage, button, title, status));
     }
     if (_nodes.length > 1) {

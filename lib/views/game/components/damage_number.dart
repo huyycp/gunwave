@@ -3,6 +3,7 @@ import 'package:flame/effects.dart';
 import 'package:flame/text.dart';
 import 'package:flutter/material.dart';
 import 'package:gunwave/data/constants/game/game_hud_style.dart';
+import 'package:gunwave/theme/app_typography.dart';
 
 /// Shows actual HP lost at the hit position, then rises and removes itself.
 /// Attached to the world so death/removal and sprite flipping do not affect it.
@@ -36,7 +37,7 @@ class DamageNumber extends TextComponent {
   // A short rise stays readable without covering the next attack's number.
   static const duration = .7;
   static const rise = 32.0;
-  static const fontSize = 14.0;
+  static const fontSize = AppTypography.bodySmallSize;
   static const maxVisible = 32;
   static final _visible = Expando<int>();
   Component? _owner;

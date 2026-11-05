@@ -5,6 +5,7 @@ import 'package:flame/text.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_menu_style.dart';
 import 'package:gunwave/data/models/character_model.dart';
+import 'package:gunwave/theme/app_typography.dart';
 import 'package:gunwave/views/game/ui/components/asset_button_component.dart';
 import 'package:gunwave/views/game/ui/components/asset_panel_component.dart';
 import 'package:gunwave/views/rpg_ui/rpg_menu_models.dart';
@@ -46,25 +47,25 @@ class HeroLoadoutScene extends RpgMenuScene {
   Future<void> loadScene() async {
     _heroPanel = addPanel(Vector2.all(1));
     _statsPanel = addPanel(Vector2.all(1));
-    _title = addText(labels.heroLoadout, scale: 1.2);
+    _title = addText(labels.heroLoadout, fontSize: AppTypography.titleSize);
     _heroName = addText(
       _hero?.name ??
           (snapshot.isLoading ? labels.loading : labels.noCharacters),
-      scale: 0.86,
+      fontSize: AppTypography.bodyLargeSize,
     );
     _abilityName = addText(
       _hero?.ability?.name ?? labels.selectHero,
-      scale: 0.62,
+      fontSize: AppTypography.bodySmallSize,
     );
     _statusPoints = addText(
       '${labels.statusPoints}: ${_hero?.sp ?? 0}',
-      scale: 0.68,
+      fontSize: AppTypography.bodySmallSize,
     );
     _emptyState = addText(
       snapshot.ownedHeroes.isEmpty
           ? (snapshot.isLoading ? labels.loading : labels.noCharacters)
           : '',
-      scale: 0.7,
+      fontSize: AppTypography.bodySmallSize,
     );
     _heroPreview = await loadHeroPreview(_hero, size: Vector2.all(180));
     _statRows.addAll(
@@ -120,8 +121,12 @@ class HeroLoadoutScene extends RpgMenuScene {
     int value,
     CharacterAttr attr,
   ) async {
-    final labelText = addText(label, scale: 0.62, anchor: Anchor.centerLeft);
-    final valueText = addText('$value', scale: 0.72);
+    final labelText = addText(
+      label,
+      fontSize: AppTypography.bodySmallSize,
+      anchor: Anchor.centerLeft,
+    );
+    final valueText = addText('$value', fontSize: AppTypography.bodySmallSize);
     final plus = await addButton(
       '+',
       () {

@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_ui.dart';
 import 'package:gunwave/localization/build_context_l10n.dart';
 import 'package:gunwave/localization/app_locale_controller.dart';
 import 'package:gunwave/localization/app_locale_mode.dart';
+import 'package:gunwave/theme/app_typography.dart';
 
 /// Parchment language choices for Settings, backed by the persisted app locale.
 /// RadioGroup provides selection semantics and keyboard navigation.
@@ -15,7 +15,7 @@ class LanguageSelector extends ConsumerWidget {
   const LanguageSelector({super.key});
 
   static const _gap = 8.0;
-  static const _fontSize = 12.0;
+  static const _fontSize = AppTypography.captionSize;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -54,7 +54,7 @@ class LanguageSelector extends ConsumerWidget {
                     selected: controller.mode == mode,
                     title: Text(
                       label,
-                      style: GoogleFonts.pressStart2p(
+                      style: AppTypography.pixelStyle(
                         fontSize: _fontSize,
                         color: GameColors.primary,
                       ),

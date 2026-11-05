@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
+import 'package:gunwave/theme/app_typography.dart';
 import 'package:gunwave/utils/common_functions.dart';
 
 class GameButton extends StatefulWidget {
@@ -109,10 +109,10 @@ class _GameButtonState extends State<GameButton> {
               child: Padding(
                 padding: buttonPadding,
                 child: DefaultTextStyle(
-                  style: GoogleFonts.pressStart2p(
+                  style: AppTypography.pixelStyle(
                     color: isEnabled ? GameColors.primary : Colors.brown.withOpacity(0.5),
-                    fontSize: widget.size == GameButtonSize.small ? 14 : 
-                             widget.size == GameButtonSize.medium ? 18 : 24,
+                    fontSize: widget.size == GameButtonSize.small ? AppTypography.bodySmallSize :
+                             widget.size == GameButtonSize.medium ? AppTypography.bodyLargeSize : AppTypography.titleSize,
                     fontWeight: FontWeight.bold,
                   ),
                   child: widget.child,

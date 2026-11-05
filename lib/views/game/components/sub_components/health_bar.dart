@@ -2,6 +2,7 @@ import 'package:flame/components.dart';
 import 'package:flame/text.dart';
 import 'package:flutter/material.dart';
 import 'package:gunwave/data/constants/game/game_hud_style.dart';
+import 'package:gunwave/theme/app_typography.dart';
 import 'package:gunwave/views/game/components/sub_components/pixel_health_bar_painter.dart';
 
 /// Monster HP with a numeric label kept upright when the sprite flips.
@@ -30,7 +31,7 @@ class HealthBar extends PositionComponent {
     text: label,
     textRenderer: TextPaint(
       style: const TextStyle(
-        fontSize: GameHudStyle.labelFontSize,
+        fontSize: AppTypography.captionSize,
         color: GameHudStyle.foreground,
         fontWeight: FontWeight.bold,
         shadows: [Shadow(blurRadius: 2, color: Colors.black)],

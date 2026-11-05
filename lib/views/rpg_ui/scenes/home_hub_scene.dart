@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flame/text.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_menu_style.dart';
+import 'package:gunwave/theme/app_typography.dart';
 import 'package:gunwave/views/game/ui/components/asset_button_component.dart';
 import 'package:gunwave/views/game/ui/components/asset_panel_component.dart';
 import 'package:gunwave/views/rpg_ui/rpg_menu_models.dart';
@@ -44,35 +45,41 @@ class HomeHubScene extends RpgMenuScene {
   Future<void> loadScene() async {
     _heroPanel = addPanel(Vector2.all(1));
     _campaignPanel = addPanel(Vector2.all(1));
-    _title = addText(labels.campaign, scale: 1.35);
+    _title = addText(labels.campaign, fontSize: AppTypography.titleSize);
     _heroName = addText(
       snapshot.selectedHero?.name ??
           (snapshot.isLoading ? labels.loading : labels.noCharacters),
-      scale: 0.9,
+      fontSize: AppTypography.bodySmallSize,
     );
     final stage = snapshot.selectedStage;
     _stageName = addText(
       stage == null
           ? (snapshot.isLoading ? labels.loading : labels.noCampaignStages)
           : _stageNameFor(stage),
-      scale: 0.95,
+      fontSize: AppTypography.bodyLargeSize,
     );
     _stageNumber = addText(
       stage == null ? '' : labels.stageNumber(stage.order),
-      scale: 0.75,
+      fontSize: AppTypography.captionSize,
     );
     _roundSummary = addText(
       stage == null
           ? ''
           : '${labels.roundsCount(stage.rounds.length)}  |  ${labels.boss}',
-      scale: 0.75,
+      fontSize: AppTypography.bodySmallSize,
     );
-    _goldLabel = addText(labels.gold, scale: 0.65);
-    _goldValue = addText(snapshot.campaignGold.toString(), scale: 0.8);
-    _statusPointsLabel = addText(labels.statusPoints, scale: 0.55);
+    _goldLabel = addText(labels.gold, fontSize: AppTypography.captionSize);
+    _goldValue = addText(
+      snapshot.campaignGold.toString(),
+      fontSize: AppTypography.bodySmallSize,
+    );
+    _statusPointsLabel = addText(
+      labels.statusPoints,
+      fontSize: AppTypography.captionSize,
+    );
     _statusPointsValue = addText(
       snapshot.campaignStatusPoints.toString(),
-      scale: 0.8,
+      fontSize: AppTypography.bodySmallSize,
     );
     _heroPreview = await loadHeroPreview(
       snapshot.selectedHero,

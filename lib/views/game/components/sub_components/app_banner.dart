@@ -2,9 +2,9 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/image_composition.dart';
 import 'package:flutter/foundation.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_ui.dart';
+import 'package:gunwave/theme/app_typography.dart';
 
 class AppBanner extends PositionComponent with HasGameRef<FlameGame> {
   AppBanner({
@@ -154,8 +154,8 @@ class AppBanner extends PositionComponent with HasGameRef<FlameGame> {
       position: Vector2(24, 0),
       size: Vector2(size.x - 48, size.y - 32),
       textRenderer: TextPaint(
-        style: GoogleFonts.pressStart2p(
-          fontSize: 16,
+        style: AppTypography.pixelStyle(
+          fontSize: AppTypography.bodySize,
           color: GameColors.primary,
         ),
       ),

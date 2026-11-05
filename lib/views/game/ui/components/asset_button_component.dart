@@ -7,6 +7,7 @@ import 'package:flame/events.dart';
 import 'package:flame/text.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_hud_style.dart';
+import 'package:gunwave/theme/app_typography.dart';
 
 import 'asset_panel_component.dart';
 
@@ -23,6 +24,7 @@ class AssetButtonComponent extends PositionComponent
     bool enabled = true,
     String label = '',
     this.labelRenderer,
+    this.labelFontSize = AppTypography.bodySmallSize,
     this.onPressed,
     NineSliceBorders borders = const NineSliceBorders(
       left: GameHudStyle.buttonBorderInset,
@@ -54,6 +56,7 @@ class AssetButtonComponent extends PositionComponent
   final NineTileBox? _disabled;
   final Vector2 _hitAreaSize;
   final SpriteFontRenderer? labelRenderer;
+  final double labelFontSize;
   final void Function()? onPressed;
 
   GameButtonState _buttonState;
@@ -161,6 +164,7 @@ class AssetButtonComponent extends PositionComponent
       textRenderer: renderer,
       anchor: Anchor.center,
       position: Vector2(width / 2, height / 2),
+      scale: Vector2.all(AppTypography.bitmapScale(labelFontSize)),
     );
     add(_label!);
   }
@@ -190,6 +194,7 @@ class AssetButtonComponent extends PositionComponent
     bool enabled = true,
     String label = '',
     SpriteFontRenderer? labelRenderer,
+    double labelFontSize = AppTypography.bodySmallSize,
     void Function()? onPressed,
   }) async {
     final assets = GameButtonAssets.forSize(buttonSize);
@@ -219,6 +224,7 @@ class AssetButtonComponent extends PositionComponent
       enabled: enabled,
       label: label,
       labelRenderer: labelRenderer,
+      labelFontSize: labelFontSize,
       onPressed: onPressed,
     );
   }

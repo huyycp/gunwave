@@ -7,6 +7,7 @@ import 'package:flutter/painting.dart' show EdgeInsets;
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_hud_style.dart';
 import 'package:gunwave/data/constants/game/game_ui.dart';
+import 'package:gunwave/theme/app_typography.dart';
 import 'package:gunwave/views/game/ui/bitmap_font.dart';
 import 'package:gunwave/views/game/ui/campaign_ui_labels.dart';
 import 'package:gunwave/views/game/ui/components/asset_button_component.dart';
@@ -146,13 +147,31 @@ class PauseMenuComponent extends PositionComponent {
         (bounds.left + bounds.right) / 2,
         panelTop + 58 * scale,
       )
-      ..scale.setValues(scale, scale);
+      ..scale.setValues(
+        AppTypography.bitmapScale(
+          AppTypography.titleSize,
+          responsiveScale: scale,
+        ),
+        AppTypography.bitmapScale(
+          AppTypography.titleSize,
+          responsiveScale: scale,
+        ),
+      );
     _confirmation
       ..position.setValues(
         (bounds.left + bounds.right) / 2,
         panelTop + 112 * scale,
       )
-      ..scale.setValues(scale, scale);
+      ..scale.setValues(
+        AppTypography.bitmapScale(
+          AppTypography.bodySize,
+          responsiveScale: scale,
+        ),
+        AppTypography.bitmapScale(
+          AppTypography.bodySize,
+          responsiveScale: scale,
+        ),
+      );
     final buttonWidth = (panelWidth - 54 * scale) / 2;
     final buttonHeight = 60 * scale;
     final buttonY = panelTop + panelHeight - buttonHeight - 24 * scale;

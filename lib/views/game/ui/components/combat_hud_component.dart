@@ -8,6 +8,7 @@ import 'package:flutter/painting.dart' show EdgeInsets;
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_hud_style.dart';
 import 'package:gunwave/data/constants/game/game_ui.dart';
+import 'package:gunwave/theme/app_typography.dart';
 import 'package:gunwave/views/game/ui/bitmap_font.dart';
 import 'package:gunwave/views/game/ui/campaign_ui_labels.dart';
 import 'package:gunwave/views/game/ui/components/asset_button_component.dart';
@@ -328,7 +329,16 @@ class CombatHudComponent extends PositionComponent {
       ..position.setValues(left, top);
     _healthText
       ..position.setValues(left + 12 * scale, top + 8 * scale)
-      ..scale.setValues(scale, scale);
+      ..scale.setValues(
+        AppTypography.bitmapScale(
+          AppTypography.bodySmallSize,
+          responsiveScale: scale,
+        ),
+        AppTypography.bitmapScale(
+          AppTypography.bodySmallSize,
+          responsiveScale: scale,
+        ),
+      );
     _healthBar
       ..size.setValues((_healthPanelWidth - 28) * scale, 20 * scale)
       ..position.setValues(left + 14 * scale, top + 42 * scale);
@@ -339,7 +349,16 @@ class CombatHudComponent extends PositionComponent {
       ..position.setValues(right - roundWidth, top);
     _roundText
       ..position.setValues(right - roundWidth + 12 * scale, top + 22 * scale)
-      ..scale.setValues(scale, scale);
+      ..scale.setValues(
+        AppTypography.bitmapScale(
+          AppTypography.bodySmallSize,
+          responsiveScale: scale,
+        ),
+        AppTypography.bitmapScale(
+          AppTypography.bodySmallSize,
+          responsiveScale: scale,
+        ),
+      );
     _pauseButton
       ..size.setValues(_pauseButtonSize * scale, _pauseButtonSize * scale)
       ..position.setValues(
@@ -357,7 +376,16 @@ class CombatHudComponent extends PositionComponent {
         (gameSize.x - bossWidth) / 2 + 12 * scale,
         bossTop + 5 * scale,
       )
-      ..scale.setValues(scale, scale);
+      ..scale.setValues(
+        AppTypography.bitmapScale(
+          AppTypography.bodySmallSize,
+          responsiveScale: scale,
+        ),
+        AppTypography.bitmapScale(
+          AppTypography.bodySmallSize,
+          responsiveScale: scale,
+        ),
+      );
     _bossBar
       ..size.setValues((_bossPanelWidth - 28) * scale, 17 * scale)
       ..position.setValues(
@@ -379,7 +407,16 @@ class CombatHudComponent extends PositionComponent {
         noticeLeft + noticeWidth / 2,
         noticeTop + _noticePanelHeight * scale / 2,
       )
-      ..scale.setValues(scale, scale);
+      ..scale.setValues(
+        AppTypography.bitmapScale(
+          AppTypography.bodySize,
+          responsiveScale: scale,
+        ),
+        AppTypography.bitmapScale(
+          AppTypography.bodySize,
+          responsiveScale: scale,
+        ),
+      );
 
     final abilityWidth = _abilityButtonWidth * scale;
     final abilityHeight = _abilityButtonHeight * scale;
@@ -397,13 +434,31 @@ class CombatHudComponent extends PositionComponent {
       ..position.setValues(abilityX, abilityY);
     _abilityStatus
       ..position.setValues(abilityX + abilityWidth / 2, abilityY - 4 * scale)
-      ..scale.setValues(scale, scale);
+      ..scale.setValues(
+        AppTypography.bitmapScale(
+          AppTypography.captionSize,
+          responsiveScale: scale,
+        ),
+        AppTypography.bitmapScale(
+          AppTypography.captionSize,
+          responsiveScale: scale,
+        ),
+      );
     _keyboardGuide
       ..position.setValues(
         (bounds.left + bounds.right) / 2,
         bounds.bottom - 22 * scale,
       )
-      ..scale.setValues(scale, scale);
+      ..scale.setValues(
+        AppTypography.bitmapScale(
+          AppTypography.captionSize,
+          responsiveScale: scale,
+        ),
+        AppTypography.bitmapScale(
+          AppTypography.captionSize,
+          responsiveScale: scale,
+        ),
+      );
   }
 
   static Future<Sprite> _loadSprite(Images images, String path) async {

@@ -11,8 +11,6 @@ abstract final class GameHudStyle {
   static const progressBarInset = buttonBorderInset - 4.0;
   static const minimumTouchSize = 48.0;
   static const uiFontScale = 1.0;
-  static const guideFontSize = 10.0;
-  static const labelFontSize = 11.0;
   static const playerPanelMaxWidth = 320.0;
   static const healthHeight = 20.0;
   static const healthWorldHeight = 10.0;

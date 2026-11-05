@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:gradient_borders/input_borders/gradient_outline_input_border.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/theme/app_colors.dart';
@@ -149,10 +148,7 @@ class _AppInputState extends BaseInputState<AppTextFormField, AppInputWidgetMode
       onTap: widget.onTap,
       inputFormatters: formatter,
       decoration: decoration,
-      style: GoogleFonts.pressStart2p(
-        color:GameColors.primary,
-        fontSize: 12,
-      ),
+      style: textStyles.bodyMedium?.copyWith(color: GameColors.primary),
     );
   }
 

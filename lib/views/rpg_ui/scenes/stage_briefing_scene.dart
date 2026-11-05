@@ -7,6 +7,7 @@ import 'package:gunwave/data/constants/game/game_menu_style.dart';
 import 'package:gunwave/data/models/campaign_stage_model.dart';
 import 'package:gunwave/data/models/reward_model.dart';
 import 'package:gunwave/data/models/stage_round_model.dart';
+import 'package:gunwave/theme/app_typography.dart';
 import 'package:gunwave/views/game/ui/components/asset_button_component.dart';
 import 'package:gunwave/views/game/ui/components/asset_panel_component.dart';
 import 'package:gunwave/views/rpg_ui/rpg_menu_models.dart';
@@ -42,13 +43,16 @@ class StageBriefingScene extends RpgMenuScene {
     _panel = addPanel(Vector2.all(1));
     _stageTitle = addText(
       stage == null ? labels.loading : labels.stageNumber(stage.order),
-      scale: 0.82,
+      fontSize: AppTypography.captionSize,
     );
     _stageName = addText(
       stage == null ? '' : _stageNameFor(stage),
-      scale: 1.15,
+      fontSize: AppTypography.titleSize,
     );
-    _mapName = addText(stage?.mapKey.toUpperCase() ?? '', scale: 0.65);
+    _mapName = addText(
+      stage?.mapKey.toUpperCase() ?? '',
+      fontSize: AppTypography.bodySmallSize,
+    );
     StageRoundModel? bossRound;
     for (final round in stage?.rounds ?? const <StageRoundModel>[]) {
       if (round.isBoss) {
@@ -67,12 +71,12 @@ class StageBriefingScene extends RpgMenuScene {
     }
     _bossName = addText(
       boss == null ? labels.boss : '${labels.boss}: $boss',
-      scale: 0.65,
+      fontSize: AppTypography.bodySmallSize,
     );
-    _rewardsTitle = addText(labels.rewards, scale: 0.76);
+    _rewardsTitle = addText(labels.rewards, fontSize: AppTypography.bodySize);
     _rewardLines = [
       for (final reward in stage?.rewards ?? const <RewardModel>[])
-        addText(_rewardLabel(reward), scale: 0.62),
+        addText(_rewardLabel(reward), fontSize: AppTypography.bodySmallSize),
     ];
     if (stage != null) {
       for (final round in stage.rounds) {
@@ -86,7 +90,7 @@ class StageBriefingScene extends RpgMenuScene {
         );
         final detail = addText(
           round.isBoss ? labels.boss : labels.roundNumber(round.number),
-          scale: 0.52,
+          fontSize: AppTypography.captionSize,
         );
         _roundMarkers.add(_RoundMarker(round, marker, detail));
       }

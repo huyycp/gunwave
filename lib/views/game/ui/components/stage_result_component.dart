@@ -7,6 +7,7 @@ import 'package:flutter/painting.dart' show EdgeInsets;
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_hud_style.dart';
 import 'package:gunwave/data/constants/game/game_ui.dart';
+import 'package:gunwave/theme/app_typography.dart';
 import 'package:gunwave/views/game/ui/bitmap_font.dart';
 import 'package:gunwave/views/game/ui/campaign_ui_labels.dart';
 import 'package:gunwave/views/game/ui/components/asset_button_component.dart';
@@ -206,13 +207,31 @@ class StageResultComponent extends PositionComponent {
         (bounds.left + bounds.right) / 2,
         panelTop + 54 * scale,
       )
-      ..scale.setValues(scale, scale);
+      ..scale.setValues(
+        AppTypography.bitmapScale(
+          AppTypography.titleSize,
+          responsiveScale: scale,
+        ),
+        AppTypography.bitmapScale(
+          AppTypography.titleSize,
+          responsiveScale: scale,
+        ),
+      );
     _progressNote
       ..position.setValues(
         (bounds.left + bounds.right) / 2,
         panelTop + 88 * scale,
       )
-      ..scale.setValues(scale, scale);
+      ..scale.setValues(
+        AppTypography.bitmapScale(
+          AppTypography.bodySmallSize,
+          responsiveScale: scale,
+        ),
+        AppTypography.bitmapScale(
+          AppTypography.bodySmallSize,
+          responsiveScale: scale,
+        ),
+      );
 
     final hasRewards = isSuccess && rewardLines.isNotEmpty;
     _rewardsHeader
@@ -220,14 +239,32 @@ class StageResultComponent extends PositionComponent {
         (bounds.left + bounds.right) / 2,
         panelTop + 112 * scale,
       )
-      ..scale.setValues(scale, scale);
+      ..scale.setValues(
+        AppTypography.bitmapScale(
+          AppTypography.bodySize,
+          responsiveScale: scale,
+        ),
+        AppTypography.bitmapScale(
+          AppTypography.bodySize,
+          responsiveScale: scale,
+        ),
+      );
     for (var index = 0; index < _rewardTexts.length; index++) {
       _rewardTexts[index]
         ..position.setValues(
           (bounds.left + bounds.right) / 2,
           panelTop + (142 + index * 23) * scale,
         )
-        ..scale.setValues(scale, scale);
+        ..scale.setValues(
+          AppTypography.bitmapScale(
+            AppTypography.bodySmallSize,
+            responsiveScale: scale,
+          ),
+          AppTypography.bitmapScale(
+            AppTypography.bodySmallSize,
+            responsiveScale: scale,
+          ),
+        );
     }
 
     final buttonCount = canContinue ? 3 : 2;

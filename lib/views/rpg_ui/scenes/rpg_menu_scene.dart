@@ -7,6 +7,7 @@ import 'package:flame/game.dart';
 import 'package:flame/text.dart';
 import 'package:flutter/foundation.dart' show ValueChanged, VoidCallback;
 import 'package:flutter/painting.dart' show EdgeInsets;
+import 'package:gunwave/theme/app_typography.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_hud_style.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
@@ -121,7 +122,7 @@ abstract class RpgMenuScene extends PositionComponent
 
   TextComponent<SpriteFontRenderer> addText(
     String text, {
-    double scale = 1,
+    double fontSize = AppTypography.bodySize,
     Anchor anchor = Anchor.center,
     Vector2? position,
   }) {
@@ -130,7 +131,7 @@ abstract class RpgMenuScene extends PositionComponent
       textRenderer: font,
       anchor: anchor,
       position: position,
-      scale: Vector2.all(scale),
+      scale: Vector2.all(AppTypography.bitmapScale(fontSize)),
     );
     add(component);
     return component;
@@ -143,6 +144,7 @@ abstract class RpgMenuScene extends PositionComponent
     Vector2? position,
     Anchor anchor = Anchor.center,
     GameButtonSize assetSize = GameButtonSize.medium,
+    double labelFontSize = AppTypography.bodySmallSize,
     bool enabled = true,
   }) async {
     final component = await AssetButtonComponent.load(
@@ -155,6 +157,7 @@ abstract class RpgMenuScene extends PositionComponent
       enabled: enabled,
       label: text,
       labelRenderer: font,
+      labelFontSize: labelFontSize,
       onPressed: onPressed,
     );
     add(component);

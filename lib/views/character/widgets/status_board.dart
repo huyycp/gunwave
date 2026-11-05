@@ -1,13 +1,13 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_color.dart';
 import 'package:gunwave/data/constants/game/game_ui.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/localization/build_context_l10n.dart';
 import 'package:gunwave/repositories/character_repository.dart';
+import 'package:gunwave/theme/app_typography.dart';
 import 'package:gunwave/utils/exception/app_exception.dart';
 import 'package:gunwave/views/game/components/sub_components/app_banner.dart';
 import 'package:gunwave/widgets/base/base_widget.dart';
@@ -77,15 +77,15 @@ class StatusBoardState
       children: [
         Text(
           context.l10n.statusPoint,
-          style: GoogleFonts.pressStart2p(
-            fontSize: 10,
+          style: AppTypography.pixelStyle(
+            fontSize: AppTypography.captionSize,
             color: GameColors.primary,
           ),
         ),
         Text(
           model.character.sp.toString(),
-          style: GoogleFonts.pressStart2p(
-            fontSize: 10,
+          style: AppTypography.pixelStyle(
+            fontSize: AppTypography.captionSize,
             color: GameColors.primary,
           ),
         ),
@@ -106,8 +106,8 @@ class StatusBoardState
         Expanded(
           child: Text(
             label,
-            style: GoogleFonts.pressStart2p(
-              fontSize: 16,
+            style: AppTypography.pixelStyle(
+              fontSize: AppTypography.bodySize,
               color: GameColors.primary,
             ),
           ),
@@ -115,8 +115,8 @@ class StatusBoardState
         Expanded(
           child: Text(
             value.toString(),
-            style: GoogleFonts.pressStart2p(
-              fontSize: 16,
+            style: AppTypography.pixelStyle(
+              fontSize: AppTypography.bodySize,
               color: GameColors.primary,
             ),
           ),
@@ -138,8 +138,8 @@ class StatusBoardState
   Widget _buildHeader() {
     return Text(
       context.l10n.statusBoard,
-      style: GoogleFonts.pressStart2p(
-        fontSize: 20,
+      style: AppTypography.pixelStyle(
+        fontSize: AppTypography.titleSize,
         color: GameColors.primary,
       ),
     );
