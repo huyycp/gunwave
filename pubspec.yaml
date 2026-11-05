@@ -21,7 +21,6 @@ dependencies:
   gradient_borders: ^1.0.1
   intl: ^0.20.2
   shared_preferences: ^2.5.6
-  permission_handler: ^12.0.0+1
   random_avatar: ^0.0.8
   string_validator: ^1.1.0
   flame: ^1.36.0
