@@ -40,6 +40,8 @@ abstract class RpgMenuScene extends PositionComponent
   final ValueChanged<RpgMenuPage> onNavigate;
 
   late final UiBitmapFontRenderer font;
+  late final UiBitmapFontRenderer lightFont;
+  late final RectangleComponent backdrop;
   late final SpriteComponent background;
   late final RectangleComponent shade;
   late final Sprite panelSprite;
@@ -54,12 +56,21 @@ abstract class RpgMenuScene extends PositionComponent
   Future<void> onLoad() async {
     await super.onLoad();
     size = game.size;
-    font = await UiBitmapFont.load(game.images);
+    font = await UiBitmapFont.load(game.images, color: GameMenuStyle.inkColor);
+    lightFont = await UiBitmapFont.load(
+      game.images,
+      color: GameMenuStyle.lightInkColor,
+    );
     final backgroundImage = await game.images.load(
       _cachePath(game.images, GameMaps.forest.imagePath),
     );
     final panelImage = await game.images.load(
       _cachePath(game.images, GameUiAssets.panel.path),
+    );
+    backdrop = RectangleComponent(
+      paint: Paint()..color = GameMenuStyle.backdropColor,
+      priority: -110,
+      anchor: Anchor.topLeft,
     );
     background = SpriteComponent(
       sprite: Sprite(backgroundImage),
@@ -72,7 +83,7 @@ abstract class RpgMenuScene extends PositionComponent
       anchor: Anchor.topLeft,
     );
     panelSprite = Sprite(panelImage);
-    addAll([background, shade]);
+    addAll([backdrop, background, shade]);
     _sceneArtLoaded = true;
     await loadScene();
     _contentLoaded = true;
@@ -92,6 +103,7 @@ abstract class RpgMenuScene extends PositionComponent
       safeAreaInsets: safeAreaInsets,
     );
     if (!_sceneArtLoaded) return;
+    backdrop.size = size;
     final imageSize = background.sprite!.srcSize;
     final scale = math.max(size.x / imageSize.x, size.y / imageSize.y);
     background.size = imageSize;
@@ -122,13 +134,14 @@ abstract class RpgMenuScene extends PositionComponent
 
   TextComponent<SpriteFontRenderer> addText(
     String text, {
-    double fontSize = AppTypography.bodySize,
+    double fontSize = AppTypography.rpgBodySize,
     Anchor anchor = Anchor.center,
     Vector2? position,
+    bool light = false,
   }) {
     final component = TextComponent<SpriteFontRenderer>(
       text: font.sanitize(text),
-      textRenderer: font,
+      textRenderer: light ? lightFont : font,
       anchor: anchor,
       position: position,
       scale: Vector2.all(AppTypography.bitmapScale(fontSize)),
@@ -144,7 +157,7 @@ abstract class RpgMenuScene extends PositionComponent
     Vector2? position,
     Anchor anchor = Anchor.center,
     GameButtonSize assetSize = GameButtonSize.medium,
-    double labelFontSize = AppTypography.bodySmallSize,
+    double labelFontSize = AppTypography.rpgButtonSize,
     bool enabled = true,
   }) async {
     final component = await AssetButtonComponent.load(

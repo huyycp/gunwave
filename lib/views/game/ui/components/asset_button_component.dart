@@ -92,7 +92,10 @@ class AssetButtonComponent extends PositionComponent
     super.size = value;
     final label = _label;
     if (label != null) {
-      label.position.setValues(width / 2, height / 2);
+      label.position.setValues(
+        width / 2,
+        height / 2 + GameHudStyle.buttonLabelOpticalYOffset,
+      );
     }
   }
 
@@ -163,7 +166,10 @@ class AssetButtonComponent extends PositionComponent
       text: value,
       textRenderer: renderer,
       anchor: Anchor.center,
-      position: Vector2(width / 2, height / 2),
+      position: Vector2(
+        width / 2,
+        height / 2 + GameHudStyle.buttonLabelOpticalYOffset,
+      ),
       scale: Vector2.all(AppTypography.bitmapScale(labelFontSize)),
     );
     add(_label!);

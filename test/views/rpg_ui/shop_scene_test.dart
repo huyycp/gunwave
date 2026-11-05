@@ -51,8 +51,8 @@ void main() {
       final scene = activeRpgMenuScene(game) as ShopScene;
       final panel = scene.children.whereType<AssetPanelComponent>().first;
       game.onGameResize(Vector2(640, 360));
-      expect(panel.width, lessThan(640 * 0.9));
-      expect(panel.height, lessThan(360 * 0.9));
+      expect(panel.width, lessThan(640 * 0.96));
+      expect(panel.height, lessThan(360 * 0.94));
       buttons[1].onTapDown(
         TapDownEvent(1, game, TapDownDetails(globalPosition: Offset.zero)),
       );

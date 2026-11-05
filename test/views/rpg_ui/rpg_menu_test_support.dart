@@ -1,5 +1,9 @@
+import 'package:flame/components.dart';
+import 'package:flame/text.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:gunwave/data/constants/game/game_play_mode.dart';
+import 'package:gunwave/data/constants/game/game_hud_style.dart';
 import 'package:gunwave/data/models/campaign_stage_model.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/data/models/monster_model.dart';
@@ -10,6 +14,8 @@ import 'package:gunwave/localization/app_locale_mode.dart';
 import 'package:gunwave/views/rpg_ui/rpg_menu_models.dart';
 import 'package:gunwave/views/rpg_ui/rpg_menu_game.dart';
 import 'package:gunwave/views/rpg_ui/scenes/rpg_menu_scene.dart';
+import 'package:gunwave/views/game/ui/components/asset_button_component.dart';
+import 'package:gunwave/views/game/ui/components/asset_panel_component.dart';
 
 RpgMenuLabels testRpgMenuLabels() => RpgMenuLabels(
   campaign: 'Campaign',
@@ -171,3 +177,48 @@ RpgMenuGame testRpgMenuGame({
 
 RpgMenuScene activeRpgMenuScene(RpgMenuGame game) =>
     game.router.currentRoute.children.whereType<RpgMenuScene>().single;
+
+void expectRpgMenuLayoutWithinViewport(
+  RpgMenuScene scene,
+  Vector2 viewportSize,
+) {
+  final viewport = Rect.fromLTWH(0, 0, viewportSize.x, viewportSize.y);
+  for (final component in scene.children) {
+    if (component is AssetPanelComponent ||
+        component is AssetButtonComponent ||
+        component is TextComponent<SpriteFontRenderer> ||
+        component is SpriteAnimationComponent) {
+      final rect = (component as PositionComponent).toAbsoluteRect();
+      expect(rect.left, greaterThanOrEqualTo(-0.5));
+      expect(rect.top, greaterThanOrEqualTo(-0.5));
+      expect(rect.right, lessThanOrEqualTo(viewport.right + 0.5));
+      expect(rect.bottom, lessThanOrEqualTo(viewport.bottom + 0.5));
+    }
+
+    if (component is TextComponent<SpriteFontRenderer> &&
+        component.text.isNotEmpty) {
+      expect(component.scale.x, greaterThanOrEqualTo(16 / 14));
+      expect(component.textRenderer.paint.colorFilter, isNotNull);
+    }
+
+    if (component is AssetButtonComponent) {
+      final labels = component.children
+          .whereType<TextComponent<SpriteFontRenderer>>();
+      for (final label in labels) {
+        expect(label.position.x, closeTo(component.width / 2, 0.01));
+        expect(
+          label.position.y,
+          closeTo(
+            component.height / 2 + GameHudStyle.buttonLabelOpticalYOffset,
+            0.01,
+          ),
+        );
+        expect(
+          label.width * label.scale.x,
+          lessThanOrEqualTo(component.width - 8),
+        );
+        expect(label.scale.x, greaterThan(18 / 14 - 0.001));
+      }
+    }
+  }
+}

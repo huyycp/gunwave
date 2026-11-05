@@ -50,6 +50,7 @@ void main() {
               second.position.x - second.width / 2,
             ),
           );
+      expectRpgMenuLayoutWithinViewport(hub, Vector2(640, 360));
       for (final button in actionButtons) {
         expect(button.position.x - button.width / 2, greaterThanOrEqualTo(0));
         expect(button.position.x + button.width / 2, lessThanOrEqualTo(640));
@@ -58,10 +59,15 @@ void main() {
       }
       final panels = hub.children.whereType<AssetPanelComponent>().toList();
       expect(panels, hasLength(2));
-      expect(panels.every((panel) => panel.height <= 360 * 0.5), isTrue);
+      expect(panels.every((panel) => panel.height <= 360 * 0.6), isTrue);
+      expect(panels.every((panel) => panel.height >= 360 * 0.55), isTrue);
       expect(
         panels.fold<double>(0, (sum, panel) => sum + panel.width),
-        lessThan(640 * 0.84),
+        greaterThan(640 * 0.84),
+      );
+      expect(
+        panels.fold<double>(0, (sum, panel) => sum + panel.width),
+        lessThan(640 * 0.96),
       );
       for (var index = 1; index < actionButtons.length; index++) {
         final previous = actionButtons[index - 1];

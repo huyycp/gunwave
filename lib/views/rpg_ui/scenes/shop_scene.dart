@@ -31,19 +31,19 @@ class ShopScene extends RpgMenuScene {
   @override
   Future<void> loadScene() async {
     _panel = addPanel(Vector2.all(1));
-    _title = addText(labels.shop, fontSize: AppTypography.titleSize);
+    _title = addText(labels.shop, fontSize: AppTypography.rpgTitleSize);
     _balance = addText(
       '${labels.gold}: ${snapshot.gold}',
-      fontSize: AppTypography.bodySmallSize,
+      fontSize: AppTypography.rpgBodySmallSize,
     );
-    _emptyText = addText(_emptyMessage, fontSize: AppTypography.bodySize);
+    _emptyText = addText(_emptyMessage, fontSize: AppTypography.rpgBodySize);
     final status = snapshot.isLoading
         ? labels.loading
         : snapshot.shopDataUnavailable
         ? labels.shopUnavailable
         : null;
     if (status != null) {
-      _statusText = addText(status, fontSize: AppTypography.captionSize);
+      _statusText = addText(status, fontSize: AppTypography.rpgCaptionSize);
     }
     _backButton = await addButton(
       labels.back,
@@ -56,7 +56,7 @@ class ShopScene extends RpgMenuScene {
       final preview = await loadHeroPreview(character, size: Vector2.all(92));
       final name = addText(
         character.name,
-        fontSize: AppTypography.bodySmallSize,
+        fontSize: AppTypography.rpgBodySmallSize,
       );
       final isOwned = snapshot.ownedHeroes.any(
         (hero) =>
@@ -123,7 +123,7 @@ class ShopScene extends RpgMenuScene {
         ..panel.position = Vector2(cardLeft, cardTop);
       final preview = card.preview;
       if (preview != null) {
-        final previewSize = math.min(72 * scale, cardHeight * 0.36);
+        final previewSize = math.min(80 * scale, cardHeight * 0.36);
         preview
           ..size = Vector2.all(previewSize)
           ..position = Vector2(
@@ -135,9 +135,19 @@ class ShopScene extends RpgMenuScene {
         cardLeft + cardWidth / 2,
         cardTop + cardHeight * 0.52,
       );
-      card.name.scale = Vector2.all(0.5 * scale);
-      final buttonWidth = math.min(142 * scale, cardWidth - 12 * scale);
-      final buttonHeight = math.min(44 * scale, cardHeight * 0.4);
+      final maxNameWidth = cardWidth - 12 * scale;
+      final fittedNameScale = math.min(
+        AppTypography.bitmapScale(AppTypography.rpgBodySmallSize),
+        maxNameWidth / card.name.width,
+      );
+      card.name.scale = Vector2.all(
+        math.max(
+          AppTypography.bitmapScale(AppTypography.rpgCaptionSize),
+          fittedNameScale,
+        ),
+      );
+      final buttonWidth = math.min(150 * scale, cardWidth - 12 * scale);
+      final buttonHeight = math.min(50 * scale, cardHeight * 0.42);
       card.button
         ..size = Vector2(buttonWidth, buttonHeight)
         ..position = Vector2(

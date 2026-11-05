@@ -10,6 +10,9 @@ abstract final class GameHudStyle {
   static const progressBarBorderInset = buttonBorderInset;
   static const progressBarInset = buttonBorderInset - 4.0;
   static const minimumTouchSize = 48.0;
+  // The Tiny Swords button's lower shadow puts its optical center above its
+  // geometric center.
+  static const buttonLabelOpticalYOffset = -5.0;
   static const uiFontScale = 1.0;
   static const playerPanelMaxWidth = 320.0;
   static const healthHeight = 20.0;

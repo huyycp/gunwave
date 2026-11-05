@@ -33,35 +33,40 @@ class CampaignMapScene extends RpgMenuScene {
   @override
   Future<void> loadScene() async {
     _headerPanel = addPanel(Vector2.all(1));
-    _title = addText(labels.campaign, fontSize: AppTypography.titleSize);
+    _title = addText(labels.campaign, fontSize: AppTypography.rpgTitleSize);
     _backButton = await addButton(
       labels.back,
       actions.onBack,
       buttonSize: Vector2(150, 58),
       anchor: Anchor.topLeft,
     );
-    _emptyText = addText(labels.loading, fontSize: AppTypography.bodySize);
+    _emptyText = addText(
+      labels.loading,
+      fontSize: AppTypography.rpgBodySize,
+      light: true,
+    );
 
     for (final stage in snapshot.stages) {
+      final labelPanel = addPanel(Vector2.all(1));
       final button = await addButton(
         '${stage.order}',
         () {
           actions.onSelectStage(stage.id);
           onNavigate(RpgMenuPage.stageBriefing);
         },
-        buttonSize: Vector2(76, 76),
+        buttonSize: Vector2(92, 92),
         assetSize: GameButtonSize.large,
         enabled: snapshot.isStageUnlocked(stage),
       );
       final title = addText(
         labels.stageNumber(stage.order),
-        fontSize: AppTypography.bodySmallSize,
+        fontSize: AppTypography.rpgBodySmallSize,
       );
       final status = addText(
         _stageStatus(stage),
-        fontSize: AppTypography.captionSize,
+        fontSize: AppTypography.rpgCaptionSize,
       );
-      _nodes.add(_StageNode(stage, button, title, status));
+      _nodes.add(_StageNode(stage, button, title, status, labelPanel));
     }
     if (_nodes.length > 1) {
       final image = await game.images.load(GameUiAssets.stageRoutePointer.path);
@@ -88,8 +93,8 @@ class CampaignMapScene extends RpgMenuScene {
     final bounds = contentBounds;
     final scale = uiScale;
     final headerWidth = math.min(
-      bounds.width - GameHudStyle.edge * 4,
-      640 * scale,
+      bounds.width - GameHudStyle.edge * 2,
+      1200 * scale,
     );
     _headerPanel
       ..size = Vector2(headerWidth, 72 * scale)
@@ -102,21 +107,28 @@ class CampaignMapScene extends RpgMenuScene {
       ..size = Vector2(150 * scale, 58 * scale)
       ..position = Vector2(bounds.left + 12 * scale, bounds.top + 12 * scale);
     final nodeCount = _nodes.length;
-    final usableWidth = math.max(0.0, bounds.width - 120 * scale);
+    final labelWidth = math.min(
+      nodeCount > 1
+          ? math.min(
+              148 * scale,
+              (bounds.width - 136 * scale) / (nodeCount - 1) * 0.92,
+            )
+          : 180 * scale,
+      bounds.width * 0.35,
+    );
+    final horizontalInset = math.max(68 * scale, labelWidth / 2 + 8 * scale);
+    final usableWidth = math.max(0.0, bounds.width - horizontalInset * 2);
     for (var index = 0; index < nodeCount; index++) {
       final node = _nodes[index];
-      final point = _stagePosition(
-        index,
-        nodeCount,
-        bounds,
-        usableWidth,
-        scale,
-      );
+      final point = _stagePosition(index, nodeCount, bounds, usableWidth);
       node.button
-        ..size = Vector2(76 * scale, 76 * scale)
+        ..size = Vector2(92 * scale, 92 * scale)
         ..position = point;
-      node.title.position = Vector2(point.x, point.y + 58 * scale);
-      node.status.position = Vector2(point.x, point.y + 84 * scale);
+      node.labelPanel
+        ..size = Vector2(labelWidth, 56 * scale)
+        ..position = Vector2(point.x - labelWidth / 2, point.y + 56 * scale);
+      node.title.position = Vector2(point.x, point.y + 72 * scale);
+      node.status.position = Vector2(point.x, point.y + 102 * scale);
     }
     for (final connection in _connections) {
       final start = _stagePosition(
@@ -124,14 +136,12 @@ class CampaignMapScene extends RpgMenuScene {
         nodeCount,
         bounds,
         usableWidth,
-        scale,
       );
       final end = _stagePosition(
         connection.startIndex + 1,
         nodeCount,
         bounds,
         usableWidth,
-        scale,
       );
       connection.component
         ..position = (start + end) / 2
@@ -145,11 +155,11 @@ class CampaignMapScene extends RpgMenuScene {
     int count,
     Rect bounds,
     double usableWidth,
-    double scale,
   ) {
+    final inset = (bounds.width - usableWidth) / 2;
     final x = count == 1
         ? bounds.center.dx
-        : bounds.left + 60 * scale + usableWidth * index / (count - 1);
+        : bounds.left + inset + usableWidth * index / (count - 1);
     final sway = index.isEven ? -0.12 : 0.12;
     return Vector2(x, bounds.center.dy + bounds.height * sway);
   }
@@ -162,12 +172,19 @@ class CampaignMapScene extends RpgMenuScene {
 }
 
 class _StageNode {
-  const _StageNode(this.stage, this.button, this.title, this.status);
+  const _StageNode(
+    this.stage,
+    this.button,
+    this.title,
+    this.status,
+    this.labelPanel,
+  );
 
   final CampaignStageModel stage;
   final AssetButtonComponent button;
   final TextComponent<SpriteFontRenderer> title;
   final TextComponent<SpriteFontRenderer> status;
+  final AssetPanelComponent labelPanel;
 }
 
 class _StageConnection {

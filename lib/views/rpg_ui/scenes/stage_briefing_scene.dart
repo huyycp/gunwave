@@ -43,15 +43,15 @@ class StageBriefingScene extends RpgMenuScene {
     _panel = addPanel(Vector2.all(1));
     _stageTitle = addText(
       stage == null ? labels.loading : labels.stageNumber(stage.order),
-      fontSize: AppTypography.captionSize,
+      fontSize: AppTypography.rpgCaptionSize,
     );
     _stageName = addText(
       stage == null ? '' : _stageNameFor(stage),
-      fontSize: AppTypography.titleSize,
+      fontSize: AppTypography.rpgTitleSize,
     );
     _mapName = addText(
       stage?.mapKey.toUpperCase() ?? '',
-      fontSize: AppTypography.bodySmallSize,
+      fontSize: AppTypography.rpgBodySmallSize,
     );
     StageRoundModel? bossRound;
     for (final round in stage?.rounds ?? const <StageRoundModel>[]) {
@@ -71,12 +71,15 @@ class StageBriefingScene extends RpgMenuScene {
     }
     _bossName = addText(
       boss == null ? labels.boss : '${labels.boss}: $boss',
-      fontSize: AppTypography.bodySmallSize,
+      fontSize: AppTypography.rpgBodySmallSize,
     );
-    _rewardsTitle = addText(labels.rewards, fontSize: AppTypography.bodySize);
+    _rewardsTitle = addText(
+      labels.rewards,
+      fontSize: AppTypography.rpgBodySize,
+    );
     _rewardLines = [
       for (final reward in stage?.rewards ?? const <RewardModel>[])
-        addText(_rewardLabel(reward), fontSize: AppTypography.bodySmallSize),
+        addText(_rewardLabel(reward), fontSize: AppTypography.rpgBodySmallSize),
     ];
     if (stage != null) {
       for (final round in stage.rounds) {
@@ -90,7 +93,7 @@ class StageBriefingScene extends RpgMenuScene {
         );
         final detail = addText(
           round.isBoss ? labels.boss : labels.roundNumber(round.number),
-          fontSize: AppTypography.captionSize,
+          fontSize: AppTypography.rpgCaptionSize,
         );
         _roundMarkers.add(_RoundMarker(round, marker, detail));
       }
@@ -133,7 +136,7 @@ class StageBriefingScene extends RpgMenuScene {
     final markersTop = top + panelHeight * 0.43;
     final markerCount = _roundMarkers.length;
     final markerGap = math.min(46 * scale, panelWidth * 0.08);
-    final markerSize = math.min(68 * scale, 76 * scale);
+    final markerSize = 76 * scale;
     final rowWidth = markerCount == 0
         ? 0.0
         : markerCount * markerSize + (markerCount - 1) * markerGap;

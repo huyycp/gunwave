@@ -1,9 +1,11 @@
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flame/text.dart';
 import 'package:flame_test/flame_test.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
+import 'package:gunwave/data/constants/game/game_hud_style.dart';
 import 'package:gunwave/views/game/ui/bitmap_font.dart';
 import 'package:gunwave/views/game/ui/components/asset_button_component.dart';
 
@@ -24,9 +26,17 @@ void main() {
       onPressed: () => activations++,
     );
     await game.ensureAdd(button);
+    final label = button.children
+        .whereType<TextComponent<SpriteFontRenderer>>()
+        .single;
 
     expect(button.size.x, 36);
     expect(button.size.y, 30);
+    expect(label.position.x, button.width / 2);
+    expect(
+      label.position.y,
+      button.height / 2 + GameHudStyle.buttonLabelOpticalYOffset,
+    );
     expect(button.containsLocalPoint(Vector2(-6, 15)), isTrue);
     expect(button.containsLocalPoint(Vector2(42, 15)), isFalse);
     expect(button.visualState, GameButtonState.enabled);
@@ -52,6 +62,11 @@ void main() {
 
     button.size = Vector2(96, 44);
     expect(button.label, 'PLAY');
+    expect(label.position.x, button.width / 2);
+    expect(
+      label.position.y,
+      button.height / 2 + GameHudStyle.buttonLabelOpticalYOffset,
+    );
     expect(button.containsLocalPoint(Vector2(95, 22)), isTrue);
 
     button.enabled = false;

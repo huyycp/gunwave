@@ -12,6 +12,14 @@ abstract final class AppTypography {
   static const double titleSize = 24;
   static const double displaySize = 32;
 
+  // RPG menus use larger bitmap sizes than supporting app and HUD labels.
+  static const double rpgCaptionSize = 16;
+  static const double rpgBodySmallSize = 18;
+  static const double rpgBodySize = 20;
+  static const double rpgBodyLargeSize = 22;
+  static const double rpgTitleSize = 28;
+  static const double rpgButtonSize = 18;
+
   static const double bitmapFontBaseSize = 14;
   static const double minimumBitmapFontSize = captionSize;
 
