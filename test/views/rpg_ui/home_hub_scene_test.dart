@@ -59,8 +59,8 @@ void main() {
       }
       final panels = hub.children.whereType<AssetPanelComponent>().toList();
       expect(panels, hasLength(2));
-      expect(panels.every((panel) => panel.height <= 360 * 0.6), isTrue);
-      expect(panels.every((panel) => panel.height >= 360 * 0.55), isTrue);
+      expect(panels.every((panel) => panel.height <= 360 * 0.76), isTrue);
+      expect(panels.every((panel) => panel.height >= 360 * 0.72), isTrue);
       expect(
         panels.fold<double>(0, (sum, panel) => sum + panel.width),
         greaterThan(640 * 0.84),

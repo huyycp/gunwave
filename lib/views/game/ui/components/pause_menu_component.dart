@@ -178,10 +178,10 @@ class PauseMenuComponent extends PositionComponent {
     final buttonHeight = 60 * scale;
     final buttonY = panelTop + panelHeight - buttonHeight - 24 * scale;
     _resumeButton
-      ..size.setValues(buttonWidth, buttonHeight)
+      ..size = Vector2(buttonWidth, buttonHeight)
       ..position.setValues(panelLeft + 18 * scale, buttonY);
     _exitButton
-      ..size.setValues(buttonWidth, buttonHeight)
+      ..size = Vector2(buttonWidth, buttonHeight)
       ..position.setValues(
         panelLeft + panelWidth - buttonWidth - 18 * scale,
         buttonY,

@@ -10,7 +10,9 @@ import 'package:gunwave/views/game/ui/components/asset_panel_component.dart';
 import 'package:gunwave/views/rpg_ui/rpg_menu_models.dart';
 import 'package:gunwave/views/rpg_ui/scenes/hero_loadout_scene.dart';
 import 'package:gunwave/views/rpg_ui/scenes/home_hub_scene.dart';
+import 'package:gunwave/views/rpg_ui/scenes/settings_scene.dart';
 import 'package:gunwave/views/rpg_ui/scenes/shop_scene.dart';
+import 'package:gunwave/views/rpg_ui/scenes/stage_briefing_scene.dart';
 
 import 'rpg_menu_test_support.dart';
 
@@ -66,6 +68,7 @@ void main() {
             .single;
         double? previousTitleScale;
         double? previousButtonLabelScale;
+        double? initialButtonLabelScale;
         for (final viewport in [
           Vector2(640, 360),
           Vector2(844, 390),
@@ -77,12 +80,23 @@ void main() {
           expectRpgMenuLayoutWithinViewport(scene, viewport);
           if (previousTitleScale != null) {
             expect(title.scale.x, greaterThan(previousTitleScale));
-            expect(buttonLabel.scale.x, greaterThan(previousButtonLabelScale!));
+            expect(
+              buttonLabel.scale.x,
+              greaterThanOrEqualTo(previousButtonLabelScale!),
+            );
           }
+          initialButtonLabelScale ??= buttonLabel.scale.x;
           previousTitleScale = title.scale.x;
           previousButtonLabelScale = buttonLabel.scale.x;
           if (scene is HomeHubScene) {
             _expectHomeHubArtAndHeaderFit(scene);
+          }
+          if (scene is StageBriefingScene || scene is SettingsScene) {
+            expect(
+              scene.children.whereType<AssetPanelComponent>().first.height /
+                  scene.size.y,
+              greaterThanOrEqualTo(0.90),
+            );
           }
           if (scene is HeroLoadoutScene) {
             _expectLoadoutHeroUsesItsPanel(scene);
@@ -92,6 +106,7 @@ void main() {
             _expectShopCardContentIsReadable(scene);
           }
         }
+        expect(buttonLabel.scale.x, greaterThan(initialButtonLabelScale!));
       },
     );
   }
@@ -105,7 +120,8 @@ void _expectHomeHubArtAndHeaderFit(HomeHubScene scene) {
   final previewBounds = preview.toAbsoluteRect();
   expect(heroPanelBounds.contains(previewBounds.topLeft), isTrue);
   expect(heroPanelBounds.contains(previewBounds.bottomRight), isTrue);
-  expect(preview.height / heroPanelBounds.height, greaterThanOrEqualTo(0.80));
+  expect(heroPanelBounds.height / scene.size.y, greaterThanOrEqualTo(0.72));
+  expect(preview.height / heroPanelBounds.height, greaterThanOrEqualTo(0.82));
 
   final text = scene.children.whereType<TextComponent<SpriteFontRenderer>>();
   Rect textBounds(String value) =>

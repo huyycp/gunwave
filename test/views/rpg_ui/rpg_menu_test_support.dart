@@ -184,6 +184,11 @@ void expectRpgMenuLayoutWithinViewport(
   Vector2 viewportSize,
 ) {
   final viewport = Rect.fromLTWH(0, 0, viewportSize.x, viewportSize.y);
+  final backgroundBounds = scene.background.toAbsoluteRect();
+  expect(backgroundBounds.left, lessThanOrEqualTo(viewport.left));
+  expect(backgroundBounds.top, lessThanOrEqualTo(viewport.top));
+  expect(backgroundBounds.right, greaterThanOrEqualTo(viewport.right));
+  expect(backgroundBounds.bottom, greaterThanOrEqualTo(viewport.bottom));
   for (final component in scene.children) {
     if (component is AssetPanelComponent ||
         component is AssetButtonComponent ||
@@ -216,7 +221,10 @@ void expectRpgMenuLayoutWithinViewport(
         expect(
           label.position.y,
           closeTo(
-            component.height / 2 + GameHudStyle.buttonLabelOpticalYOffset,
+            component.height / 2 +
+                GameHudStyle.buttonLabelOpticalOffsetForHeight(
+                  component.height,
+                ),
             0.01,
           ),
         );

@@ -63,7 +63,7 @@ void main() {
         abilityLabel.scale.x,
         closeTo(
           AppTypography.bitmapScale(
-            AppTypography.labelLargeSize,
+            abilityButton.labelFontSize,
             responsiveScale: abilityButton.responsiveTextScale,
           ),
           0.001,

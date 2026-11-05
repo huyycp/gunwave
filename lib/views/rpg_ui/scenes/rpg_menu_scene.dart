@@ -110,7 +110,9 @@ abstract class RpgMenuScene extends PositionComponent
     if (!_sceneArtLoaded) return;
     backdrop.size = size;
     final imageSize = background.sprite!.srcSize;
-    final scale = math.max(size.x / imageSize.x, size.y / imageSize.y);
+    final scale =
+        math.max(size.x / imageSize.x, size.y / imageSize.y) *
+        GameMenuStyle.backgroundZoomScale;
     background.size = imageSize;
     background.scale = Vector2.all(scale);
     background.position = Vector2(
@@ -168,7 +170,7 @@ abstract class RpgMenuScene extends PositionComponent
     Vector2? position,
     Anchor anchor = Anchor.center,
     GameButtonSize assetSize = GameButtonSize.medium,
-    double labelFontSize = AppTypography.labelLargeSize,
+    double? labelFontSize,
     bool enabled = true,
   }) async {
     final component = await AssetButtonComponent.load(

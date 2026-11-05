@@ -6,6 +6,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
 import 'package:gunwave/data/constants/game/game_hud_style.dart';
+import 'package:gunwave/theme/app_typography.dart';
 import 'package:gunwave/views/game/ui/bitmap_font.dart';
 import 'package:gunwave/views/game/ui/components/asset_button_component.dart';
 
@@ -35,7 +36,11 @@ void main() {
     expect(label.position.x, button.width / 2);
     expect(
       label.position.y,
-      button.height / 2 + GameHudStyle.buttonLabelOpticalYOffset,
+      closeTo(
+        button.height / 2 +
+            GameHudStyle.buttonLabelOpticalOffsetForHeight(button.height),
+        0.001,
+      ),
     );
     expect(button.containsLocalPoint(Vector2(-6, 15)), isTrue);
     expect(button.containsLocalPoint(Vector2(42, 15)), isFalse);
@@ -65,7 +70,11 @@ void main() {
     expect(label.position.x, button.width / 2);
     expect(
       label.position.y,
-      button.height / 2 + GameHudStyle.buttonLabelOpticalYOffset,
+      closeTo(
+        button.height / 2 +
+            GameHudStyle.buttonLabelOpticalOffsetForHeight(button.height),
+        0.001,
+      ),
     );
     expect(button.containsLocalPoint(Vector2(95, 22)), isTrue);
 
@@ -85,5 +94,60 @@ void main() {
       ),
     );
     expect(activations, 1);
+  });
+
+  testWithFlameGame('button label role follows its visible button height', (
+    game,
+  ) async {
+    final font = await UiBitmapFont.load(game.images);
+    final compact = await AssetButtonComponent.load(
+      game.images,
+      buttonSize: GameButtonSize.small,
+      size: Vector2(72, 48),
+      label: 'OK',
+      labelRenderer: font,
+    );
+    final standard = await AssetButtonComponent.load(
+      game.images,
+      buttonSize: GameButtonSize.medium,
+      size: Vector2(180, 56),
+      label: 'Settings',
+      labelRenderer: font,
+    );
+    final prominent = await AssetButtonComponent.load(
+      game.images,
+      buttonSize: GameButtonSize.large,
+      size: Vector2(220, 68),
+      label: 'Continue',
+      labelRenderer: font,
+    );
+    await game.ensureAdd(compact);
+    await game.ensureAdd(standard);
+    await game.ensureAdd(prominent);
+
+    expect(compact.labelFontSize, 12);
+    expect(standard.labelFontSize, 14);
+    expect(prominent.labelFontSize, 16);
+
+    final prominentLabel = prominent.children
+        .whereType<TextComponent<SpriteFontRenderer>>()
+        .single;
+    expect(
+      prominentLabel.width * prominentLabel.scale.x,
+      lessThanOrEqualTo(
+        prominent.width - GameHudStyle.buttonLabelHorizontalInset * 2,
+      ),
+    );
+
+    standard.size = Vector2(180, 64);
+    expect(standard.labelFontSize, 16);
+    standard.responsiveTextScale = 0.85;
+    final standardLabel = standard.children
+        .whereType<TextComponent<SpriteFontRenderer>>()
+        .single;
+    expect(
+      standardLabel.scale.x,
+      closeTo(AppTypography.titleMediumSize * 0.85 / 14, 0.001),
+    );
   });
 }

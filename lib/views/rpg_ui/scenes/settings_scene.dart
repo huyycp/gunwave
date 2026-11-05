@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flame/components.dart';
 import 'package:flame/text.dart';
 import 'package:gunwave/data/constants/game/game_hud_style.dart';
+import 'package:gunwave/data/constants/game/game_menu_style.dart';
 import 'package:gunwave/data/constants/game/game_play_mode.dart';
 import 'package:gunwave/localization/app_locale_mode.dart';
 import 'package:gunwave/theme/app_typography.dart';
@@ -88,7 +89,7 @@ class SettingsScene extends RpgMenuScene {
     );
     final panelHeight = math.min(
       bounds.height - GameHudStyle.edge * 4,
-      700 * scale,
+      GameMenuStyle.settingsMaxHeight * scale,
     );
     final left = bounds.center.dx - panelWidth / 2;
     final top = bounds.center.dy - panelHeight / 2;

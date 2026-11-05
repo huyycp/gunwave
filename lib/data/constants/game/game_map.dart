@@ -4,7 +4,7 @@ class GameMaps {
   const GameMaps._(this.name, this.path, this.imagePath);
 
   final String name;
-  
+
   /// Path to tmx
   final String path;
 
@@ -14,13 +14,18 @@ class GameMaps {
   static const className = 'maps';
   static const basePath = Assets.tiles;
 
-  static final values = [
-    forest,
-    rockland,
-  ];
+  static final values = [forest, rockland];
 
-  static final forest = GameMaps._('forest', basePath.forestTmx, basePath.forestBrief.path);
-  static final rockland = GameMaps._('rockland', basePath.rocklandTmx, basePath.rocklandBrief.path);
+  static final forest = GameMaps._(
+    'forest',
+    basePath.forestTmx,
+    basePath.forestPng.path,
+  );
+  static final rockland = GameMaps._(
+    'rockland',
+    basePath.rocklandTmx,
+    basePath.rocklandBrief.path,
+  );
   static final loading = GameMaps._('loading', basePath.loading, '');
   static final background = GameMaps._('background', basePath.background, '');
 }

@@ -24,7 +24,7 @@ class AssetButtonComponent extends PositionComponent
     bool enabled = true,
     String label = '',
     this.labelRenderer,
-    this.labelFontSize = AppTypography.labelLargeSize,
+    double? labelFontSize,
     this.onPressed,
     NineSliceBorders borders = const NineSliceBorders(
       left: GameHudStyle.buttonBorderInset,
@@ -43,6 +43,7 @@ class AssetButtonComponent extends PositionComponent
            ? null
            : _nineSlice(disabledSprite, borders),
        _hitAreaSize = _minimumHitArea(hitAreaSize ?? Vector2.zero()),
+       _labelFontSizeOverride = labelFontSize,
        _buttonState = enabled
            ? GameButtonState.enabled
            : GameButtonState.disabled,
@@ -55,8 +56,8 @@ class AssetButtonComponent extends PositionComponent
   final NineTileBox _pressed;
   final NineTileBox? _disabled;
   final Vector2 _hitAreaSize;
+  final double? _labelFontSizeOverride;
   final SpriteFontRenderer? labelRenderer;
-  final double labelFontSize;
   final void Function()? onPressed;
   double _responsiveTextScale = 1;
 
@@ -66,6 +67,9 @@ class AssetButtonComponent extends PositionComponent
   TextComponent<SpriteFontRenderer>? _label;
 
   bool get enabled => _buttonState != GameButtonState.disabled;
+
+  double get labelFontSize =>
+      _labelFontSizeOverride ?? _labelSizeForHeight(height);
 
   set enabled(bool value) {
     _buttonState = value ? GameButtonState.enabled : GameButtonState.disabled;
@@ -83,11 +87,7 @@ class AssetButtonComponent extends PositionComponent
 
   set responsiveTextScale(double value) {
     _responsiveTextScale = value;
-    final labelScale = AppTypography.bitmapScale(
-      labelFontSize,
-      responsiveScale: value,
-    );
-    _label?.scale.setValues(labelScale, labelScale);
+    _updateLabelScale();
   }
 
   /// Returns the drawn sprite state; the caller may resize [size] freely.
@@ -106,8 +106,9 @@ class AssetButtonComponent extends PositionComponent
     if (label != null) {
       label.position.setValues(
         width / 2,
-        height / 2 + GameHudStyle.buttonLabelOpticalYOffset,
+        height / 2 + GameHudStyle.buttonLabelOpticalOffsetForHeight(height),
       );
+      _updateLabelScale();
     }
   }
 
@@ -165,6 +166,7 @@ class AssetButtonComponent extends PositionComponent
     final currentLabel = _label;
     if (currentLabel != null) {
       currentLabel.text = value;
+      _updateLabelScale();
       return;
     }
     if (value.isEmpty) return;
@@ -180,16 +182,42 @@ class AssetButtonComponent extends PositionComponent
       anchor: Anchor.center,
       position: Vector2(
         width / 2,
-        height / 2 + GameHudStyle.buttonLabelOpticalYOffset,
-      ),
-      scale: Vector2.all(
-        AppTypography.bitmapScale(
-          labelFontSize,
-          responsiveScale: _responsiveTextScale,
-        ),
+        height / 2 + GameHudStyle.buttonLabelOpticalOffsetForHeight(height),
       ),
     );
     add(_label!);
+    _updateLabelScale();
+  }
+
+  void _updateLabelScale() {
+    final label = _label;
+    if (label == null) return;
+
+    final preferredScale = AppTypography.bitmapScale(
+      labelFontSize,
+      responsiveScale: _responsiveTextScale,
+    );
+    const minimumScale =
+        AppTypography.minimumBitmapFontSize / AppTypography.bitmapFontBaseSize;
+    final availableWidth = math.max(
+      0,
+      width - GameHudStyle.buttonLabelHorizontalInset * 2,
+    );
+    final fittedScale = label.width == 0
+        ? preferredScale
+        : availableWidth / label.width;
+    final scale = math.max(minimumScale, math.min(preferredScale, fittedScale));
+    label.scale.setValues(scale, scale);
+  }
+
+  static double _labelSizeForHeight(double height) {
+    if (height <= GameHudStyle.compactButtonLabelMaxHeight) {
+      return AppTypography.labelMediumSize;
+    }
+    if (height >= GameHudStyle.prominentButtonLabelMinHeight) {
+      return AppTypography.titleMediumSize;
+    }
+    return AppTypography.labelLargeSize;
   }
 
   static NineTileBox _nineSlice(Sprite sprite, NineSliceBorders borders) =>
@@ -217,7 +245,7 @@ class AssetButtonComponent extends PositionComponent
     bool enabled = true,
     String label = '',
     SpriteFontRenderer? labelRenderer,
-    double labelFontSize = AppTypography.labelLargeSize,
+    double? labelFontSize,
     double responsiveTextScale = 1,
     void Function()? onPressed,
   }) async {

@@ -362,7 +362,7 @@ class CombatHudComponent extends PositionComponent {
         ),
       );
     _pauseButton
-      ..size.setValues(_pauseButtonSize * scale, _pauseButtonSize * scale)
+      ..size = Vector2(_pauseButtonSize * scale, _pauseButtonSize * scale)
       ..position.setValues(
         right - _pauseButtonSize * scale - 7 * scale,
         top + 8 * scale,
@@ -432,7 +432,7 @@ class CombatHudComponent extends PositionComponent {
             scale -
         abilityHeight;
     _abilityButton
-      ..size.setValues(abilityWidth, abilityHeight)
+      ..size = Vector2(abilityWidth, abilityHeight)
       ..position.setValues(abilityX, abilityY);
     _abilityStatus
       ..position.setValues(abilityX + abilityWidth / 2, abilityY - 4 * scale)

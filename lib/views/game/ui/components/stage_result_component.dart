@@ -283,13 +283,13 @@ class StageResultComponent extends PositionComponent {
     final firstButtonX = (bounds.left + bounds.right - groupWidth) / 2;
     final buttonY = panelTop + panelHeight - buttonHeight - 24 * scale;
     _retryButton
-      ..size.setValues(buttonWidth, buttonHeight)
+      ..size = Vector2(buttonWidth, buttonHeight)
       ..position.setValues(firstButtonX, buttonY);
     _continueButton
-      ..size.setValues(buttonWidth, buttonHeight)
+      ..size = Vector2(buttonWidth, buttonHeight)
       ..position.setValues(firstButtonX + buttonWidth + gap, buttonY);
     _campaignButton
-      ..size.setValues(buttonWidth, buttonHeight)
+      ..size = Vector2(buttonWidth, buttonHeight)
       ..position.setValues(
         firstButtonX + (buttonWidth + gap) * (buttonCount - 1),
         buttonY,
