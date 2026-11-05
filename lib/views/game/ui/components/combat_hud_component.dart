@@ -105,9 +105,11 @@ class CombatHudComponent extends PositionComponent {
   static const double _noticePanelWidth = 320;
   static const double _noticePanelHeight = 54;
   static const double _noticeDurationSeconds = 4;
-  static const double _abilityButtonWidth = 96;
-  static const double _abilityButtonHeight = 58;
-  static const double _pauseButtonSize = 48;
+  static const double _abilityButtonWidth = 120;
+  static const double _abilityButtonHeight = 68;
+  static const double _abilityStatusGap = 4;
+  static const double _bossPanelGap = 5;
+  static const double _pauseButtonSize = 56;
 
   final CampaignUiLabels _labels;
   final EdgeInsets _safeAreaInsets;
@@ -317,8 +319,27 @@ class CombatHudComponent extends PositionComponent {
         _roundPanelWidth +
         GameHudStyle.gap +
         GameHudStyle.edge * 2;
+    const requiredHeight =
+        GameHudStyle.edge +
+        _healthPanelHeight +
+        _bossPanelGap +
+        _bossPanelHeight +
+        GameHudStyle.touchControlGap +
+        _abilityButtonHeight +
+        _abilityStatusGap +
+        AppTypography.labelLargeSize;
     final widthScale = bounds.width / requiredWidth;
-    final scale = math.min(layout.scale, widthScale);
+    final heightScale =
+        math.max(
+          0,
+          bounds.height - GameHudStyle.touchEdge - GameHudStyle.touchAttackSize,
+        ) /
+        requiredHeight;
+    final preferredScale = math.max(
+      layout.scale,
+      GameHudStyle.minimumGameplayUiScale,
+    );
+    final scale = math.min(preferredScale, math.min(widthScale, heightScale));
     _pauseButton.responsiveTextScale = scale;
     _abilityButton.responsiveTextScale = scale;
     final edge = GameHudStyle.edge * scale;
@@ -333,11 +354,11 @@ class CombatHudComponent extends PositionComponent {
       ..position.setValues(left + 12 * scale, top + 8 * scale)
       ..scale.setValues(
         AppTypography.bitmapScale(
-          AppTypography.bodyMediumSize,
+          AppTypography.bodyLargeSize,
           responsiveScale: scale,
         ),
         AppTypography.bitmapScale(
-          AppTypography.bodyMediumSize,
+          AppTypography.bodyLargeSize,
           responsiveScale: scale,
         ),
       );
@@ -353,11 +374,11 @@ class CombatHudComponent extends PositionComponent {
       ..position.setValues(right - roundWidth + 12 * scale, top + 22 * scale)
       ..scale.setValues(
         AppTypography.bitmapScale(
-          AppTypography.bodyMediumSize,
+          AppTypography.bodyLargeSize,
           responsiveScale: scale,
         ),
         AppTypography.bitmapScale(
-          AppTypography.bodyMediumSize,
+          AppTypography.bodyLargeSize,
           responsiveScale: scale,
         ),
       );
@@ -369,29 +390,30 @@ class CombatHudComponent extends PositionComponent {
       );
 
     final bossWidth = _bossPanelWidth * scale;
-    final bossTop = top + _healthPanelHeight * scale + 5 * scale;
+    final bossTop = top + _healthPanelHeight * scale + _bossPanelGap * scale;
+    final safeCenterX = (bounds.left + bounds.right) / 2;
     _bossPanel
       ..size.setValues(bossWidth, _bossPanelHeight * scale)
-      ..position.setValues((gameSize.x - bossWidth) / 2, bossTop);
+      ..position.setValues(safeCenterX - bossWidth / 2, bossTop);
     _bossText
       ..position.setValues(
-        (gameSize.x - bossWidth) / 2 + 12 * scale,
+        safeCenterX - bossWidth / 2 + 12 * scale,
         bossTop + 5 * scale,
       )
       ..scale.setValues(
         AppTypography.bitmapScale(
-          AppTypography.bodyMediumSize,
+          AppTypography.bodyLargeSize,
           responsiveScale: scale,
         ),
         AppTypography.bitmapScale(
-          AppTypography.bodyMediumSize,
+          AppTypography.bodyLargeSize,
           responsiveScale: scale,
         ),
       );
     _bossBar
       ..size.setValues((_bossPanelWidth - 28) * scale, 17 * scale)
       ..position.setValues(
-        (gameSize.x - bossWidth) / 2 + 14 * scale,
+        safeCenterX - bossWidth / 2 + 14 * scale,
         bossTop + 31 * scale,
       );
 
@@ -400,7 +422,7 @@ class CombatHudComponent extends PositionComponent {
       bounds.width - edge * 2,
     );
     final noticeLeft = (bounds.left + bounds.right - noticeWidth) / 2;
-    final noticeTop = top + _healthPanelHeight * scale + 5 * scale;
+    final noticeTop = top + _healthPanelHeight * scale + _bossPanelGap * scale;
     _noticePanel
       ..size.setValues(noticeWidth, _noticePanelHeight * scale)
       ..position.setValues(noticeLeft, noticeTop);
@@ -422,27 +444,28 @@ class CombatHudComponent extends PositionComponent {
 
     final abilityWidth = _abilityButtonWidth * scale;
     final abilityHeight = _abilityButtonHeight * scale;
-    final abilityX =
-        bounds.right - GameHudStyle.touchEdge * scale - abilityWidth;
+    final abilityX = bounds.right - GameHudStyle.touchEdge - abilityWidth;
     final abilityY =
         bounds.bottom -
-        (GameHudStyle.touchEdge +
-                GameHudStyle.touchAttackSize +
-                GameHudStyle.touchControlGap) *
-            scale -
+        GameHudStyle.touchEdge -
+        GameHudStyle.touchAttackSize -
+        GameHudStyle.touchControlGap * scale -
         abilityHeight;
     _abilityButton
       ..size = Vector2(abilityWidth, abilityHeight)
       ..position.setValues(abilityX, abilityY);
     _abilityStatus
-      ..position.setValues(abilityX + abilityWidth / 2, abilityY - 4 * scale)
+      ..position.setValues(
+        abilityX + abilityWidth / 2,
+        abilityY - _abilityStatusGap * scale,
+      )
       ..scale.setValues(
         AppTypography.bitmapScale(
-          AppTypography.labelMediumSize,
+          AppTypography.labelLargeSize,
           responsiveScale: scale,
         ),
         AppTypography.bitmapScale(
-          AppTypography.labelMediumSize,
+          AppTypography.labelLargeSize,
           responsiveScale: scale,
         ),
       );
@@ -453,11 +476,11 @@ class CombatHudComponent extends PositionComponent {
       )
       ..scale.setValues(
         AppTypography.bitmapScale(
-          AppTypography.labelMediumSize,
+          AppTypography.labelLargeSize,
           responsiveScale: scale,
         ),
         AppTypography.bitmapScale(
-          AppTypography.labelMediumSize,
+          AppTypography.labelLargeSize,
           responsiveScale: scale,
         ),
       );

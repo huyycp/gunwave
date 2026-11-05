@@ -10,6 +10,7 @@ abstract final class GameHudStyle {
   static const progressBarBorderInset = buttonBorderInset;
   static const progressBarInset = buttonBorderInset - 4.0;
   static const minimumTouchSize = 48.0;
+  static const minimumGameplayUiScale = 1.0;
   static const compactButtonLabelMaxHeight = 52.0;
   static const prominentButtonLabelMinHeight = 60.0;
   static const buttonLabelHorizontalInset = 4.0;
@@ -26,7 +27,7 @@ abstract final class GameHudStyle {
   static const healthWorldHeight = 10.0;
   static const joystickDiameter = 128.0;
   static const joystickKnobDiameter = 64.0;
-  static const touchAttackSize = 64.0;
+  static const touchAttackSize = 72.0;
   static const touchEdge = 24.0;
   static const touchControlGap = 12.0;
   static const healthInset = 2.0;

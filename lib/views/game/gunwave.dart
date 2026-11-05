@@ -106,7 +106,7 @@ class Gunwave extends FlameGame
       world: world,
     );
 
-    camera.viewfinder.anchor = Anchor.topLeft;
+    camera.viewfinder.anchor = Anchor.center;
 
     if (playMode.isJoystick) {
       addJoystick();
@@ -141,11 +141,7 @@ class Gunwave extends FlameGame
     }
     accoumulatedTime += dt;
     while (accoumulatedTime > GameConstants.refreshRate) {
-      camera.viewfinder.position = Vector2(
-        (character.scale.x > 0 ? character.x : character.x - character.width) -
-            size.x / 4,
-        (character.y - (size.y - character.height) / 2),
-      );
+      camera.viewfinder.position = character.combatCenter;
       if (playMode.isJoystick) updateJoystick();
       if (playMode.isGesture) updateGesture();
 

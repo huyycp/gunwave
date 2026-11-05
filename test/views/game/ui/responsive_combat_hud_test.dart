@@ -78,4 +78,32 @@ void main() {
       previousAbilityLabelScale = abilityLabel.scale.x;
     }
   });
+
+  testWithFlameGame('HUD text and buttons stay readable in phone landscape', (
+    game,
+  ) async {
+    final hud = await CombatHudComponent.load(
+      game.images,
+      labels: testCampaignUiLabels(),
+      safeAreaInsets: const EdgeInsets.fromLTRB(24, 12, 20, 14),
+      showAbility: true,
+      showKeyboardGuide: false,
+      onPause: () {},
+      onActivateAbility: () {},
+    );
+    await game.ensureAdd(hud);
+    hud.onGameResize(Vector2(844, 390));
+
+    final healthText = hud.children
+        .whereType<TextComponent<SpriteFontRenderer>>()
+        .first;
+    final abilityButton = hud.children.whereType<AssetButtonComponent>().last;
+
+    expect(
+      healthText.scale.x,
+      closeTo(AppTypography.bitmapScale(AppTypography.bodyLargeSize), 0.001),
+    );
+    expect(abilityButton.size, Vector2(120, 68));
+    expect(abilityButton.labelFontSize, AppTypography.titleMediumSize);
+  });
 }

@@ -23,7 +23,16 @@ void main() {
     );
     expect(
       GameTouchControlLayout.attackPosition(Vector2(390, 844), safeArea),
-      Vector2(282, 726),
+      Vector2(
+        390 -
+            GameHudStyle.touchEdge -
+            safeArea.right -
+            GameHudStyle.touchAttackSize,
+        844 -
+            GameHudStyle.touchEdge -
+            safeArea.bottom -
+            GameHudStyle.touchAttackSize,
+      ),
     );
   });
 
@@ -81,7 +90,7 @@ void main() {
     game.world.add(button);
     await game.ready();
 
-    expect(button.size, Vector2.all(64));
+    expect(button.size, Vector2.all(GameHudStyle.touchAttackSize));
     button.onTapDown(
       TapDownEvent(
         1,
