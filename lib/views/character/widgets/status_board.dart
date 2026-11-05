@@ -15,10 +15,7 @@ import 'package:gunwave/widgets/base/base_widget_model.dart';
 import 'package:gunwave/widgets/game/game_button.dart';
 
 class StatusBoard extends BaseWidget {
-  const StatusBoard(
-    this.character, {
-    super.key,
-  });
+  const StatusBoard(this.character, {super.key});
 
   final CharacterModel character;
 
@@ -35,13 +32,11 @@ class StatusBoardState
   );
 
   final _background = GameWidget(
-    game: FlameGame(children: [
-      AppBanner(
-        banner: GameBanners.bannerVertical,
-        xCount: 5,
-        yCount: 5,
-      )
-    ]),
+    game: FlameGame(
+      children: [
+        AppBanner(banner: GameBanners.bannerVertical, xCount: 5, yCount: 5),
+      ],
+    ),
   );
 
   @override
@@ -125,12 +120,13 @@ class StatusBoardState
           height: 40,
           width: 40,
           child: GameButton(
-              onPressed: () {
-                model.updateAttr(model.character, attr);
-              },
-              size: GameButtonSize.small,
-              child: const Text('+')),
-        )
+            onPressed: () {
+              model.updateAttr(model.character, attr);
+            },
+            size: GameButtonSize.small,
+            child: const Text('+'),
+          ),
+        ),
       ],
     );
   }
@@ -181,14 +177,18 @@ class StatusBoardWidgetModel extends BaseWidgetModel {
       if (result) {
         final currentCharacter = _character;
         final updatedCharacter = switch (attr) {
-          CharacterAttr.hp =>
-            currentCharacter.copyWith(hp: currentCharacter.hp + 1),
-          CharacterAttr.str =>
-            currentCharacter.copyWith(str: currentCharacter.str + 1),
-          CharacterAttr.vit =>
-            currentCharacter.copyWith(vit: currentCharacter.vit + 1),
-          CharacterAttr.agi =>
-            currentCharacter.copyWith(agi: currentCharacter.agi + 1),
+          CharacterAttr.hp => currentCharacter.copyWith(
+            hp: currentCharacter.hp + 1,
+          ),
+          CharacterAttr.str => currentCharacter.copyWith(
+            str: currentCharacter.str + 1,
+          ),
+          CharacterAttr.vit => currentCharacter.copyWith(
+            vit: currentCharacter.vit + 1,
+          ),
+          CharacterAttr.agi => currentCharacter.copyWith(
+            agi: currentCharacter.agi + 1,
+          ),
         };
         _character = updatedCharacter.copyWith(sp: currentCharacter.sp - 1);
         notifyListeners();
@@ -203,11 +203,8 @@ class StatusBoardWidgetModel extends BaseWidgetModel {
     try {
       final result = await _characterRepo.resetAttr(character.id);
       if (result) {
-        _character = await _characterRepo.getOwnedCharacter(
-              userRepo.appUser!.id,
-              character.id,
-            ) ??
-            character;
+        _character =
+            await _characterRepo.getOwnedCharacter(character.id) ?? character;
         notifyListeners();
       }
     } catch (err, stack) {

@@ -3,7 +3,7 @@ import 'package:gunwave/utils/logger/app_logger.dart';
 import 'package:gunwave/views/game/abilities/ability.dart';
 import 'package:gunwave/views/game/abilities/implementations/built_in_abilities.dart';
 
-/// Registers ability implementations by the stable key stored in Supabase.
+/// Registers ability implementations by their stable local catalog key.
 class AbilityRegistry {
   AbilityRegistry._();
   static const _logger = AppLogger(AbilityRegistry);

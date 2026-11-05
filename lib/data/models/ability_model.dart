@@ -7,7 +7,7 @@ part 'ability_model.freezed.dart';
 part 'ability_model.g.dart';
 
 /// Describes a character ability and the values used by game logic.
-/// Holds the ability metadata and JSON parameters stored in Supabase.
+/// Holds ability metadata and parameters from the bundled local catalog.
 @freezed
 abstract class AbilityModel with _$AbilityModel {
   /// Creates an immutable ability definition.

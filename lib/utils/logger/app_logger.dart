@@ -4,7 +4,7 @@ import 'dart:developer' as developer;
 ///
 /// Create a logger with `AppLogger(runtimeType)` and pass the function name
 /// explicitly, so logging does not capture or parse a stack trace on every call.
-/// For example: `logger.info('signInAsGuest', 'Guest session ready.');`.
+/// For example: `logger.info('campaignLoad', 'Campaign data is ready.');`.
 class AppLogger {
   /// Creates a logger scoped to [className].
   const AppLogger(this.className);

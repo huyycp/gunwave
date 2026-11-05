@@ -14,7 +14,7 @@ abstract class Ability {
   bool activate(AbilityContext context);
 }
 
-/// Validates Supabase parameters once while constructing an ability.
+/// Validates local catalog parameters once while constructing an ability.
 class AbilityParameters {
   const AbilityParameters(this.definition);
   final AbilityModel definition;

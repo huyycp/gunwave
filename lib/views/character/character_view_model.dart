@@ -24,8 +24,7 @@ class CharacterViewModel extends BaseViewModel {
   Future<void> getCharacters() async {
     try {
       setLoading(true);
-      if (userRepo.appUser == null) return;
-      await _characterRepo.getOwnedCharacters(userRepo.appUser!.id);
+      await _characterRepo.getOwnedCharacters();
       selectedCharacterIndex = 0;
     } catch (err, stack) {
       AppException.log(runtimeType, err, stack, function: 'getCharacters');

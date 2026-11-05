@@ -39,8 +39,6 @@ class ShopScene extends RpgMenuScene {
     _emptyText = addText(_emptyMessage, fontSize: AppTypography.bodySize);
     final status = snapshot.isLoading
         ? labels.loading
-        : !snapshot.isAccountSignedIn
-        ? labels.signInToShop
         : snapshot.shopDataUnavailable
         ? labels.shopUnavailable
         : null;
@@ -70,10 +68,7 @@ class ShopScene extends RpgMenuScene {
         isOwned ? labels.owned : '${character.price}',
         () => actions.onPurchase(character),
         buttonSize: Vector2(142, 48),
-        enabled:
-            snapshot.isAccountSignedIn &&
-            !isOwned &&
-            snapshot.gold >= character.price,
+        enabled: !isOwned && snapshot.gold >= character.price,
       );
       _cards.add(_ShopCard(character, panel, preview, name, button));
     }
@@ -157,9 +152,7 @@ class ShopScene extends RpgMenuScene {
   }
 
   String get _emptyMessage {
-    if (snapshot.isLoading ||
-        !snapshot.isAccountSignedIn ||
-        snapshot.shopDataUnavailable) {
+    if (snapshot.isLoading || snapshot.shopDataUnavailable) {
       return '';
     }
     return labels.noCharacters;

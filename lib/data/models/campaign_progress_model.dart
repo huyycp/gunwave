@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:gunwave/data/models/reward_model.dart';
 
-/// Local campaign state saved as one record on this device.
+/// Local campaign state read from this device's SQLite database.
 @immutable
 class CampaignProgressModel {
   CampaignProgressModel({
@@ -39,7 +39,7 @@ class CampaignProgressModel {
   final String? selectedHeroId;
   final Map<String, int> rewardBalances;
 
-  /// Campaign gold is separate from the online account balance used by Shop.
+  /// Current local gold shared by campaign rewards and Shop purchases.
   int get goldBalance => balanceFor(RewardType.gold);
 
   /// Earned status points are kept with other local campaign rewards.

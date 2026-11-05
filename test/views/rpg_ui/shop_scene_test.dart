@@ -71,13 +71,10 @@ void main() {
   );
 
   testWithGame(
-    'Shop explains account and catalog empty states',
+    'Shop explains an empty local catalog',
     () => testRpgMenuGame(
       initialPage: RpgMenuPage.shop,
-      snapshot: testRpgMenuSnapshot(
-        shopHeroes: const [],
-        isAccountSignedIn: false,
-      ),
+      snapshot: testRpgMenuSnapshot(shopHeroes: const []),
     ),
     (game) async {
       await game.ready();
@@ -85,7 +82,7 @@ void main() {
       final labels = scene.children
           .whereType<TextComponent<SpriteFontRenderer>>()
           .map((component) => component.text);
-      expect(labels, contains('Sign in to buy more heroes'));
+      expect(labels, contains('No heroes'));
       expect(scene.children.whereType<AssetButtonComponent>(), hasLength(1));
     },
   );
@@ -97,7 +94,6 @@ void main() {
       snapshot: testRpgMenuSnapshot(
         ownedHeroes: [CampaignHeroCatalog.starter],
         shopHeroes: [CampaignHeroCatalog.starter],
-        isAccountSignedIn: false,
       ),
     ),
     (game) async {
@@ -115,7 +111,7 @@ void main() {
         scene.children.whereType<TextComponent<SpriteFontRenderer>>().map(
           (component) => component.text,
         ),
-        contains('Sign in to buy more heroes'),
+        isNot(contains('Sign in to buy more heroes')),
       );
 
       game.onGameResize(Vector2(640, 360));
@@ -142,7 +138,7 @@ void main() {
   );
 
   testWithGame(
-    'Shop marks the remote starter sprite as owned by a solo starter',
+    'Shop recognizes the starter sprite as an owned local hero',
     () => testRpgMenuGame(
       initialPage: RpgMenuPage.shop,
       snapshot: testRpgMenuSnapshot(

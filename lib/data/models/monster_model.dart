@@ -22,7 +22,7 @@ abstract class MonsterModel with _$MonsterModel {
     @Default(0) int score,
   }) = _MonsterModel;
 
-  /// Parses a monster row from Supabase JSON.
+  /// Parses a monster definition from local JSON content.
   factory MonsterModel.fromJson(Map<String, dynamic> json) =>
       _$MonsterModelFromJson(json);
 

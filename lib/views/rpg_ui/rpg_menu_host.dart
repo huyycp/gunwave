@@ -15,12 +15,10 @@ import 'package:gunwave/localization/app_locale_mode.dart';
 import 'package:gunwave/repositories/campaign_repository.dart';
 import 'package:gunwave/repositories/campaign_progress_repository.dart';
 import 'package:gunwave/repositories/character_repository.dart';
-import 'package:gunwave/repositories/user_repository.dart';
 import 'package:gunwave/routes.dart';
 import 'package:gunwave/views/game/game_view.dart';
 import 'package:gunwave/views/rpg_ui/rpg_menu_game.dart';
 import 'package:gunwave/views/rpg_ui/rpg_menu_models.dart';
-import 'package:gunwave/views/shop/shop_view_model.dart';
 
 /// Flutter host that supplies data and callbacks to the asset-rendered menu.
 class RpgMenuHost extends ConsumerStatefulWidget {
@@ -95,7 +93,6 @@ class _RpgMenuHostState extends ConsumerState<RpgMenuHost> {
           .read(campaignProgressRepositoryProvider)
           .getProgress();
       if (_pageNeedsHeroes(widget.initialPage)) {
-        _gold = ref.read(userRepoProvider).appUser?.gold ?? 0;
         await _loadHeroData();
       }
       _selectedStageId ??= _firstUnlockedStageId(_stages);
@@ -115,7 +112,6 @@ class _RpgMenuHostState extends ConsumerState<RpgMenuHost> {
     gold: _gold,
     campaignGold: _campaignProgress.goldBalance,
     campaignStatusPoints: _campaignProgress.statusPointBalance,
-    isAccountSignedIn: ref.read(userRepoProvider).appUser != null,
     shopDataUnavailable: _shopDataUnavailable,
     selectedHeroIndex: _selectedHeroIndex,
     selectedStageId: _selectedStageId,
@@ -198,40 +194,41 @@ class _RpgMenuHostState extends ConsumerState<RpgMenuHost> {
     if (_heroDataLoaded || _heroDataLoading) return;
     _heroDataLoading = true;
     try {
-      final user = ref.read(userRepoProvider).appUser;
-      if (user == null) {
-        _ownedHeroes = [CampaignHeroCatalog.starter];
-        _shopHeroes = [CampaignHeroCatalog.starter];
-        _gold = 0;
-        _selectedHeroIndex = 0;
-        _heroDataLoaded = true;
-        return;
-      }
-      final shopModel = ref.read(shopViewModel);
-      await shopModel.getCharacters();
       final characterRepository = ref.read(characterRepoProvider);
-      _ownedHeroes = _withStarterHero(characterRepository.ownedCharacters);
-      _shopHeroes = _withStarterHero(shopModel.characters);
-      _shopDataUnavailable = shopModel.hasLoadError;
-      _gold = ref.read(userRepoProvider).appUser?.gold ?? shopModel.userBalance;
+      _ownedHeroes = _withStarterHero(
+        await characterRepository.getOwnedCharacters(),
+      );
+      _shopHeroes = _withStarterHero(await characterRepository.getCharacters());
+      _gold = await characterRepository.getGoldBalance();
+      _shopDataUnavailable = false;
       final persistedHeroIndex = _ownedHeroes.indexWhere(
         (hero) => hero.id == _campaignProgress.selectedHeroId,
       );
       _selectedHeroIndex = persistedHeroIndex >= 0 ? persistedHeroIndex : 0;
       _heroDataLoaded = true;
+    } catch (error, stackTrace) {
+      _shopDataUnavailable = true;
+      if (_ownedHeroes.isEmpty) {
+        _ownedHeroes = [CampaignHeroCatalog.starter];
+      }
+      if (_shopHeroes.isEmpty) {
+        _shopHeroes = [CampaignHeroCatalog.starter];
+      }
+      debugPrint('Unable to load local hero data: $error\n$stackTrace');
     } finally {
       _heroDataLoading = false;
     }
   }
 
   List<CharacterModel> _withStarterHero(List<CharacterModel> heroes) {
+    final hasStarter = heroes.any(
+      (hero) => hero.id == CampaignHeroCatalog.starter.id,
+    );
     final hasStarterAsset = heroes.any(
       (hero) => hero.filename == CampaignHeroCatalog.starter.filename,
     );
-    return List.unmodifiable([
-      if (!hasStarterAsset) CampaignHeroCatalog.starter,
-      ...heroes.where((hero) => hero.id != CampaignHeroCatalog.starter.id),
-    ]);
+    if (hasStarter || hasStarterAsset) return List.unmodifiable(heroes);
+    return List.unmodifiable([CampaignHeroCatalog.starter, ...heroes]);
   }
 
   void _selectStage(String stageId) {
@@ -255,20 +252,19 @@ class _RpgMenuHostState extends ConsumerState<RpgMenuHost> {
   }
 
   Future<void> _purchase(CharacterModel character) async {
-    if (ref.read(userRepoProvider).appUser == null) return;
-    await ref.read(shopViewModel).buyCharacter(character);
-    final userId = ref.read(userRepoProvider).appUser?.id;
-    if (userId != null) {
-      _ownedHeroes = _withStarterHero(
-        await ref.read(characterRepoProvider).getOwnedCharacters(userId),
-      );
+    try {
+      final repository = ref.read(characterRepoProvider);
+      final purchased = await repository.buyCharacter(character.id);
+      if (!purchased) return;
+      _ownedHeroes = _withStarterHero(await repository.getOwnedCharacters());
+      _shopHeroes = _withStarterHero(await repository.getCharacters());
+      _shopDataUnavailable = false;
+      _gold = await repository.getGoldBalance();
+      _snapshot = _createSnapshot(isLoading: false);
+      _replaceGame();
+    } catch (error, stackTrace) {
+      debugPrint('Unable to purchase local hero: $error\n$stackTrace');
     }
-    final shopModel = ref.read(shopViewModel);
-    _shopHeroes = _withStarterHero(shopModel.characters);
-    _shopDataUnavailable = shopModel.hasLoadError;
-    _gold = ref.read(userRepoProvider).appUser?.gold ?? shopModel.userBalance;
-    _snapshot = _createSnapshot(isLoading: false);
-    _replaceGame();
   }
 
   Future<void> _upgradeHero(

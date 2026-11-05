@@ -47,7 +47,6 @@ class RpgMenuLabels {
     required this.noCampaignStages,
     required this.owned,
     required this.noCharacters,
-    required this.signInToShop,
     required this.shopUnavailable,
     required this.language,
     required this.gameControls,
@@ -88,7 +87,6 @@ class RpgMenuLabels {
   final String noCampaignStages;
   final String owned;
   final String noCharacters;
-  final String signInToShop;
   final String shopUnavailable;
   final String language;
   final String gameControls;
@@ -130,7 +128,6 @@ class RpgMenuLabels {
         noCampaignStages: strings.noCampaignStages,
         owned: strings.owned,
         noCharacters: strings.noCharactersAvailable,
-        signInToShop: strings.signInToShop,
         shopUnavailable: strings.shopUnavailable,
         language: strings.language,
         gameControls: strings.gameControls,
@@ -157,7 +154,6 @@ class RpgMenuSnapshot {
     this.gold = 0,
     this.campaignGold = 0,
     this.campaignStatusPoints = 0,
-    this.isAccountSignedIn = true,
     this.shopDataUnavailable = false,
     this.selectedHeroIndex = 0,
     this.selectedStageId,
@@ -171,15 +167,14 @@ class RpgMenuSnapshot {
   final List<CharacterModel> shopHeroes;
   final Set<String> clearedStageIds;
 
-  /// Online account balance used by the existing character shop.
+  /// Local gold balance shared by campaign rewards and Shop purchases.
   final int gold;
 
-  /// Local balance earned through first-time campaign completions.
+  /// Current local wallet displayed in the campaign hub.
   final int campaignGold;
 
   /// Local status-point rewards earned through the campaign.
   final int campaignStatusPoints;
-  final bool isAccountSignedIn;
   final bool shopDataUnavailable;
   final int selectedHeroIndex;
   final String? selectedStageId;

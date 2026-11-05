@@ -1,31 +1,54 @@
+import 'package:drift/native.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gunwave/data/constants/game/game_play_mode.dart';
-import 'package:gunwave/data/data_sources/local/campaign_progress_local_data_source.dart';
 import 'package:gunwave/data/data_sources/local/campaign_content_data_source.dart';
+import 'package:gunwave/data/data_sources/local/campaign_progress_local_data_source.dart';
+import 'package:gunwave/data/data_sources/local/local_game_data_seeder.dart';
+import 'package:gunwave/data/database/app_database.dart';
 import 'package:gunwave/data/models/campaign_stage_model.dart';
 import 'package:gunwave/data/models/reward_model.dart';
-import 'package:gunwave/data/data_sources/remote/user_remote_data_source.dart';
 import 'package:gunwave/l10n/app_localizations.dart';
+import 'package:gunwave/localization/app_locale_controller.dart';
 import 'package:gunwave/repositories/campaign_progress_repository.dart';
 import 'package:gunwave/repositories/campaign_repository.dart';
-import 'package:gunwave/repositories/user_repository.dart';
+import 'package:gunwave/repositories/character_repository.dart';
 import 'package:gunwave/theme/theme_provider.dart';
 import 'package:gunwave/views/game/game_view.dart';
 import 'package:gunwave/views/rpg_ui/rpg_menu_game.dart';
 import 'package:gunwave/views/rpg_ui/rpg_menu_host.dart';
 import 'package:gunwave/views/rpg_ui/rpg_menu_models.dart';
-import 'package:gunwave/localization/app_locale_controller.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'rpg_menu_test_support.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  late List<CampaignStageModel> bundledStages;
 
-  testWidgets('Campaign menu host renders its screen through Flame', (
+  setUpAll(() async {
+    bundledStages = await AssetCampaignContentDataSource().loadStages();
+  });
+
+  Future<AppDatabase> createDatabase() async {
+    final database = AppDatabase.forTesting(NativeDatabase.memory());
+    await LocalGameDataSeeder(
+      database,
+      contentDataSource: _StaticCampaignContentDataSource(bundledStages),
+    ).seed();
+    return database;
+  }
+
+  List<Override> appOverrides(AppDatabase database) => [
+    appDatabaseProvider.overrideWithValue(database),
+    themeProvider.overrideWith((ref) => ThemeProvider.forTesting()),
+    appLocaleControllerProvider.overrideWith(
+      (ref) => AppLocaleController(database),
+    ),
+  ];
+
+  testWidgets('Campaign menu host renders database progress through Flame', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(1280, 720);
@@ -33,9 +56,10 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    final preferences = _MemoryPreferences();
+    final database = await createDatabase();
+    addTearDown(database.close);
     final progressRepository = CampaignProgressRepository(
-      CampaignProgressLocalDataSource(preferences: preferences),
+      CampaignProgressLocalDataSource(database),
     );
     await progressRepository.completeStage(
       const CampaignStageModel(
@@ -50,23 +74,12 @@ void main() {
       (await progressRepository.getProgress()).completedStageIds,
       contains('stage_1'),
     );
-    final container = ProviderContainer(
-      overrides: [
-        appLocaleControllerProvider.overrideWith(
-          (ref) => AppLocaleController(preferences: preferences),
-        ),
-        campaignProgressRepositoryProvider.overrideWithValue(
-          progressRepository,
-        ),
-        campaignRepositoryProvider.overrideWithValue(
-          CampaignRepository(_StaticCampaignContentDataSource()),
-        ),
-        userRepoProvider.overrideWithValue(
-          UserRepository(_EmptyUserRemoteDataSource()),
-        ),
-      ],
-    );
+    final container = ProviderContainer(overrides: appOverrides(database));
     addTearDown(container.dispose);
+    expect(
+      await container.read(campaignRepositoryProvider).getStages(),
+      isNotEmpty,
+    );
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
@@ -91,7 +104,7 @@ void main() {
     expect(game.snapshot.campaignStatusPoints, 25);
   });
 
-  testWidgets('Solo Hub has a local starter hero without a signed-in user', (
+  testWidgets('local Hub loads the seeded starter and campaign', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(1280, 720);
@@ -99,27 +112,18 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    final preferences = _MemoryPreferences();
-    final progressRepository = CampaignProgressRepository(
-      CampaignProgressLocalDataSource(preferences: preferences),
-    );
-    final container = ProviderContainer(
-      overrides: [
-        appLocaleControllerProvider.overrideWith(
-          (ref) => AppLocaleController(preferences: preferences),
-        ),
-        campaignProgressRepositoryProvider.overrideWithValue(
-          progressRepository,
-        ),
-        campaignRepositoryProvider.overrideWithValue(
-          CampaignRepository(_StaticCampaignContentDataSource()),
-        ),
-        userRepoProvider.overrideWithValue(
-          UserRepository(_EmptyUserRemoteDataSource()),
-        ),
-      ],
-    );
+    final database = await createDatabase();
+    addTearDown(database.close);
+    final container = ProviderContainer(overrides: appOverrides(database));
     addTearDown(container.dispose);
+    expect(
+      await container.read(campaignRepositoryProvider).getStages(),
+      isNotEmpty,
+    );
+    expect(
+      await container.read(characterRepoProvider).getOwnedCharacters(),
+      hasLength(1),
+    );
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
@@ -140,7 +144,6 @@ void main() {
           .game!;
     }
     expect(game.snapshot.isLoading, isFalse);
-    expect(game.snapshot.isAccountSignedIn, isFalse);
     expect(game.snapshot.ownedHeroes, hasLength(1));
     expect(game.snapshot.selectedHero?.id, 'local_starter_warrior_blue');
     expect(game.snapshot.shopHeroes, hasLength(1));
@@ -163,21 +166,9 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    final preferences = _MemoryPreferences();
-    final progressRepository = CampaignProgressRepository(
-      CampaignProgressLocalDataSource(preferences: preferences),
-    );
-    final container = ProviderContainer(
-      overrides: [
-        themeProvider.overrideWith((ref) => ThemeProvider.instance),
-        appLocaleControllerProvider.overrideWith(
-          (ref) => AppLocaleController(preferences: preferences),
-        ),
-        campaignProgressRepositoryProvider.overrideWithValue(
-          progressRepository,
-        ),
-      ],
-    );
+    final database = await createDatabase();
+    addTearDown(database.close);
+    final container = ProviderContainer(overrides: appOverrides(database));
     addTearDown(container.dispose);
     await tester.pumpWidget(
       UncontrolledProviderScope(
@@ -213,27 +204,11 @@ void main() {
   });
 }
 
-class _MemoryPreferences implements SharedPreferencesAsync {
-  final Map<String, Object> values = {};
-
-  @override
-  Future<String?> getString(String key) async => values[key] as String?;
-
-  @override
-  Future<void> setString(String key, String value) async {
-    values[key] = value;
-  }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
-
-class _EmptyUserRemoteDataSource implements UserRemoteDataSource {
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
-
 class _StaticCampaignContentDataSource implements CampaignContentDataSource {
+  const _StaticCampaignContentDataSource(this._stages);
+
+  final List<CampaignStageModel> _stages;
+
   @override
-  Future<List<CampaignStageModel>> loadStages() async => [testCampaignStage()];
+  Future<List<CampaignStageModel>> loadStages() async => _stages;
 }
