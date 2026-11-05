@@ -5,6 +5,7 @@ import 'package:flame_test/flame_test.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gunwave/views/game/ui/components/asset_button_component.dart';
+import 'package:gunwave/views/game/ui/components/asset_panel_component.dart';
 import 'package:gunwave/views/rpg_ui/rpg_menu_models.dart';
 import 'package:gunwave/views/rpg_ui/rpg_menu_game.dart';
 import 'package:gunwave/views/rpg_ui/scenes/home_hub_scene.dart';
@@ -37,6 +38,7 @@ void main() {
       expect(buttons.map((button) => button.label), contains('Shop'));
       expect(labels, contains('100'));
       expect(labels, contains('25'));
+      expect(hub.children.whereType<SpriteAnimationComponent>(), hasLength(1));
 
       game.onGameResize(Vector2(640, 360));
       final actionButtons =
@@ -54,6 +56,13 @@ void main() {
         expect(button.position.y, lessThanOrEqualTo(360));
         expect(button.position.y - button.height, greaterThanOrEqualTo(0));
       }
+      final panels = hub.children.whereType<AssetPanelComponent>().toList();
+      expect(panels, hasLength(2));
+      expect(panels.every((panel) => panel.height <= 360 * 0.5), isTrue);
+      expect(
+        panels.fold<double>(0, (sum, panel) => sum + panel.width),
+        lessThan(640 * 0.84),
+      );
       for (var index = 1; index < actionButtons.length; index++) {
         final previous = actionButtons[index - 1];
         final current = actionButtons[index];

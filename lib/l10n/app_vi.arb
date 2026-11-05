@@ -14,6 +14,7 @@
   "email": "Email",
   "password": "Mật khẩu",
   "login": "Đăng nhập",
+  "playSolo": "Chơi đơn",
   "noCharactersAvailable": "Không có nhân vật nào",
   "openShop": "Mở cửa hàng",
   "back": "Quay lại",
@@ -75,6 +76,8 @@
   "gold": "Vàng",
   "loading": "Đang tải",
   "noCampaignStages": "Chưa có màn chiến dịch",
+  "signInToShop": "Đăng nhập để mua thêm nhân vật",
+  "shopUnavailable": "Cửa hàng hiện không khả dụng",
   "roundsCount": "{count} vòng",
   "campaignRewardsAlreadyClaimed": "Phần thưởng vượt màn lần đầu đã nhận",
   "campaignProgressSaveFailed": "Không lưu được tiến trình; chưa nhận phần thưởng"

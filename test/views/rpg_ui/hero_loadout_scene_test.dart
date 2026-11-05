@@ -1,3 +1,4 @@
+import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame_test/flame_test.dart';
@@ -32,6 +33,10 @@ void main() {
     },
     (game) async {
       await game.ready();
+      expect(
+        activeRpgMenuScene(game).children.whereType<SpriteAnimationComponent>(),
+        hasLength(1),
+      );
       final buttons = activeRpgMenuScene(game).children
           .whereType<AssetButtonComponent>()
           .toList();

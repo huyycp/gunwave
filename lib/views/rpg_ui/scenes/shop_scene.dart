@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flame/components.dart';
 import 'package:flame/text.dart';
+import 'package:gunwave/data/constants/game/game_menu_style.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/views/game/ui/components/asset_button_component.dart';
 import 'package:gunwave/views/game/ui/components/asset_panel_component.dart';
@@ -20,6 +21,8 @@ class ShopScene extends RpgMenuScene {
   late final AssetPanelComponent _panel;
   late final TextComponent<SpriteFontRenderer> _title;
   late final TextComponent<SpriteFontRenderer> _balance;
+  late final TextComponent<SpriteFontRenderer> _emptyText;
+  TextComponent<SpriteFontRenderer>? _statusText;
   late final AssetButtonComponent _backButton;
   late final List<_ShopCard> _cards;
 
@@ -28,6 +31,17 @@ class ShopScene extends RpgMenuScene {
     _panel = addPanel(Vector2.all(1));
     _title = addText(labels.shop, scale: 1.12);
     _balance = addText('${labels.gold}: ${snapshot.gold}', scale: 0.72);
+    _emptyText = addText(_emptyMessage, scale: 0.78);
+    final status = snapshot.isLoading
+        ? labels.loading
+        : !snapshot.isAccountSignedIn
+        ? labels.signInToShop
+        : snapshot.shopDataUnavailable
+        ? labels.shopUnavailable
+        : null;
+    if (status != null) {
+      _statusText = addText(status, scale: 0.55);
+    }
     _backButton = await addButton(
       labels.back,
       actions.onBack,
@@ -45,7 +59,10 @@ class ShopScene extends RpgMenuScene {
         isOwned ? labels.owned : '${character.price}',
         () => actions.onPurchase(character),
         buttonSize: Vector2(142, 48),
-        enabled: !isOwned && snapshot.gold >= character.price,
+        enabled:
+            snapshot.isAccountSignedIn &&
+            !isOwned &&
+            snapshot.gold >= character.price,
       );
       _cards.add(_ShopCard(character, panel, preview, name, button));
     }
@@ -53,12 +70,18 @@ class ShopScene extends RpgMenuScene {
 
   @override
   void layoutScene() {
-    // Four columns and two rows show the current eight-hero catalog together;
-    // each card separates the sprite, name, and purchase hit target vertically.
+    // Four columns and two rows keep the hero, name, and action distinct on
+    // compact landscape screens.
     final bounds = contentBounds;
     final scale = uiScale;
-    final panelWidth = math.min(bounds.width - 32 * scale, 1120 * scale);
-    final panelHeight = math.min(bounds.height - 32 * scale, 600 * scale);
+    final panelWidth = math.min(
+      bounds.width * GameMenuStyle.shopWidthRatio,
+      GameMenuStyle.shopMaxWidth * scale,
+    );
+    final panelHeight = math.min(
+      bounds.height * GameMenuStyle.shopHeightRatio,
+      GameMenuStyle.shopMaxHeight * scale,
+    );
     final left = bounds.center.dx - panelWidth / 2;
     final top = bounds.center.dy - panelHeight / 2;
     _panel
@@ -73,48 +96,62 @@ class ShopScene extends RpgMenuScene {
       ..size = Vector2(150 * scale, 56 * scale)
       ..position = Vector2(left + 90 * scale, top + 34 * scale);
     final columns = math.min(4, math.max(1, _cards.length));
-    final rows = (_cards.length / 4).ceil();
+    final rows = (_cards.length / columns).ceil();
     final gap = 12 * scale;
-    final contentTop = top + 76 * scale;
-    final contentHeight = panelHeight - 94 * scale;
-    final cardWidth = (panelWidth - 32 * scale - gap * 3) / 4;
+    final statusText = _statusText;
+    statusText?.position = Vector2(bounds.center.dx, top + 62 * scale);
+    final contentTop = top + (statusText == null ? 76 : 92) * scale;
+    final contentHeight = panelHeight - (statusText == null ? 94 : 110) * scale;
+    final cardWidth = (panelWidth - 32 * scale - gap * (columns - 1)) / columns;
     final cardHeight = rows == 0
         ? contentHeight
         : (contentHeight - (rows - 1) * gap) / rows;
     for (var index = 0; index < _cards.length; index++) {
       final card = _cards[index];
       final column = index % columns;
-      final row = index ~/ 4;
+      final row = index ~/ columns;
       final cardLeft = left + 16 * scale + column * (cardWidth + gap);
       final cardTop = contentTop + row * (cardHeight + gap);
       card
         ..panel.size = Vector2(cardWidth, cardHeight)
         ..panel.position = Vector2(cardLeft, cardTop);
-      card.name.position = Vector2(
-        cardLeft + cardWidth / 2,
-        cardTop + cardHeight - 64 * scale,
-      );
       final preview = card.preview;
       if (preview != null) {
-        final previewSize = math.min(100 * scale, cardHeight * 0.32);
+        final previewSize = math.min(72 * scale, cardHeight * 0.36);
         preview
           ..size = Vector2.all(previewSize)
           ..position = Vector2(
             cardLeft + cardWidth / 2,
-            cardTop + cardHeight * 0.34,
+            cardTop + cardHeight * 0.24,
           );
       }
+      card.name.position = Vector2(
+        cardLeft + cardWidth / 2,
+        cardTop + cardHeight * 0.52,
+      );
+      card.name.scale = Vector2.all(0.5 * scale);
+      final buttonWidth = math.min(142 * scale, cardWidth - 12 * scale);
+      final buttonHeight = math.min(44 * scale, cardHeight * 0.4);
       card.button
-        ..size = Vector2(
-          math.min(142 * scale, cardWidth - 12 * scale),
-          46 * scale,
-        )
+        ..size = Vector2(buttonWidth, buttonHeight)
         ..position = Vector2(
           cardLeft + cardWidth / 2,
-          cardTop + cardHeight - 10 * scale,
+          cardTop + cardHeight * 0.79,
         )
-        ..anchor = Anchor.bottomCenter;
+        ..anchor = Anchor.center;
     }
+    _emptyText
+      ..text = _cards.isEmpty ? _emptyMessage : ''
+      ..position = Vector2(bounds.center.dx, top + panelHeight * 0.58);
+  }
+
+  String get _emptyMessage {
+    if (snapshot.isLoading ||
+        !snapshot.isAccountSignedIn ||
+        snapshot.shopDataUnavailable) {
+      return '';
+    }
+    return labels.noCharacters;
   }
 }
 

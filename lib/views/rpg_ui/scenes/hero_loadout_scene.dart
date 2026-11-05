@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flame/components.dart';
 import 'package:flame/text.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
-import 'package:gunwave/data/constants/game/game_hud_style.dart';
+import 'package:gunwave/data/constants/game/game_menu_style.dart';
 import 'package:gunwave/data/models/character_model.dart';
 import 'package:gunwave/views/game/ui/components/asset_button_component.dart';
 import 'package:gunwave/views/game/ui/components/asset_panel_component.dart';
@@ -47,7 +47,11 @@ class HeroLoadoutScene extends RpgMenuScene {
     _heroPanel = addPanel(Vector2.all(1));
     _statsPanel = addPanel(Vector2.all(1));
     _title = addText(labels.heroLoadout, scale: 1.2);
-    _heroName = addText(_hero?.name ?? labels.noCharacters, scale: 0.86);
+    _heroName = addText(
+      _hero?.name ??
+          (snapshot.isLoading ? labels.loading : labels.noCharacters),
+      scale: 0.86,
+    );
     _abilityName = addText(
       _hero?.ability?.name ?? labels.selectHero,
       scale: 0.62,
@@ -57,7 +61,9 @@ class HeroLoadoutScene extends RpgMenuScene {
       scale: 0.68,
     );
     _emptyState = addText(
-      snapshot.ownedHeroes.isEmpty ? labels.noCharacters : '',
+      snapshot.ownedHeroes.isEmpty
+          ? (snapshot.isLoading ? labels.loading : labels.noCharacters)
+          : '',
       scale: 0.7,
     );
     _heroPreview = await loadHeroPreview(_hero, size: Vector2.all(180));
@@ -146,17 +152,17 @@ class HeroLoadoutScene extends RpgMenuScene {
     final bounds = contentBounds;
     final scale = uiScale;
     final panelWidth = math.min(
-      bounds.width - GameHudStyle.edge * 4,
-      980 * scale,
+      bounds.width * GameMenuStyle.loadoutWidthRatio,
+      GameMenuStyle.loadoutMaxWidth * scale,
     );
     final panelHeight = math.min(
-      bounds.height - GameHudStyle.edge * 4,
-      550 * scale,
+      bounds.height * GameMenuStyle.loadoutHeightRatio,
+      GameMenuStyle.loadoutMaxHeight * scale,
     );
     final left = bounds.center.dx - panelWidth / 2;
     final top = bounds.center.dy - panelHeight / 2;
     final gap = 16 * scale;
-    final heroWidth = panelWidth * 0.40;
+    final heroWidth = panelWidth * 0.38;
     final statsWidth = panelWidth - heroWidth - gap;
     final bodyTop = top + 64 * scale;
     final bodyHeight = panelHeight - 148 * scale;

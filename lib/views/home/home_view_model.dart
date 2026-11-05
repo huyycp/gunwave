@@ -8,6 +8,18 @@ final homeViewModel = ChangeNotifierProvider.autoDispose<HomeViewModel>(
 
 class HomeViewModel extends BaseViewModel {
   bool isLoginFormVisible = false;
+  bool isSoloSession = false;
+
+  void playSolo() {
+    isSoloSession = true;
+    notifyListeners();
+  }
+
+  void returnToAuthOptions() {
+    isSoloSession = false;
+    isLoginFormVisible = false;
+    notifyListeners();
+  }
 
   void showLoginForm() {
     isLoginFormVisible = true;
@@ -23,6 +35,7 @@ class HomeViewModel extends BaseViewModel {
     try {
       final repository = userRepo;
       await repository.signInAsGuest();
+      isSoloSession = false;
       return repository.appUser != null;
     } catch (error, stackTrace) {
       AppException.log(
@@ -40,6 +53,7 @@ class HomeViewModel extends BaseViewModel {
   void onLoginComplete(bool succeeded) {
     if (succeeded) {
       isLoginFormVisible = false;
+      isSoloSession = false;
     }
     notifyListeners();
   }

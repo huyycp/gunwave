@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flame/components.dart';
 import 'package:flame/text.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
-import 'package:gunwave/data/constants/game/game_hud_style.dart';
+import 'package:gunwave/data/constants/game/game_menu_style.dart';
 import 'package:gunwave/views/game/ui/components/asset_button_component.dart';
 import 'package:gunwave/views/game/ui/components/asset_panel_component.dart';
 import 'package:gunwave/views/rpg_ui/rpg_menu_models.dart';
@@ -46,12 +46,15 @@ class HomeHubScene extends RpgMenuScene {
     _campaignPanel = addPanel(Vector2.all(1));
     _title = addText(labels.campaign, scale: 1.35);
     _heroName = addText(
-      snapshot.selectedHero?.name ?? labels.noCharacters,
+      snapshot.selectedHero?.name ??
+          (snapshot.isLoading ? labels.loading : labels.noCharacters),
       scale: 0.9,
     );
     final stage = snapshot.selectedStage;
     _stageName = addText(
-      stage == null ? labels.loading : _stageNameFor(stage),
+      stage == null
+          ? (snapshot.isLoading ? labels.loading : labels.noCampaignStages)
+          : _stageNameFor(stage),
       scale: 0.95,
     );
     _stageNumber = addText(
@@ -113,41 +116,42 @@ class HomeHubScene extends RpgMenuScene {
     final bounds = contentBounds;
     final scale = uiScale;
     final cardWidth = math.min(
-      bounds.width - GameHudStyle.edge * 4,
-      1000 * scale,
+      bounds.width * GameMenuStyle.homeHubWidthRatio,
+      GameMenuStyle.homeHubMaxWidth * scale,
     );
     final cardHeight = math.min(
-      bounds.height - GameHudStyle.edge * 4,
-      560 * scale,
+      bounds.height * GameMenuStyle.homeHubHeightRatio,
+      GameMenuStyle.homeHubMaxHeight * scale,
     );
     final left = bounds.center.dx - cardWidth / 2;
     final top = bounds.center.dy - cardHeight / 2;
     final gap = 16 * scale;
     final leftWidth = cardWidth * 0.39;
     final rightWidth = cardWidth - leftWidth - gap;
-    final heroPanelHeight = cardHeight * 0.76;
+    final panelTop = top + 36 * scale;
+    final heroPanelHeight = cardHeight * GameMenuStyle.homeHubPanelHeightRatio;
     _heroPanel
       ..size = Vector2(leftWidth, heroPanelHeight)
-      ..position = Vector2(left, top + 48 * scale);
+      ..position = Vector2(left, panelTop);
     _campaignPanel
       ..size = Vector2(rightWidth, heroPanelHeight)
-      ..position = Vector2(left + leftWidth + gap, top + 48 * scale);
+      ..position = Vector2(left + leftWidth + gap, panelTop);
     _title.position = Vector2(left + 12 * scale, top + 20 * scale);
     _heroName.position = Vector2(
       left + leftWidth / 2,
-      top + 48 * scale + heroPanelHeight - 24 * scale,
+      panelTop + heroPanelHeight - 18 * scale,
     );
     _stageNumber.position = Vector2(
       left + leftWidth + gap + rightWidth / 2,
-      top + 86 * scale,
+      panelTop + heroPanelHeight * 0.25,
     );
     _stageName.position = Vector2(
       left + leftWidth + gap + rightWidth / 2,
-      top + 142 * scale,
+      panelTop + heroPanelHeight * 0.49,
     );
     _roundSummary.position = Vector2(
       left + leftWidth + gap + rightWidth / 2,
-      top + 196 * scale,
+      panelTop + heroPanelHeight * 0.73,
     );
     _goldLabel.position = Vector2(
       bounds.right - 190 * scale,
@@ -168,10 +172,10 @@ class HomeHubScene extends RpgMenuScene {
     final hero = _heroPreview;
     if (hero != null) {
       hero
-        ..size = Vector2.all(math.min(leftWidth * 0.58, heroPanelHeight * 0.48))
+        ..size = Vector2.all(math.min(leftWidth * 0.58, heroPanelHeight * 0.56))
         ..position = Vector2(
           left + leftWidth / 2,
-          top + 48 * scale + heroPanelHeight * 0.48,
+          panelTop + heroPanelHeight * 0.5,
         );
     }
     final actionY = bounds.bottom - 12 * scale;

@@ -43,8 +43,11 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
   @override
   Widget getView() {
     ref.watch(homeViewModel);
-    if (model.userRepo.appUser != null) {
-      return const RpgMenuHost(initialPage: RpgMenuPage.homeHub);
+    if (model.userRepo.appUser != null || model.isSoloSession) {
+      return RpgMenuHost(
+        initialPage: RpgMenuPage.homeHub,
+        onBack: model.isSoloSession ? model.returnToAuthOptions : null,
+      );
     }
     return Scaffold(
       body: Stack(
@@ -93,6 +96,11 @@ class _HomeViewState extends BaseViewState<HomeView, HomeViewModel> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        GameButton(
+          onPressed: model.playSolo,
+          child: Text(context.l10n.playSolo),
+        ),
+        const SizedBox(height: 12),
         GameButton(
           onPressed: () async {
             final succeeded = await model.continueAsGuest();

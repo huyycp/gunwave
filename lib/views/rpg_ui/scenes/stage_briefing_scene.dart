@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flame/components.dart';
 import 'package:flame/text.dart';
 import 'package:gunwave/data/constants/game/game_button.dart';
+import 'package:gunwave/data/constants/game/game_menu_style.dart';
 import 'package:gunwave/data/models/campaign_stage_model.dart';
 import 'package:gunwave/data/models/reward_model.dart';
 import 'package:gunwave/data/models/stage_round_model.dart';
@@ -106,12 +107,17 @@ class StageBriefingScene extends RpgMenuScene {
 
   @override
   void layoutScene() {
-    // Reserve the final 128 logical pixels for the two large touch targets;
-    // keep round markers, boss information, and rewards inside the panel.
+    // Reserve room around the briefing panel for the map and action buttons.
     final bounds = contentBounds;
     final scale = uiScale;
-    final panelWidth = math.min(bounds.width - 32 * scale, 1060 * scale);
-    final panelHeight = math.min(bounds.height - 128 * scale, 540 * scale);
+    final panelWidth = math.min(
+      bounds.width * GameMenuStyle.briefingWidthRatio,
+      GameMenuStyle.briefingMaxWidth * scale,
+    );
+    final panelHeight = math.min(
+      bounds.height * GameMenuStyle.briefingHeightRatio,
+      GameMenuStyle.briefingMaxHeight * scale,
+    );
     final left = bounds.center.dx - panelWidth / 2;
     final top = bounds.center.dy - panelHeight / 2;
     _panel

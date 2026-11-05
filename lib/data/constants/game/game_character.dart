@@ -14,6 +14,10 @@ class GameCharacters {
     redWarrior,
     yellowWarrior,
     purpleWarrior,
+    blueArcher,
+    redArcher,
+    yellowArcher,
+    purpleArcher,
     bluePawn,
     redPawn,
     yellowPawn,
@@ -38,6 +42,26 @@ class GameCharacters {
   static final purpleWarrior = GameCharacters._(
     'warrior_purple',
     basePath.warrior.purple.warriorPurplePng.path,
+  );
+
+  static final blueArcher = GameCharacters._(
+    'archer_blue',
+    basePath.archer.blue.archerBluePng.path,
+  );
+
+  static final redArcher = GameCharacters._(
+    'archer_red',
+    basePath.archer.red.archerRedPng.path,
+  );
+
+  static final yellowArcher = GameCharacters._(
+    'archer_yellow',
+    basePath.archer.yellow.archerYellowPng.path,
+  );
+
+  static final purpleArcher = GameCharacters._(
+    'archer_purple',
+    basePath.archer.purple.archerPurlplePng.path,
   );
 
   static final bluePawn = GameCharacters._(

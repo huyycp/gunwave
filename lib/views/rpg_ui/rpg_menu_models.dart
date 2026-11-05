@@ -47,6 +47,8 @@ class RpgMenuLabels {
     required this.noCampaignStages,
     required this.owned,
     required this.noCharacters,
+    required this.signInToShop,
+    required this.shopUnavailable,
     required this.language,
     required this.gameControls,
     required this.deviceLanguage,
@@ -86,6 +88,8 @@ class RpgMenuLabels {
   final String noCampaignStages;
   final String owned;
   final String noCharacters;
+  final String signInToShop;
+  final String shopUnavailable;
   final String language;
   final String gameControls;
   final String deviceLanguage;
@@ -126,6 +130,8 @@ class RpgMenuLabels {
         noCampaignStages: strings.noCampaignStages,
         owned: strings.owned,
         noCharacters: strings.noCharactersAvailable,
+        signInToShop: strings.signInToShop,
+        shopUnavailable: strings.shopUnavailable,
         language: strings.language,
         gameControls: strings.gameControls,
         deviceLanguage: strings.deviceLanguage,
@@ -151,6 +157,8 @@ class RpgMenuSnapshot {
     this.gold = 0,
     this.campaignGold = 0,
     this.campaignStatusPoints = 0,
+    this.isAccountSignedIn = true,
+    this.shopDataUnavailable = false,
     this.selectedHeroIndex = 0,
     this.selectedStageId,
     this.selectedPlayMode = GamePlayMode.joystick,
@@ -171,6 +179,8 @@ class RpgMenuSnapshot {
 
   /// Local status-point rewards earned through the campaign.
   final int campaignStatusPoints;
+  final bool isAccountSignedIn;
+  final bool shopDataUnavailable;
   final int selectedHeroIndex;
   final String? selectedStageId;
   final GamePlayMode selectedPlayMode;
