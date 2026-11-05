@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gunwave/data/database/app_database.dart';
 import 'package:gunwave/localization/app_locale_mode.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Stores the selected language mode and exposes its locale to the app.
 ///
 /// A `null` locale means Flutter should follow the device language. The mode
-/// is stored locally so users can change language before signing in.
+/// is stored in the local Drift database.
 class AppLocaleController extends ChangeNotifier {
-  AppLocaleController({SharedPreferencesAsync? preferences})
-    : _preferences = preferences ?? SharedPreferencesAsync();
+  AppLocaleController(this._database);
 
-  static const _preferenceKey = 'app_locale_mode';
+  static const storageKey = 'locale_mode';
 
-  final SharedPreferencesAsync _preferences;
+  final AppDatabase _database;
   Future<void> _pendingWrite = Future<void>.value();
   AppLocaleMode _mode = AppLocaleMode.system;
 
@@ -30,11 +29,10 @@ class AppLocaleController extends ChangeNotifier {
   /// Loads the saved language mode, defaulting to device language if invalid.
   Future<void> load() async {
     try {
-      final savedMode = await _preferences.getString(_preferenceKey);
-      _mode = AppLocaleMode.values.firstWhere(
-        (mode) => mode.name == savedMode,
-        orElse: () => AppLocaleMode.system,
-      );
+      final savedMode = await (_database.select(
+        _database.settings,
+      )..where((setting) => setting.key.equals(storageKey))).getSingleOrNull();
+      _mode = _parseMode(savedMode?.value);
     } catch (error) {
       debugPrint('Unable to load saved language preference: $error');
       _mode = AppLocaleMode.system;
@@ -49,16 +47,26 @@ class AppLocaleController extends ChangeNotifier {
     // Serialize writes: a slower earlier choice must not overwrite the latest.
     _pendingWrite = _pendingWrite.then((_) async {
       try {
-        await _preferences.setString(_preferenceKey, mode.name);
+        await _database
+            .into(_database.settings)
+            .insertOnConflictUpdate(
+              SettingsCompanion.insert(key: storageKey, value: mode.name),
+            );
       } catch (error) {
         debugPrint('Unable to save language preference: $error');
       }
     });
     await _pendingWrite;
   }
+
+  static AppLocaleMode _parseMode(String? savedMode) =>
+      AppLocaleMode.values.firstWhere(
+        (mode) => mode.name == savedMode,
+        orElse: () => AppLocaleMode.system,
+      );
 }
 
 /// Provides the app's persisted language-mode controller.
 final appLocaleControllerProvider = ChangeNotifierProvider<AppLocaleController>(
-  (ref) => AppLocaleController(),
+  (ref) => AppLocaleController(ref.read(appDatabaseProvider)),
 );
