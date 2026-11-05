@@ -12,6 +12,7 @@ import 'package:gunwave/data/data_sources/local/campaign_content_data_source.dar
 import 'package:gunwave/data/models/campaign_stage_model.dart';
 import 'package:gunwave/data/models/monster_model.dart';
 import 'package:gunwave/data/models/stage_round_model.dart';
+import 'package:gunwave/utils/tiled_map_asset_images.dart';
 import 'package:gunwave/views/game/components/character.dart';
 import 'package:gunwave/views/game/components/campaign_spawn_marker_validator.dart';
 import 'package:gunwave/views/game/components/round_director.dart';
@@ -59,6 +60,7 @@ class Stage extends World with HasGameRef<Gunwave> {
       component = await TiledComponent.load(
         '$mapName.tmx',
         Vector2.all(GameConstants.tileSize),
+        images: TiledMapAssetImages(),
       );
     } catch (error) {
       throw CampaignContentException(

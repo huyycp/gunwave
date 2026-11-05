@@ -1,7 +1,9 @@
 import 'dart:async';
+
 import 'package:flame/components.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:gunwave/data/constants/game/game_map.dart';
+import 'package:gunwave/utils/tiled_map_asset_images.dart';
 
 class Background extends World {
   Background({
@@ -30,6 +32,7 @@ class Background extends World {
     final component = await TiledComponent.load(
       '${backgroundPath.name}.tmx',
       Vector2.all(64),
+      images: TiledMapAssetImages(),
     );
     
     // Scale the component to cover screen

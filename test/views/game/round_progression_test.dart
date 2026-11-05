@@ -8,6 +8,7 @@ import 'package:gunwave/data/constants/game/game_layer.dart';
 import 'package:gunwave/data/data_sources/local/campaign_content_data_source.dart';
 import 'package:gunwave/data/models/stage_round_model.dart';
 import 'package:gunwave/repositories/campaign_repository.dart';
+import 'package:gunwave/utils/tiled_map_asset_images.dart';
 import 'package:gunwave/views/game/components/campaign_spawn_marker_validator.dart';
 import 'package:gunwave/views/game/components/round_director.dart';
 
@@ -147,35 +148,45 @@ void main() {
   test('Stage 1 spawn markers exist in its loaded Tiled map', () async {
     final stage = await CampaignRepository(AssetCampaignContentDataSource())
         .getStage('stage_1');
-    final tiled = await TiledComponent.load(
-      '${stage.map!.name}.tmx',
-      Vector2.all(GameConstants.tileSize),
-    );
-    final spawnPoints = tiled.tileMap.getLayer<ObjectGroup>(
-      GameLayers.spawnPoints.name,
-    );
-    final markerNames = spawnPoints!.objects
-        .where((point) => point.class_ == GameComponents.monster)
-        .map((point) => point.name)
-        .toSet();
-    final configuredMarkers = stage.rounds
-        .expand((round) => round.encounters)
-        .map((encounter) => encounter.spawnMarker)
-        .toSet();
+    final originalPrefix = Flame.images.prefix;
+    final mapImages = TiledMapAssetImages();
+    TiledAtlas.clearCache();
+    Flame.images.prefix = '';
+    try {
+      final tiled = await TiledComponent.load(
+        '${stage.map!.name}.tmx',
+        Vector2.all(GameConstants.tileSize),
+        images: mapImages,
+      );
+      final spawnPoints = tiled.tileMap.getLayer<ObjectGroup>(
+        GameLayers.spawnPoints.name,
+      );
+      final markerNames = spawnPoints!.objects
+          .where((point) => point.class_ == GameComponents.monster)
+          .map((point) => point.name)
+          .toSet();
+      final configuredMarkers = stage.rounds
+          .expand((round) => round.encounters)
+          .map((encounter) => encounter.spawnMarker)
+          .toSet();
 
-    expect(markerNames, containsAll(configuredMarkers));
-    expect(
-      () => validateCampaignSpawnMarkers(stage, markerNames),
-      returnsNormally,
-    );
-    final missingMarkerNames = Set<String>.of(markerNames)
-      ..remove(configuredMarkers.first);
-    expect(
-      () => validateCampaignSpawnMarkers(stage, missingMarkerNames),
-      throwsA(isA<CampaignContentException>()),
-    );
-
-    Flame.images.clearCache();
+      expect(markerNames, containsAll(configuredMarkers));
+      expect(
+        () => validateCampaignSpawnMarkers(stage, markerNames),
+        returnsNormally,
+      );
+      final missingMarkerNames = Set<String>.of(markerNames)
+        ..remove(configuredMarkers.first);
+      expect(
+        () => validateCampaignSpawnMarkers(stage, missingMarkerNames),
+        throwsA(isA<CampaignContentException>()),
+      );
+      expect(mapImages.containsKey('../images/terrain/elevation.png'), isTrue);
+    } finally {
+      mapImages.clearCache();
+      TiledAtlas.clearCache();
+      Flame.images.prefix = originalPrefix;
+    }
   });
 }
 
