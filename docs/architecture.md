@@ -1,11 +1,13 @@
 # Architecture and data flow
 
-Gunwave uses a feature-oriented Flutter structure with presentation, repository, and data-source responsibilities. The app is not implemented with BLoC: screen state is handled by Riverpod providers and `ChangeNotifier` view models.
+Gunwave uses a feature-oriented Flutter structure with presentation,
+repository, and data-source responsibilities. App state uses Riverpod providers
+and `ChangeNotifier` view models.
 
 ## Flutter application flow
 
 ```text
-View / widget
+Flutter host/view
     ↓ reads and watches
 Riverpod provider + ChangeNotifier view model
     ↓ calls
@@ -16,26 +18,69 @@ Local or remote data source
 Platform API or Supabase
 ```
 
-- **Views** in `lib/views/` render screens and send user actions to view models.
-- **View models** own screen state and coordinate asynchronous operations.
-- **Repositories** expose feature operations to view models and delegate persistence or platform access.
-- **Data sources** implement the integrations: Supabase for remote data and a Flutter method channel for native gesture recognition.
-- **Models and request DTOs** represent loaded entities and serialized operation inputs.
+- Views in `lib/views/` host a screen and forward user actions.
+- View models own screen state and coordinate asynchronous operations.
+- Repositories expose feature operations and delegate persistence or platform
+  access to data sources.
+- Data sources connect to local storage, Supabase, or native gesture
+  recognition.
 
-Repositories are intentionally thin in several features; the data layer is not a separate Dart package.
+Repositories are intentionally thin in several features; the data layer is
+not a separate Dart package.
 
-## Game runtime
-
-`GameView` hosts `Gunwave` inside Flame's `GameWidget`. `Gunwave` loads a `Stage`, and the stage loads the selected Tiled map and creates runtime components for the character, monsters, traps, buildings, and collision objects.
-
-Static collision rectangles are inserted into a uniform `CollisionGrid`. Moving entities query nearby cells, then `AabbMovement` resolves horizontal and vertical movement separately against candidate rectangles. This limits collision checks to nearby map geometry instead of scanning every collision object for every move.
-
-Room quiz data is displayed by Flutter UI over the Flame game. The game timer, quiz progress, and submitted run state are coordinated by `GameViewModel` and `GameView`.
-
-## Gesture data flow
+## RPG menus and campaign data flow
 
 ```text
-Flutter game view model
+Local stages.json
+    ↓ CampaignContentDataSource / CampaignRepository
+RpgMenuHost snapshots + callbacks
+    ↓ GameWidget host
+Flame menu scenes → selected stage and hero
+    ↓
+GameView → Gunwave → Stage + RoundDirector
+    ↓
+Tiled map + local enemy catalog → Flame combat HUD and results
+    ↓
+CampaignProgressRepository → SharedPreferencesAsync
+```
+
+- `assets/data/campaign/stages.json` is the source for stage order, rounds,
+  encounter groups, enemy stats, unlock rules, and rewards.
+- `CampaignRepository` validates campaign references without Supabase room or
+  remote map data.
+- `Stage` resolves the stage map key to the local `GameMaps` catalog, loads the
+  Tiled map once, validates named spawn markers, and creates the world
+  components.
+- `RoundDirector` advances configured encounters and emits one stage result.
+- `CampaignProgressRepository` stores completed stages, selected hero, and
+  campaign-earned balances locally. Completion mutations are serialized and
+  first-clear rewards are idempotent.
+- The visible Home Hub, Campaign Map, Stage Briefing, Loadout, Shop, Settings,
+  combat HUD, pause menu, and results are Flame components using local sprites
+  and the shared bitmap font. Flutter hosts Flame through `GameWidget` and
+  provides non-visual application state and callbacks.
+- Input mode selection is rendered in Flame Settings and held by
+  `RpgMenuHost` for its current lifetime. A new menu host defaults to joystick.
+
+## Game runtime and inputs
+
+`GameView` hosts `Gunwave` inside Flame's `GameWidget`. `Gunwave` mounts a
+`Stage`, the player, local enemies, abilities, and the asset-rendered HUD.
+Tiled object layers provide spawn points and collision geometry.
+
+Static collision rectangles are inserted into a uniform `CollisionGrid`.
+Moving entities query nearby cells, then `AabbMovement` resolves horizontal
+and vertical movement separately against candidate rectangles. This limits
+collision checks to nearby map geometry instead of scanning every collision
+object for every move.
+
+Joystick, keyboard, and gesture modes drive the same character movement and
+attack actions. Keyboard input uses the game focus node. Gesture control starts
+and stops native recognition with the campaign view lifecycle. The solo stage
+does not use room countdowns, quiz overlays, or quiz-derived failure rules.
+
+```text
+Flutter GameViewModel
     ↕ MethodChannel: gesture_recognizer
 Android CameraX / iOS AVFoundation
     ↓ camera frames
@@ -44,18 +89,46 @@ Native MediaPipe Gesture Recognizer
 Flutter gesture stream → GestureControls → character movement/attack
 ```
 
-The native service owns camera capture and inference. Android uses CameraX and MediaPipe on a native executor; iOS uses AVFoundation sample buffers and MediaPipe live-stream recognition. Flutter receives gesture labels and maps them to movement and attack state. Frames are not sent through a Dart isolate, which would require crossing the platform boundary with image data.
+The native service owns camera capture and inference. Android uses CameraX and
+MediaPipe on a native executor; iOS uses AVFoundation sample buffers and
+MediaPipe live-stream recognition. Flutter receives gesture labels and maps
+them to movement and attack state. Frames are not sent through a Dart isolate,
+which would require crossing the platform boundary with image data.
 
-The game view starts recognition when gesture mode begins and stops it when the view is disposed. Camera access requires operating-system permission.
+## Asset storage
+
+- `assets/images/` contains runtime sprite PNGs and their editable Aseprite
+  files.
+- `assets/images/ui/` contains shared frames, buttons, icons, pointers, and the
+  generated bitmap font.
+- `assets/tiles/` contains Tiled maps.
+- `assets/data/campaign/` contains local stage definitions.
+- There is no separate source-pack archive or version manifest. Keep imported
+  runtime art in the existing folders, avoid storing distributable source-pack
+  archives in the app, and document each addition's source, revision, and
+  license in the project asset audit.
 
 ## Supabase backend
 
-`SupabaseApi` initializes the client from `SUPABASE_URL` and `SUPABASE_ANON_KEY` loaded by `BuildConfig` from the selected environment file. Remote data sources use Supabase Auth and database queries for users, rooms, maps, characters, and rankings.
+`SupabaseApi` initializes the client from `SUPABASE_URL` and
+`SUPABASE_ANON_KEY` loaded by `BuildConfig` from the selected environment file.
+The current app still uses Supabase Auth and account-backed character/shop
+operations. Solo campaign content and progress are local, but Home currently
+requires Supabase guest sign-in before it opens the RPG menus; cold-start
+offline access is not guaranteed.
 
-Room creation calls the database function `create_room_with_quizzes`, which validates the authenticated creator and map, then inserts the room and its quizzes in one transaction. Ranking submissions go through the `update-ranks` Edge Function; it validates the authenticated user, room, character ownership, and score inputs before saving a rank.
-
-The checked-in Supabase files do not define the complete base schema or all game content tables. A backend intended for a fresh install needs that schema and content provisioned separately, in addition to applying the checked-in migration and deploying the Edge Function. Keep privileged service-role credentials on trusted backend infrastructure; the Flutter app should use only a client-safe anon/publishable key.
+Room creation, quiz gameplay, and ranking entry points have been retired from
+the client. The checked-in Supabase files do not provide a complete base
+schema, so room/rank database objects and the `update-ranks` Edge Function are
+preserved pending review of the deployed schema, old-client compatibility, and
+data retention needs. A backend intended for a fresh install still needs its
+base schema and content provisioned separately. Keep privileged service-role
+credentials on trusted backend infrastructure; the Flutter app should use
+only a client-safe anon/publishable key.
 
 ## Environment selection
 
-`lib/main_dev.dart` calls `startApp(BuildEnv.dev)` and loads `dev.env`; `lib/main_prod.dart` selects `prod.env`. These are Dart entrypoints, not Android product flavors. The selected file must exist because both environment files are declared as Flutter assets in `pubspec.yaml`.
+`lib/main_dev.dart` calls `startApp(BuildEnv.dev)` and loads `dev.env`;
+`lib/main_prod.dart` selects `prod.env`. These are Dart entrypoints, not
+Android product flavors. The selected file must exist because both environment
+files are declared as Flutter assets in `pubspec.yaml`.
